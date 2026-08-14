@@ -1,0 +1,178 @@
+.pub {
+  min-height: 100vh;
+  background: #f4f6f8;
+  color: #1f2937;
+  font-family: Inter, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.pub-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 20px;
+  background: #00695c;
+  color: #fff;
+}
+
+.pub-brand {
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+}
+
+.pub-login {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.pub-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+.pub-head {
+  margin-bottom: 18px;
+}
+
+.pub-kicker {
+  margin: 0 0 4px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #0f766e;
+}
+
+.pub-head h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.pub-head p {
+  margin: 6px 0 0;
+  color: #64748b;
+}
+
+.pub-flash {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.pub-flash.is-ok {
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.pub-flash.is-err {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.pub-card {
+  margin-bottom: 16px;
+  padding: 18px;
+  border: 1px solid #e8eef3;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.pub-card h2 {
+  margin: 0 0 14px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.pub-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px 20px;
+}
+
+@media (min-width: 768px) {
+  .pub-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.pub-field span {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pub-field input,
+.pub-field select {
+  width: 100%;
+  height: 40px;
+  padding: 8px 12px;
+  border: 1px solid #d2d6de;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 14px;
+}
+
+.pub-field input:focus,
+.pub-field select:focus {
+  outline: 2px solid #99f6e4;
+  border-color: #0f766e;
+}
+
+.pub-field input[readonly] {
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.pub-submit {
+  width: 100%;
+  max-width: 280px;
+  height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background: #00695c;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pub-submit:hover:not(:disabled) {
+  background: #004d40;
+}
+
+.pub-submit:disabled {
+  opacity: 0.7;
+}
+
+[data-theme="dark"] .pub {
+  background: #0b1220;
+  color: #e5e7eb;
+}
+
+[data-theme="dark"] .pub-card {
+  background: #111827;
+  border-color: #1f2937;
+}
+
+[data-theme="dark"] .pub-field input,
+[data-theme="dark"] .pub-field select {
+  background: #0f172a;
+  border-color: #334155;
+  color: #e5e7eb;
+}
+
+[data-theme="dark"] .pub-head p {
+  color: #94a3b8;
+}

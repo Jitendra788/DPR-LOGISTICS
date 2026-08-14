@@ -1,26 +1,360 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-brand: #00695c;
+  --color-brand-dark: #004d40;
+  --color-brand-light: #00897b;
+  --color-sidebar: #222d32;
+  --color-sidebar-hover: #1e282c;
+  --color-content: #f4f6f8;
+  --color-danger: #dd4b39;
+  --color-control: #d2d6de;
+  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-logo: Georgia, "Times New Roman", serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background: #f4f6f8;
+  color: #333;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group > span,
+.form-label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555;
+  background-color: #fff;
+  border: 1px solid #d2d6de;
+  border-radius: 0;
+  box-shadow: none;
+  outline: none;
+}
+
+.form-control:focus {
+  border-color: #3c8dbc;
+}
+
+select.form-control {
+  padding-right: 24px;
+}
+
+textarea.form-control {
+  height: auto;
+  min-height: 72px;
+  resize: vertical;
+}
+
+input[type="date"].form-control::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.box {
+  position: relative;
+  margin-bottom: 20px;
+  background: #fff;
+  border-top: 3px solid #d2d6de;
+  border-radius: 3px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.box-body {
+  padding: 12px;
+  border-top: 0;
+}
+
+@media (min-width: 640px) {
+  .box-body {
+    padding: 15px;
+  }
+}
+
+.page-content {
+  padding: 16px;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+@media (min-width: 640px) {
+  .page-content {
+    padding: 24px;
+  }
+}
+
+.btn-admin {
+  display: inline-block;
+  padding: 6px 12px;
+  margin-bottom: 0;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.42857143;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 3px;
+}
+
+.btn-admin-sm {
+  padding: 4px 10px;
+  margin: 0 2px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  border-radius: 4px;
+}
+
+@media (max-width: 639px) {
+  .btn-admin {
+    white-space: normal;
+    min-height: 34px;
+  }
+
+  .form-control {
+    font-size: 16px;
+  }
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-scroll::-webkit-scrollbar-thumb {
+  background: #3a454b;
+  border-radius: 4px;
+}
+
+.login-page {
+  background: #d2d6de;
+}
+
+.login-box {
+  width: 360px;
+  margin: 7% auto;
+}
+
+.login-box-body {
+  background: #fff;
+  padding: 20px;
+  color: #444;
+  border-top: 0;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.login-box-msg {
+  margin: 0 0 20px;
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+}
+
+.erp-dt th,
+.erp-dt td {
+  border: 1px solid #f4f4f4;
+  padding: 8px;
+  text-align: left;
+  color: #333;
+}
+
+.erp-dt thead tr {
+  background: #f4f4f4;
+}
+
+.erp-dt th {
+  font-weight: 700;
+}
+
+.erp-dt tbody tr:nth-child(odd) {
+  background: #fff;
+}
+
+.erp-dt tbody tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+.erp-dt-empty {
+  text-align: center;
+  padding: 24px 8px;
+  color: #777;
+}
+
+.erp-dt-meta {
+  font-size: 13px;
+  color: #333;
+}
+
+.erp-dt-foot {
+  color: #4b5563;
+}
+
+.erp-pager {
+  display: flex;
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #d1d5db;
+}
+
+@media (min-width: 640px) {
+  .erp-pager {
+    width: auto;
+  }
+}
+
+.erp-pager button {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border: 0;
+  border-left: 1px solid #d1d5db;
+  background: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.erp-pager button:first-child {
+  border-left: 0;
+}
+
+.erp-pager button:hover:not(:disabled):not(.is-current) {
+  background: #f3f4f6;
+}
+
+.erp-pager button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.erp-pager .is-current {
+  background: #00695c;
+  color: #fff;
+}
+
+.erp-pager-gap {
+  border-left: 1px solid #d1d5db;
+  padding: 4px 8px;
+  color: #9ca3af;
+}
+
+.s2 {
+  position: relative;
+}
+
+.s2-control {
+  display: flex;
+  width: 100%;
+  height: 34px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border: 1px solid #d2d6de;
+  background: #fff;
+  color: #555;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.s2-placeholder {
+  color: #999;
+}
+
+.s2-caret {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 5px solid #666;
+}
+
+.s2-menu {
+  position: absolute;
+  top: calc(100% + 1px);
+  left: 0;
+  right: 0;
+  z-index: 80;
+  overflow: hidden;
+  border: 1px solid #aaa;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.s2-search {
+  display: block;
+  width: calc(100% - 12px);
+  height: 28px;
+  margin: 6px;
+  padding: 4px 8px;
+  border: 1px solid #aaa;
+  font-size: 13px;
+  outline: none;
+}
+
+.s2-list {
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.s2-opt {
+  display: block;
+  width: 100%;
+  padding: 6px 10px;
+  border: 0;
+  background: #fff;
+  color: #333;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.s2-opt.is-active,
+.s2-opt:hover {
+  background: #3c8dbc;
+  color: #fff;
+}
+
+.s2-opt.is-selected:not(.is-active) {
+  background: #f4f4f4;
+}
+
+.s2-empty {
+  padding: 8px 10px;
+  color: #888;
+  font-size: 13px;
+}
+
+.s2.is-disabled .s2-control {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

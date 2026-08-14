@@ -1,0 +1,377 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Party {
+  id        Int      @id @default(autoincrement())
+  name      String
+  address   String   @default("")
+  contact   String   @default("")
+  gst       String   @default("")
+  opBalance String   @default("")
+  opDate    String   @default("")
+  partyType String   @default("Consigner/Consignee")
+  partyCode String   @default("")
+  pan       String   @default("")
+  createdAt DateTime @default(now())
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  password String
+  name     String
+  mobile   String @default("")
+  email    String @default("")
+  role     String @default("Operator")
+  branch   String @default("HO")
+  status   String @default("Active")
+}
+
+model Driver {
+  id             Int    @id @default(autoincrement())
+  name           String
+  mobile         String @default("")
+  licenceNo      String @default("")
+  licenceExpiry  String @default("")
+  address        String @default("")
+  aadhar         String @default("")
+  pan            String @default("")
+  bankName       String @default("")
+  accountNo      String @default("")
+  ifsc           String @default("")
+  alternateNo    String @default("")
+  homeContact    String @default("")
+  accountHolder  String @default("")
+  guarantorName  String @default("")
+  guarantorMob   String @default("")
+  category       String @default("Driver")
+}
+
+model Vehicle {
+  id                   Int    @id @default(autoincrement())
+  vehNo                String @unique
+  ownerName            String @default("")
+  ownerMob             String @default("")
+  ownerAadhar          String @default("")
+  ownerPan             String @default("")
+  ownerLicence         String @default("")
+  ownerLicenceExpiry   String @default("")
+  engineNo             String @default("")
+  chassisNo            String @default("")
+  insuranceCompany     String @default("")
+  policyNo             String @default("")
+  policyExpDate        String @default("")
+  allIndiaPermitNo     String @default("")
+  allIndiaExpiry       String @default("")
+  statePermitNo        String @default("")
+  statePermitExp       String @default("")
+  pollutionExp         String @default("")
+  fitnessExp           String @default("")
+  stateTaxExp          String @default("")
+  guarantorName        String @default("")
+  guarantorMob         String @default("")
+  altMob               String @default("")
+  aadhar               String @default("")
+  pan                  String @default("")
+  licenceNo            String @default("")
+  licenceExpiry        String @default("")
+}
+
+model Vendor {
+  id      Int    @id @default(autoincrement())
+  name    String
+  address String @default("")
+  contact String @default("")
+  gst     String @default("")
+  pan     String @default("")
+  type    String @default("Other")
+}
+
+model Station {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  code String @default("")
+}
+
+model Rate {
+  id            Int    @id @default(autoincrement())
+  fromStation   String
+  toStation     String
+  ratePerTon    Float  @default(0)
+  effectiveDate String @default("")
+}
+
+model LrBooking {
+  id             Int      @id @default(autoincrement())
+  bookingFrom    String   @default("")
+  lrNo           String   @unique
+  lrDate         String   @default("")
+  fromStation    String   @default("")
+  toStation      String   @default("")
+  vehNo          String   @default("")
+  deliveryAt     String   @default("DOOR")
+  billingParty   String   @default("")
+  consignor      String   @default("")
+  consignee      String   @default("")
+  articles       String   @default("")
+  particulars    String   @default("")
+  invNoDate      String   @default("")
+  actWeight      String   @default("")
+  chargedWeight  String   @default("")
+  rate           String   @default("")
+  billAs         String   @default("Weight")
+  totalMeter     String   @default("")
+  freight        Float    @default(0)
+  serviceTax     Float    @default(0)
+  haltage        Float    @default(0)
+  insurance      Float    @default(0)
+  stCharges      Float    @default(0)
+  doorCollection Float    @default(0)
+  barrier        Float    @default(0)
+  other          Float    @default(0)
+  hamali         Float    @default(0)
+  total          Float    @default(0)
+  gst            Float    @default(0)
+  grandTotal     Float    @default(0)
+  gstPaidBy      String   @default("Consignor")
+  ewayBill       String   @default("")
+  validDate      String   @default("")
+  lrType         String   @default("TBB")
+  valueRs        String   @default("")
+  billed         Boolean  @default(false)
+  billNo         String   @default("")
+  lhcNo          String   @default("")
+  podStatus      String   @default("Pending")
+  source         String   @default("DPR")
+  createdAt      DateTime @default(now())
+}
+
+model LhcContract {
+  id           Int     @id @default(autoincrement())
+  challanNo    String  @unique
+  challanDate  String  @default("")
+  vehNo        String  @default("")
+  fromStation  String  @default("")
+  toStation    String  @default("")
+  ownerName    String  @default("")
+  ownerMob     String  @default("")
+  ownerPan     String  @default("")
+  ownerAadhar  String  @default("")
+  driverName   String  @default("")
+  driverMob    String  @default("")
+  driverPan    String  @default("")
+  driverAadhar String  @default("")
+  licenceNo    String  @default("")
+  engineNo     String  @default("")
+  chassisNo    String  @default("")
+  insCompany   String  @default("")
+  policyNo     String  @default("")
+  policyExp    String  @default("")
+  allPermitNo  String  @default("")
+  allPermitExp String  @default("")
+  fitnessExp   String  @default("")
+  brokerName   String  @default("")
+  brokerPan    String  @default("")
+  lorryFreight Float   @default(0)
+  transfer     Float   @default(0)
+  cash         Float   @default(0)
+  dieselLtr    Float   @default(0)
+  fuel         Float   @default(0)
+  fuelVendor   String  @default("")
+  totalAdvance Float   @default(0)
+  balance      Float   @default(0)
+  lrNos        String  @default("")
+  paid         Boolean @default(false)
+  paidDate     String  @default("")
+  paidAmount   Float   @default(0)
+}
+
+model Bill {
+  id          Int      @id @default(autoincrement())
+  billNo      String   @unique
+  partyName   String   @default("")
+  fromDate    String   @default("")
+  toDate      String   @default("")
+  fromStation String   @default("")
+  toStation   String   @default("")
+  amount      Float    @default(0)
+  lrCount     Int      @default(0)
+  source      String   @default("DPR")
+  poNo        String   @default("")
+  billAt      String   @default("")
+  billDate    String   @default("")
+  cgstPct     Float    @default(0)
+  cgstAmt     Float    @default(0)
+  sgstPct     Float    @default(0)
+  sgstAmt     Float    @default(0)
+  igstPct     Float    @default(0)
+  igstAmt     Float    @default(0)
+  paidRs      Float    @default(0)
+  remark      String   @default("")
+  scanDate    String   @default("")
+  submitDate  String   @default("")
+  createdAt   DateTime @default(now())
+}
+
+model DriverRegister {
+  id         Int    @id @default(autoincrement())
+  date       String
+  driverName String
+  vehNo      String @default("")
+  startKm    String @default("")
+  endKm      String @default("")
+  remarks    String @default("")
+}
+
+model DriverAdvance {
+  id         Int    @id @default(autoincrement())
+  date       String
+  driverName String
+  vehNo      String @default("")
+  amount     Float  @default(0)
+  mode       String @default("Cash")
+  remarks    String @default("")
+}
+
+model TripSheet {
+  id                Int    @id @default(autoincrement())
+  tripDate          String @default("")
+  vehNo             String @default("")
+  driverName        String @default("")
+  fromStation       String @default("")
+  toStation         String @default("")
+  freight           Float  @default(0)
+  openingMeter      String @default("")
+  closingMeter      String @default("")
+  totalKm           String @default("")
+  lhcDate           String @default("")
+  lhcNo             String @default("")
+  lhcFreight        Float  @default(0)
+  tyreChangeAfterKm String @default("")
+  totalRunningKm    String @default("")
+  servicingKmAfter  String @default("")
+}
+
+model Expense {
+  id          Int    @id @default(autoincrement())
+  date        String
+  vehNo       String @default("")
+  expenseType String @default("Other")
+  amount      Float  @default(0)
+  billNo      String @default("")
+  remarks     String @default("")
+}
+
+model FleetVehicle {
+  id                Int    @id @default(autoincrement())
+  vehNo             String @unique
+  vehicleType       String @default("Truck")
+  capacity          String @default("")
+  purchaseDate      String @default("")
+  currentKm         String @default("")
+  status            String @default("Available")
+  make              String @default("")
+  model             String @default("")
+  engineNo          String @default("")
+  chassisNo         String @default("")
+  policyExpDate     String @default("")
+  allIndiaExpiry    String @default("")
+  statePermitExp    String @default("")
+  pollutionExp      String @default("")
+  fitnessExp        String @default("")
+  stateTaxExp       String @default("")
+  tyreChangeKmAfter String @default("")
+  opKm              String @default("")
+  servicingAfter    String @default("")
+  olKm              String @default("")
+}
+
+model Maintenance {
+  id            Int    @id @default(autoincrement())
+  vehNo         String @default("")
+  serviceDate   String @default("")
+  workType      String @default("Service")
+  workshopName  String @default("")
+  amount        Float  @default(0)
+  nextServiceKm String @default("")
+  expenseName   String @default("")
+  narration     String @default("")
+}
+
+model MoneyReceipt {
+  id         Int    @id @default(autoincrement())
+  receiptNo  String @default("")
+  date       String @default("")
+  partyName  String @default("")
+  amount     Float  @default(0)
+  mode       String @default("Cash")
+  remarks    String @default("")
+  source     String @default("DPR")
+  billNo     String @default("")
+}
+
+model VendorVoucher {
+  id          Int    @id @default(autoincrement())
+  voucherNo   String @default("")
+  date        String @default("")
+  vendorName  String @default("")
+  amount      Float  @default(0)
+  particulars String @default("")
+  paymentType String @default("Cr")
+}
+
+model DriverVoucher {
+  id          Int    @id @default(autoincrement())
+  voucherNo   String @default("")
+  date        String @default("")
+  driverName  String @default("")
+  amount      Float  @default(0)
+  particulars String @default("")
+  paymentType String @default("Cr")
+}
+
+model BookingSlip {
+  id               Int     @id @default(autoincrement())
+  slipNo           String  @default("")
+  date             String  @default("")
+  vehNo            String  @default("")
+  fromStation      String  @default("")
+  toStation        String  @default("")
+  partyName        String  @default("")
+  amount           Float   @default(0)
+  paid             Boolean @default(false)
+  paidDate         String  @default("")
+  paidAmount       Float   @default(0)
+  lorryNo          String  @default("")
+  receiptDate      String  @default("")
+  guaranteeWeight  String  @default("")
+  freight          Float   @default(0)
+  advance          Float   @default(0)
+  balance          Float   @default(0)
+  receiptNo        String  @default("")
+  remark           String  @default("")
+  mailId           String  @default("")
+}
+
+model TyreStatus {
+  id                Int    @id @default(autoincrement())
+  vehNo             String @default("")
+  tyrePosition      String @default("Front Left")
+  brand             String @default("")
+  serialNo          String @default("")
+  fitDate           String @default("")
+  status            String @default("OK")
+  tyreChangeAfterKm String @default("")
+  totalRunningOn    String @default("")
+  servicingKmAfter  String @default("")
+  totalRunningKm    String @default("")
+  tyreChangeStatus  String @default("Yes")
+  servicingStatus   String @default("Yes")
+  entryDate         String @default("")
+}
