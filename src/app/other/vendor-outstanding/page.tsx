@@ -30,7 +30,7 @@ export default function VendorOutstandingPage() {
 
   return (
     <>
-      <PageHeader title="Vendor Outstanding" subtitle="View Vendor Outstanding" crumbs={[{ label: "Home", href: "/" }, { label: "Vendor Outstanding" }]} />
+      <PageHeader title="Vendor Outstanding" subtitle="View Vendor Outstanding" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Vendor Outstanding" }]} />
       <DataTable
         rows={rows}
         columns={[

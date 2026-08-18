@@ -1,0 +1,790 @@
+/* DPR Logistics — Advanced premium polish (animations, glass, depth) */
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing-site *,
+  .marketing-site *::before,
+  .marketing-site *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes mkt-shimmer {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+@keyframes mkt-float-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes mkt-pulse-ring {
+  0% { transform: scale(0.92); opacity: 0.55; }
+  70% { transform: scale(1.08); opacity: 0; }
+  100% { transform: scale(1.08); opacity: 0; }
+}
+
+@keyframes mkt-route-pulse {
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+@keyframes mkt-status-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* ── Hero copy ── */
+.mkt-hero-copy-premium .mkt-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(0, 143, 135, 0.14), rgba(18, 184, 166, 0.08));
+  border: 1px solid rgba(0, 143, 135, 0.28);
+  box-shadow: 0 4px 20px rgba(0, 143, 135, 0.12);
+}
+
+.mkt-hero-copy-premium .mkt-hero-badge::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-bright);
+  box-shadow: 0 0 10px rgba(18, 184, 166, 0.8);
+  animation: mkt-status-blink 2.4s ease-in-out infinite;
+}
+
+.mkt-hero-headline-line {
+  display: block;
+  color: var(--primary);
+}
+
+.mkt-hero-headline-accent {
+  display: block;
+  background: linear-gradient(120deg, var(--accent) 0%, var(--accent-bright) 45%, var(--accent-gold) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.mkt-hero-trust-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mkt-hero-trust-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(216, 226, 236, 0.9);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgba(7, 27, 51, 0.06);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.mkt-hero-trust-pill:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 143, 135, 0.35);
+  box-shadow: 0 12px 28px rgba(0, 143, 135, 0.12);
+}
+
+.mkt-hero-trust-pill svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--accent);
+}
+
+.mkt-btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.mkt-btn-primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.22) 50%, transparent 65%);
+  transform: translateX(-120%);
+  transition: transform 0.55s ease;
+}
+
+.mkt-btn-primary:hover::after {
+  transform: translateX(120%);
+}
+
+/* ── Hero visual card ── */
+.mkt-hero-visual-wrap.mkt-hero-visual-premium {
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  box-shadow:
+    0 4px 6px rgba(7, 27, 51, 0.04),
+    0 32px 80px rgba(7, 27, 51, 0.18),
+    0 0 0 1px rgba(0, 143, 135, 0.08);
+  animation: mkt-float-soft 7s ease-in-out infinite;
+}
+
+.mkt-hero-visual-premium .mkt-hero-visual-scene {
+  background:
+    radial-gradient(circle at 20% 15%, rgba(18, 184, 166, 0.22), transparent 42%),
+    radial-gradient(circle at 85% 75%, rgba(244, 183, 64, 0.12), transparent 38%),
+    linear-gradient(160deg, var(--primary) 0%, #0a3550 45%, #0d4a52 100%);
+}
+
+.mkt-hero-scene-mesh {
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, black, transparent);
+}
+
+.mkt-hero-scene-glow-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(180px, 50%, 260px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -58%);
+  border-radius: 50%;
+  border: 1px solid rgba(18, 184, 166, 0.35);
+  pointer-events: none;
+}
+
+.mkt-hero-scene-glow-ring::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: inherit;
+  border: 1px solid rgba(18, 184, 166, 0.2);
+  animation: mkt-pulse-ring 3s ease-out infinite;
+}
+
+.mkt-hero-scene-node {
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: mkt-route-pulse 2.8s ease-in-out infinite;
+}
+
+.mkt-hero-scene-node:nth-child(2) { animation-delay: 0.4s; }
+.mkt-hero-scene-node:nth-child(3) { animation-delay: 0.9s; }
+.mkt-hero-scene-node:nth-child(4) { animation-delay: 1.3s; }
+
+.mkt-hero-scene-badge {
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.mkt-hero-track-panel-premium {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%);
+}
+
+.mkt-hero-track-panel-premium .mkt-hero-track-panel-head svg {
+  padding: 0.45rem;
+  border-radius: 12px;
+  background: rgba(0, 143, 135, 0.1);
+}
+
+.mkt-hero-track-panel-body input {
+  background: #fff;
+  box-shadow: inset 0 1px 2px rgba(7, 27, 51, 0.04);
+}
+
+.mkt-hero-track-panel-body button {
+  box-shadow: 0 8px 24px rgba(0, 143, 135, 0.32);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mkt-hero-track-panel-body button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(0, 143, 135, 0.4);
+}
+
+.mkt-hero-float-cards-premium {
+  gap: 0.85rem;
+}
+
+.mkt-hero-float-card-premium {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #ffffff 0%, #f8fbfc 100%);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 32px rgba(7, 27, 51, 0.07);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.mkt-hero-float-card-premium::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+}
+
+.mkt-hero-float-card-premium:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px rgba(7, 27, 51, 0.1);
+}
+
+.mkt-hero-float-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  margin-bottom: 0.35rem;
+}
+
+.mkt-hero-float-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-bright);
+  animation: mkt-status-blink 2s ease-in-out infinite;
+}
+
+/* ── Section headings ── */
+.mkt-section-head-premium {
+  margin-bottom: clamp(2rem, 3vw, 2.75rem);
+}
+
+.mkt-section-head-premium .mkt-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.mkt-section-head-premium .mkt-eyebrow::after {
+  content: "";
+  width: clamp(2rem, 5vw, 3.5rem);
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+}
+
+.mkt-section-head-center .mkt-eyebrow::after {
+  display: none;
+}
+
+.mkt-section-head-center .mkt-eyebrow {
+  justify-content: center;
+}
+
+/* ── Statistics ── */
+.mkt-stat-card-premium {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(160deg, #ffffff 0%, #f8fbfc 100%);
+}
+
+.mkt-stat-card-premium::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+  border-radius: 4px 0 0 4px;
+}
+
+.mkt-stat-card-premium strong {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-bright) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.mkt-stat-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 0.65rem;
+  border-radius: 12px;
+  background: rgba(0, 143, 135, 0.1);
+  color: var(--accent);
+}
+
+.mkt-stat-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ── Service cards ── */
+.mkt-service-card-premium {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(160deg, #ffffff 0%, #fafcfd 100%);
+}
+
+.mkt-service-card-premium::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(0, 143, 135, 0.45), rgba(18, 184, 166, 0.15), transparent 60%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.mkt-service-card-premium:hover::after {
+  opacity: 1;
+}
+
+.mkt-service-icon {
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.mkt-service-card-premium:hover .mkt-service-icon {
+  transform: scale(1.06);
+  background: rgba(0, 143, 135, 0.16);
+}
+
+.mkt-service-category {
+  display: inline-block;
+  margin-bottom: 0.35rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* ── Quote cards ── */
+.mkt-quote-card-premium {
+  position: relative;
+  padding: clamp(1.5rem, 2.5vw, 2rem);
+  border-radius: 20px;
+  background: linear-gradient(160deg, #ffffff 0%, #f8fbfc 100%);
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 40px rgba(7, 27, 51, 0.06);
+  transition: transform 0.28s ease, box-shadow 0.28s ease;
+}
+
+.mkt-quote-card-premium::before {
+  content: "\201C";
+  position: absolute;
+  top: 0.75rem;
+  right: 1.25rem;
+  font-size: 3.5rem;
+  line-height: 1;
+  font-family: Georgia, serif;
+  color: rgba(0, 143, 135, 0.12);
+  pointer-events: none;
+}
+
+.mkt-quote-card-premium:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 48px rgba(7, 27, 51, 0.1);
+}
+
+.mkt-quote-card-premium p {
+  font-size: 1.0125rem;
+  line-height: 1.75;
+  color: #334155;
+}
+
+.mkt-quote-card-premium footer {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+/* ── CTA panel ── */
+.mkt-cta-panel {
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 32px 80px rgba(7, 27, 51, 0.2);
+}
+
+.mkt-cta-panel-bg {
+  background:
+    radial-gradient(circle at 15% 50%, rgba(18, 184, 166, 0.25), transparent 45%),
+    radial-gradient(circle at 90% 20%, rgba(244, 183, 64, 0.15), transparent 40%),
+    linear-gradient(135deg, var(--primary) 0%, #0a3550 50%, var(--accent) 100%);
+}
+
+.mkt-cta-panel-content {
+  backdrop-filter: blur(2px);
+}
+
+/* ── Header polish ── */
+.mkt-header {
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.mkt-header-scrolled {
+  background: rgba(255, 255, 255, 0.97);
+}
+
+.mkt-nav-link {
+  border-radius: 10px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.mkt-nav-highlight {
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(7, 27, 51, 0.2);
+}
+
+/* ══════════════════════════════════════════════════════════
+   Ultra-quality layer — typography, depth, sections
+   ══════════════════════════════════════════════════════════ */
+
+.marketing-site {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+}
+
+.marketing-site img {
+  image-rendering: auto;
+}
+
+/* Subtle film grain on hero */
+.mkt-hero-premium::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.028;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+.mkt-hero-copy h1 {
+  text-wrap: balance;
+}
+
+.mkt-hero-copy p {
+  text-wrap: pretty;
+}
+
+/* Logo frame — crisp white stage */
+.mkt-hero-logo-frame {
+  padding: clamp(0.75rem, 2vw, 1.1rem) clamp(0.85rem, 2.5vw, 1.35rem);
+  border-radius: 18px;
+  background: linear-gradient(165deg, #ffffff 0%, #f0f6f8 100%);
+  box-shadow:
+    0 24px 48px rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(255, 255, 255, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.mkt-hero-scene-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.mkt-hero-visual-premium .mkt-hero-scene-truck {
+  width: clamp(160px, 46%, 240px);
+  filter: none;
+}
+
+/* Stats — refined spacing & depth */
+.mkt-stat-card-premium {
+  padding-left: calc(clamp(1rem, 2vw, 1.5rem) + 6px);
+  box-shadow:
+    0 1px 2px rgba(7, 27, 51, 0.04),
+    0 12px 36px rgba(7, 27, 51, 0.07);
+}
+
+.mkt-stat-card-premium:hover {
+  box-shadow:
+    0 2px 4px rgba(7, 27, 51, 0.05),
+    0 20px 48px rgba(0, 143, 135, 0.12);
+}
+
+.mkt-stat-icon {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 143, 135, 0.12);
+}
+
+/* Service cards — layered depth */
+.mkt-service-card-premium {
+  box-shadow:
+    0 1px 2px rgba(7, 27, 51, 0.04),
+    0 8px 28px rgba(7, 27, 51, 0.06);
+}
+
+.mkt-service-card-premium:hover {
+  box-shadow:
+    0 4px 8px rgba(7, 27, 51, 0.06),
+    0 28px 64px rgba(0, 143, 135, 0.14);
+}
+
+.mkt-service-card-premium h3 {
+  letter-spacing: -0.015em;
+}
+
+/* Why DPR visual panel */
+.mkt-why-visual-premium {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(18, 184, 166, 0.18), transparent 50%),
+    linear-gradient(155deg, #071b33 0%, #0a3550 55%, #0d4a52 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 32px 80px rgba(7, 27, 51, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.mkt-why-visual-premium .mkt-why-visual-badge {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.mkt-why-visual-premium .mkt-why-visual-stat {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+}
+
+.mkt-why-visual-premium .mkt-why-visual-stat strong {
+  color: var(--accent-bright);
+}
+
+.mkt-why-visual-premium .mkt-why-visual-stat span {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.mkt-why-item-premium {
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: linear-gradient(160deg, #ffffff 0%, #fafcfd 100%);
+  box-shadow: 0 4px 20px rgba(7, 27, 51, 0.04);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.mkt-why-item-premium:hover {
+  transform: translateX(4px);
+  border-color: rgba(0, 143, 135, 0.35);
+  box-shadow: 0 12px 32px rgba(0, 143, 135, 0.1);
+}
+
+.mkt-why-item-premium .mkt-why-icon {
+  background: linear-gradient(135deg, rgba(0, 143, 135, 0.14), rgba(18, 184, 166, 0.08));
+  border: 1px solid rgba(0, 143, 135, 0.15);
+}
+
+.mkt-why-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1.25rem;
+  padding: 0.65rem 1.1rem;
+  border-radius: 10px;
+  background: rgba(0, 143, 135, 0.08);
+  border: 1px solid rgba(0, 143, 135, 0.2);
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.mkt-why-link:hover {
+  background: rgba(0, 143, 135, 0.14);
+  transform: translateX(2px);
+}
+
+/* Process steps */
+.mkt-process-step-premium {
+  background: linear-gradient(165deg, #ffffff 0%, #f8fbfc 100%);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 8px 28px rgba(7, 27, 51, 0.05);
+  transition: transform 0.28s ease, box-shadow 0.28s ease;
+}
+
+.mkt-process-step-premium:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 48px rgba(0, 143, 135, 0.12);
+}
+
+.mkt-process-step-premium .mkt-process-icon {
+  background: linear-gradient(135deg, rgba(0, 143, 135, 0.16), rgba(18, 184, 166, 0.08));
+  border: 1px solid rgba(0, 143, 135, 0.18);
+  box-shadow: 0 4px 12px rgba(0, 143, 135, 0.12);
+}
+
+.mkt-process-step-premium .mkt-process-num {
+  color: rgba(0, 143, 135, 0.35);
+  font-weight: 800;
+  font-size: 1.75rem;
+}
+
+/* Tracking section widget */
+.mkt-tracking-widget-premium {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.mkt-tracking-widget-premium .mkt-tracking-widget-body input {
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.mkt-tracking-widget-premium .mkt-tracking-widget-body button {
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 143, 135, 0.4);
+}
+
+.mkt-tracking-result-premium {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 1.5rem;
+}
+
+.mkt-tracking-live-badge {
+  animation: mkt-status-blink 2.5s ease-in-out infinite;
+}
+
+/* Network map */
+.mkt-network-section-premium {
+  background: linear-gradient(180deg, #ffffff 0%, #f5f8fa 100%);
+}
+
+.mkt-network-map-premium {
+  border-radius: 24px;
+  background: linear-gradient(155deg, #071b33 0%, #0a3550 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 32px 80px rgba(7, 27, 51, 0.18);
+  overflow: hidden;
+}
+
+.mkt-network-map-premium .mkt-network-map {
+  opacity: 0.95;
+}
+
+.mkt-network-map-premium .mkt-network-tags span {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(8px);
+  font-weight: 600;
+}
+
+/* CTA panel ultra */
+.mkt-cta-panel-premium {
+  position: relative;
+  isolation: isolate;
+}
+
+.mkt-cta-panel-premium::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(18, 184, 166, 0.2), transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(244, 183, 64, 0.12), transparent 45%);
+  pointer-events: none;
+}
+
+.mkt-cta-panel-premium .mkt-cta-panel-content {
+  position: relative;
+  z-index: 1;
+}
+
+.mkt-cta-panel-premium .mkt-cta-panel-content h2 {
+  text-wrap: balance;
+  letter-spacing: -0.025em;
+}
+
+/* Inner pages */
+.mkt-page-hero-premium h1 {
+  text-wrap: balance;
+}
+
+.mkt-page-hero-premium::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* Footer refinement */
+.mkt-footer-premium .mkt-footer-text {
+  line-height: 1.75;
+  color: #cbd5e1;
+}
+
+/* Section alt background rhythm */
+.mkt-section-alt {
+  background: linear-gradient(180deg, #f8fbfc 0%, #f0f5f8 100%);
+}
+
+/* Demo float cards — tighter typography */
+.mkt-hero-float-card-premium .mkt-hero-float-card-value {
+  font-size: 1.0625rem;
+  letter-spacing: -0.01em;
+}
+
+/* Business solutions dark cards */
+.mkt-solution-dark-card {
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(8px);
+  transition: transform 0.28s ease, background 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+}
+
+.mkt-solution-dark-card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(18, 184, 166, 0.35);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.2);
+}
+
+.mkt-solution-dark-icon {
+  box-shadow: 0 4px 16px rgba(0, 143, 135, 0.2);
+}
+
+.marketing-site button:focus-visible,
+.marketing-site input:focus-visible {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 2px;
+}
+

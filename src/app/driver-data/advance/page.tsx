@@ -30,7 +30,7 @@ export default function DriverAdvancePage() {
 
   return (
     <>
-      <PageHeader title="Driver Advance" subtitle="Record driver cash / diesel advance" crumbs={[{ label: "Home", href: "/" }, { label: "Driver Advance" }]} />
+      <PageHeader title="Driver Advance" subtitle="Record driver cash / diesel advance" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Driver Advance" }]} />
       <Flash message={message} />
       <form onSubmit={onSubmit}>
         <FormCard>

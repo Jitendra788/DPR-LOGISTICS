@@ -79,7 +79,7 @@ export default function BookingMisReportPage() {
 
   return (
     <>
-      <PageHeader title="Booking MIS Report" subtitle="Select Date and View Report" crumbs={[{ label: "Home", href: "/" }, { label: "Booking MIS Report" }]} />
+      <PageHeader title="Booking MIS Report" subtitle="Select Date and View Report" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Booking MIS Report" }]} />
       <Flash message={message} />
       <form onSubmit={loadReport}>
         <FormCard>

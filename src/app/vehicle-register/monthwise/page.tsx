@@ -53,7 +53,7 @@ export default function MonthwiseReportPage() {
       <PageHeader
         title="Monthwise Margin Report"
         subtitle="Select Data and View Ledger"
-        crumbs={[{ label: "Home", href: "/" }, { label: "Monthwise Margin Report" }]}
+        crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Monthwise Margin Report" }]}
       />
       <Flash message={message} />
       <form onSubmit={show}>

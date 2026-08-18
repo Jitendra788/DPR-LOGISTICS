@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
   try {
     const created = await prisma.lrBooking.create({
       data: {
-        ...sanitize(body),
+        ...sanitize(body, "bookings"),
         lrNo,
         source: "CUSTOMER",
         billed: false,

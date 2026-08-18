@@ -37,7 +37,7 @@ export default function MoneyReceiptReportPage() {
       <PageHeader
         title="Money Reciept"
         subtitle="Select and fill data for the payment"
-        crumbs={[{ label: "Home", href: "/" }, { label: "Money Reciept" }]}
+        crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Money Reciept" }]}
       />
       <Flash message={message} />
       <form onSubmit={show}>

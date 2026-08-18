@@ -56,7 +56,7 @@ body {
 
 @media (min-width: 1024px) {
   .erp-sidebar {
-    width: 264px;
+    width: 288px;
   }
 
   .erp-sidebar.is-collapsed {
@@ -105,6 +105,15 @@ body {
 
   .erp-hero h2 {
     font-size: 18px;
+  }
+
+  .app-shell {
+    min-width: 0;
+  }
+
+  .erp-main {
+    min-width: 0;
+    width: 100%;
   }
 }
 
@@ -276,3 +285,70 @@ body {
     opacity: 0.9;
   }
 }
+
+/* ERP / public forms — prevent horizontal overflow */
+.app-shell,
+.erp-main,
+.page-content,
+.box,
+.box-body {
+  max-width: 100%;
+}
+
+.page-content .flex,
+.box-body .flex,
+.box-header {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+@media (max-width: 767px) {
+  .table-scroll,
+  .erp-table-wrap,
+  table.erp-dt {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .box-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .box-header .flex {
+    width: 100%;
+  }
+
+  .btn-admin {
+    max-width: 100%;
+  }
+
+  input,
+  select,
+  textarea,
+  .form-control,
+  .s2-control {
+    max-width: 100%;
+  }
+
+  .dpr-login-card,
+  .pub-card {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 1023px) {
+  .erp-kpi-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+@media (max-width: 639px) {
+  .erp-kpi-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+

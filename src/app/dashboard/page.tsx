@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ClientFormattedDate } from "@/components/ui/ClientFormattedDate";
 import { DataTable } from "@/components/ui/DataTable";
 import { BarChart, DonutChart, SparkLine } from "@/components/dashboard/Charts";
 import { api } from "@/lib/api-client";
@@ -180,7 +181,7 @@ export default function DashboardPage() {
       <PageHeader
         title="Dashboard"
         subtitle="Operations overview"
-        crumbs={[{ label: "Home", href: "/" }, { label: "Dashboard" }]}
+        crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Dashboard" }]}
       />
 
       <div className="erp-hero">
@@ -190,7 +191,7 @@ export default function DashboardPage() {
           <p>Click a card to open its live list. Numbers come from your current records.</p>
         </div>
         <div className="erp-hero-pills">
-          <span>{new Date().toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</span>
+          <ClientFormattedDate />
           <span>{stats ? `${stats.totalBookings} bookings` : "Loading…"}</span>
         </div>
       </div>

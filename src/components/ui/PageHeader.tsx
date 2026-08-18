@@ -1,5 +1,6 @@
 import { ChevronRight, Home } from "lucide-react";
 import Link from "next/link";
+import { ADMIN_HOME } from "@/lib/admin-routes";
 
 type Props = {
   title: string;
@@ -13,7 +14,7 @@ export function PageHeader({ title, subtitle, subtitleClass = "", crumbs }: Prop
     <div className="erp-pagehead">
       <div className="min-w-0">
         <nav className="erp-crumbs" aria-label="Breadcrumb">
-          <Link href="/" className="erp-crumb-home" aria-label="Home">
+          <Link href={ADMIN_HOME} className="erp-crumb-home" aria-label="Home">
             <Home className="h-3.5 w-3.5" />
           </Link>
           {crumbs.map((c) => (

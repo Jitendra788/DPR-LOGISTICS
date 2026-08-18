@@ -1,15 +1,18 @@
 import { NextResponse } from "next/server";
+import { isMarketingRoute } from "@/lib/marketing-routes";
 
 export function middleware(req: Request) {
   const url = new URL(req.url);
   const { pathname } = url;
   const isPublic =
+    isMarketingRoute(pathname) ||
     pathname === "/login" ||
     pathname.startsWith("/customer-booking") ||
     pathname.startsWith("/api/public/") ||
     pathname.startsWith("/api/auth/login") ||
     pathname.startsWith("/_next") ||
-    pathname === "/favicon.ico";
+    pathname === "/favicon.ico" ||
+    /\.(png|jpe?g|svg|webp|gif|ico|js)$/i.test(pathname);
 
   if (isPublic) return NextResponse.next();
 
@@ -25,5 +28,5 @@ export function middleware(req: Request) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|js)$).*)"],
 };

@@ -78,7 +78,7 @@ export default function BookingSlipPaymentPage() {
       <PageHeader
         title="Booking Slip Payment"
         subtitle="Select and fill data for the payment"
-        crumbs={[{ label: "Home", href: "/" }, { label: "Booking Slip Payment" }]}
+        crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Booking Slip Payment" }]}
       />
       <Flash message={message} />
       <form onSubmit={show}>

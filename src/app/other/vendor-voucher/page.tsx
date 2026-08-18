@@ -52,7 +52,7 @@ export default function VendorVoucherPage() {
 
   return (
     <>
-      <PageHeader title="Vendor Voucher" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/" }, { label: "Vendor Voucher" }]} />
+      <PageHeader title="Vendor Voucher" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Vendor Voucher" }]} />
       <Flash message={message} />
       <form onSubmit={onSubmit}>
         <FormCard>

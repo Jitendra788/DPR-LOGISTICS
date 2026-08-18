@@ -3,8 +3,10 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { isMarketingRoute } from "@/lib/marketing-routes";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
+import { ThemeInit } from "./ThemeInit";
 
 const COLLAPSE_KEY = "dpr_sidebar_collapsed";
 
@@ -43,20 +45,28 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   if (
+    isMarketingRoute(pathname) ||
     pathname === "/login" ||
     pathname.startsWith("/customer-booking") ||
     pathname.startsWith("/booking/lr/print") ||
     pathname.startsWith("/lhc/contract/print") ||
-    pathname.startsWith("/bills/print")
+    pathname.startsWith("/bills/print") ||
+    pathname.startsWith("/roadways/booking-slip/print")
   ) {
-    return <>{children}</>;
+    return (
+      <>
+        <ThemeInit />
+        {children}
+      </>
+    );
   }
 
   const sidebarOpen = isDesktop || mobileOpen;
   const rail = isDesktop && collapsed;
 
   return (
-    <div className="app-shell min-h-screen bg-content">
+    <div className="app-shell min-h-screen bg-content" suppressHydrationWarning>
+      <ThemeInit />
       {!isDesktop && mobileOpen ? (
         <button
           type="button"

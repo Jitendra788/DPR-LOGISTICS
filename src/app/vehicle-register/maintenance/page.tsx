@@ -36,7 +36,7 @@ export default function MaintenancePage() {
 
   return (
     <>
-      <PageHeader title="New Vehicle Maintanace Entry" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/" }, { label: "Vehicle Maintenance" }]} />
+      <PageHeader title="New Vehicle Maintanace Entry" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Vehicle Maintenance" }]} />
       <Flash message={message} />
       <form onSubmit={onSubmit}>
         <FormCard>

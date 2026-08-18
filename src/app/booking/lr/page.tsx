@@ -202,7 +202,7 @@ function LrBookingInner() {
 
   return (
     <>
-      <PageHeader title="LR Booking" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/" }, { label: "LR Booking" }]} />
+      <PageHeader title="LR Booking" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "LR Booking" }]} />
       <Flash message={message} />
       <form onSubmit={onSubmit}>
         <FormCard>

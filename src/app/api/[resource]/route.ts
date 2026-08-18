@@ -19,7 +19,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
   }
   const body = (await req.json()) as Record<string, unknown>;
   try {
-    const created = await getModel(resource).create({ data: sanitize(body) });
+    const created = await getModel(resource).create({ data: sanitize(body, resource) });
     return NextResponse.json(created);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Create failed";

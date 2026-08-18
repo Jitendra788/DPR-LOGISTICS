@@ -84,7 +84,7 @@ export default function PartyOutstandingPage() {
       <PageHeader
         title="Party Outstanding"
         subtitle="View Party Outstanding"
-        crumbs={[{ label: "Home", href: "/" }, { label: "Party Outstanding" }]}
+        crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Party Outstanding" }]}
       />
       <Flash message={message} />
       <form onSubmit={search}>

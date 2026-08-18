@@ -53,7 +53,7 @@ export default function BillReportPage() {
 
   return (
     <>
-      <PageHeader title="Bill Report" subtitle="Select date and view bills" crumbs={[{ label: "Home", href: "/" }, { label: "Bill Report" }]} />
+      <PageHeader title="Bill Report" subtitle="Select date and view bills" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Bill Report" }]} />
       <Flash message={message} />
       <form onSubmit={showReport}>
         <FormCard>

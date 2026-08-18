@@ -30,7 +30,7 @@ export default function DriverRegisterPage() {
 
   return (
     <>
-      <PageHeader title="Driver Register" subtitle="Daily driver attendance / trip register" crumbs={[{ label: "Home", href: "/" }, { label: "Driver Register" }]} />
+      <PageHeader title="Driver Register" subtitle="Daily driver attendance / trip register" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Driver Register" }]} />
       <Flash message={message} />
       <form onSubmit={onSubmit}>
         <FormCard>

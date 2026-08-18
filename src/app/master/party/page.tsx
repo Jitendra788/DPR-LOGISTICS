@@ -27,7 +27,7 @@ type Party = {
 export default function PartyCreationPage() {
   const { rows, message, create, update, remove, setMessage } = useCrud<Party>("parties");
   const [editId, setEditId] = useState<number | null>(null);
-  const [form, setForm] = useState<Partial<Party>>({ partyType: "Consigner/Consignee" });
+  const [form, setForm] = useState<Partial<Party>>({ partyType: "Consigner/Consignee", gst: "" });
   const [nextSr, setNextSr] = useState(1);
 
   useEffect(() => {
@@ -55,12 +55,13 @@ export default function PartyCreationPage() {
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const body = { ...form, ...formToObject(e.currentTarget) };
+    const raw = { ...form, ...formToObject(e.currentTarget) };
+    const body = { ...raw, gst: String(raw.gst ?? "").trim() };
     const saved = editId ? await update(editId, body) : await create(body);
     if (saved) {
       setEditId(null);
       e.currentTarget.reset();
-      setForm({ partyType: "Consigner/Consignee" });
+      setForm({ partyType: "Consigner/Consignee", gst: "" });
     }
   }
 
@@ -69,7 +70,7 @@ export default function PartyCreationPage() {
       <PageHeader
         title="New Supplier Party Creation"
         subtitle="Fill all the fields"
-        crumbs={[{ label: "Home", href: "/" }, { label: "Supplier Party Creation" }]}
+        crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Supplier Party Creation" }]}
       />
       <Flash message={message} />
       <form onSubmit={onSubmit}>
@@ -100,7 +101,7 @@ export default function PartyCreationPage() {
           <div className="flex flex-wrap gap-2">
             <Button type="submit">{editId ? "Update Data" : "Save Data"}</Button>
             {editId ? (
-              <Button type="button" variant="muted" onClick={() => { setEditId(null); setForm({ partyType: "Consigner/Consignee" }); }}>
+              <Button type="button" variant="muted" onClick={() => { setEditId(null); setForm({ partyType: "Consigner/Consignee", gst: "" }); }}>
                 Cancel
               </Button>
             ) : null}

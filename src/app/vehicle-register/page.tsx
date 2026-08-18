@@ -69,7 +69,7 @@ export default function VehicleRegisterPage() {
 
   return (
     <>
-      <PageHeader title="New Vehicle Creation" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/" }, { label: "Self Vehicle Creation" }]} />
+      <PageHeader title="New Vehicle Creation" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Self Vehicle Creation" }]} />
       <Flash message={message} />
       <form onSubmit={onSubmit}>
         <FormCard>

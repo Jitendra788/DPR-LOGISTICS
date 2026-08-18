@@ -93,7 +93,7 @@ export default function LhcWiseBookingPage() {
 
   return (
     <>
-      <PageHeader title="Vehicle LHC Booking" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/" }, { label: "Self Vehicle Trans Entry" }]} />
+      <PageHeader title="Vehicle LHC Booking" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Self Vehicle Trans Entry" }]} />
       <Flash message={message} />
       <form onSubmit={onSubmit}>
         <FormCard>

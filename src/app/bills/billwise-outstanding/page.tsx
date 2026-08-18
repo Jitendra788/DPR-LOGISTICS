@@ -64,7 +64,7 @@ export default function BillwiseOutstandingPage() {
       <PageHeader
         title="Billwise Outstanding Report"
         subtitle="Select and fill data for the payment"
-        crumbs={[{ label: "Home", href: "/" }, { label: "Outstanding Report" }]}
+        crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Outstanding Report" }]}
       />
       <Flash message={message} />
       <form onSubmit={show}>

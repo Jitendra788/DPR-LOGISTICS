@@ -130,6 +130,82 @@ export function DateField({
   );
 }
 
+function formatMoneyDisplay(value: number) {
+  const num = Number(value) || 0;
+  if (num === 0) return "0";
+  if (Number.isInteger(num)) return String(num);
+  return num.toFixed(2).replace(/\.?0+$/, "");
+}
+
+function parseMoney(text: string) {
+  const cleaned = text.replace(/,/g, "").trim();
+  if (!cleaned || cleaned === ".") return 0;
+  const num = Number(cleaned);
+  return Number.isFinite(num) ? num : 0;
+}
+
+function formatManualNumber(value: number) {
+  const num = Number(value) || 0;
+  if (num === 0) return "";
+  return String(num);
+}
+
+function parseManualNumber(text: string) {
+  const cleaned = text.replace(/,/g, "").trim();
+  if (!cleaned || cleaned === ".") return 0;
+  const num = Number(cleaned);
+  return Number.isFinite(num) ? num : 0;
+}
+
+export function ManualNumberField({
+  label,
+  value,
+  onChange,
+  readOnly,
+}: {
+  label: string;
+  value: number;
+  onChange?: (n: number) => void;
+  readOnly?: boolean;
+}) {
+  const [text, setText] = useState(() => formatManualNumber(value));
+  const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    if (!focused) {
+      setText(formatManualNumber(value));
+    }
+  }, [value, focused]);
+
+  return (
+    <FieldWrap label={label}>
+      <input
+        type="text"
+        className="form-control"
+        value={text}
+        readOnly={readOnly}
+        inputMode="decimal"
+        onFocus={() => {
+          if (!readOnly) setFocused(true);
+        }}
+        onChange={(e) => {
+          if (readOnly) return;
+          const raw = e.target.value;
+          setText(raw);
+          onChange?.(parseManualNumber(raw));
+        }}
+        onBlur={() => {
+          if (readOnly) return;
+          setFocused(false);
+          const num = parseManualNumber(text);
+          setText(formatManualNumber(num));
+          onChange?.(num);
+        }}
+      />
+    </FieldWrap>
+  );
+}
+
 export function MoneyField({
   label,
   value,
@@ -141,11 +217,14 @@ export function MoneyField({
   onChange?: (n: number) => void;
   readOnly?: boolean;
 }) {
-  const [text, setText] = useState((Number(value) || 0).toFixed(2));
+  const [text, setText] = useState(() => formatMoneyDisplay(value));
+  const [focused, setFocused] = useState(false);
 
   useEffect(() => {
-    setText((Number(value) || 0).toFixed(2));
-  }, [value]);
+    if (!focused) {
+      setText(formatMoneyDisplay(value));
+    }
+  }, [value, focused]);
 
   return (
     <FieldWrap label={label}>
@@ -153,12 +232,24 @@ export function MoneyField({
         className="form-control"
         value={text}
         readOnly={readOnly}
+        inputMode="decimal"
+        onFocus={() => {
+          if (!readOnly) setFocused(true);
+        }}
         onChange={(e) => {
           if (readOnly) return;
-          setText(e.target.value);
-          onChange?.(Number(e.target.value) || 0);
+          const raw = e.target.value;
+          if (raw !== "" && !/^\d*\.?\d*$/.test(raw)) return;
+          setText(raw);
+          onChange?.(parseMoney(raw));
         }}
-        onBlur={() => setText((Number(text) || 0).toFixed(2))}
+        onBlur={() => {
+          if (readOnly) return;
+          setFocused(false);
+          const num = parseMoney(text);
+          setText(formatMoneyDisplay(num));
+          onChange?.(num);
+        }}
       />
     </FieldWrap>
   );

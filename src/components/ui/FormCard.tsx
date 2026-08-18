@@ -1,9 +1,27 @@
 import type { ReactNode } from "react";
 
-export function FormCard({ children, className = "" }: { children?: ReactNode; className?: string }) {
+export function FormCard({
+  children,
+  className = "",
+  title,
+  subtitle,
+}: {
+  children?: ReactNode;
+  className?: string;
+  title?: string;
+  subtitle?: string;
+}) {
   return (
-    <div className={`box ${className}`}>
-      <div className="box-body">{children}</div>
+    <div className={`box erp-form-card ${className}`.trim()}>
+      {title ? (
+        <div className="erp-form-card-head">
+          <div>
+            <h2 className="erp-form-card-title">{title}</h2>
+            {subtitle ? <p className="erp-form-card-sub">{subtitle}</p> : null}
+          </div>
+        </div>
+      ) : null}
+      <div className="box-body erp-form-card-body">{children}</div>
     </div>
   );
 }

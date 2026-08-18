@@ -1,0 +1,439 @@
+/* DPR Logistics — site-wide marketing responsive rules (loaded last) */
+
+.marketing-site img,
+.marketing-site svg,
+.marketing-site video,
+.marketing-site iframe,
+.marketing-site table {
+  max-width: 100%;
+}
+
+.marketing-site {
+  overflow-x: clip;
+}
+
+/* Default: mobile-first header — desktop nav shown at 1100px+ in marketing-responsive.css */
+.mkt-menu-btn {
+  display: grid;
+}
+
+.mkt-hero-grid,
+.mkt-why-grid,
+.mkt-network-grid,
+.mkt-contact-grid,
+.mkt-gc-band,
+.mkt-form-grid,
+.mkt-grid-3,
+.mkt-value-grid,
+.mkt-solution-grid,
+.mkt-highlight-grid,
+.mkt-quote-grid,
+.mkt-process-grid,
+.mkt-solutions-dark-grid,
+.mkt-tracking-meta,
+.mkt-stats-grid {
+  min-width: 0;
+}
+
+.mkt-hero-copy,
+.mkt-hero-visual,
+.mkt-hero-visual-wrap,
+.mkt-tracking-stack,
+.mkt-form,
+.mkt-form-grid label,
+.mkt-tracking-widget,
+.mkt-tracking-widget-body,
+.mkt-section-head {
+  min-width: 0;
+}
+
+.mkt-tracking-widget-body,
+.mkt-hero-track-panel-body,
+.mkt-search-bar,
+.mkt-cta-panel-actions,
+.mkt-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.mkt-tracking-widget-body input,
+.mkt-hero-track-panel-body input,
+.mkt-search-bar input,
+.mkt-form-grid input,
+.mkt-form-grid select,
+.mkt-form-grid textarea {
+  width: 100%;
+  max-width: 100%;
+}
+
+.mkt-chat-panel {
+  max-width: calc(100vw - 32px);
+}
+
+/* ── 375 / 390 / phones ── */
+@media (max-width: 639px) {
+  .marketing-site {
+    --mkt-header-height: 68px;
+    --mkt-header-height-scrolled: 64px;
+    --mkt-container-pad: 1.25rem;
+  }
+
+  .mkt-header-inner {
+    grid-template-columns: 1fr auto !important;
+    gap: 0.5rem;
+  }
+
+  .mkt-nav,
+  .mkt-header-phone,
+  .mkt-header-track-btn {
+    display: none !important;
+  }
+
+  .mkt-menu-btn {
+    display: grid !important;
+  }
+
+  .mkt-brand-logo,
+  .brand-logo-header {
+    width: min(132px, 42vw) !important;
+    max-height: 54px !important;
+  }
+
+  .mkt-hero-premium {
+    min-height: auto !important;
+    padding: 1.5rem 0 2rem !important;
+  }
+
+  .mkt-hero-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+
+  .mkt-hero-copy h1 {
+    font-size: clamp(1.85rem, 9vw, 2.4rem) !important;
+    line-height: 1.12 !important;
+  }
+
+  .mkt-hero-copy p {
+    font-size: 1rem !important;
+  }
+
+  .mkt-hero-actions,
+  .mkt-cta-panel-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mkt-hero-actions .mkt-btn,
+  .mkt-cta-panel-actions .mkt-btn {
+    width: 100%;
+  }
+
+  .mkt-hero-visual-premium {
+    animation: none !important;
+  }
+
+  .mkt-hero-trust-row {
+    flex-direction: column;
+    gap: 0.65rem !important;
+  }
+
+  .mkt-hero-visual-scene {
+    min-height: 200px !important;
+    padding: 2rem 1rem 1.25rem !important;
+  }
+
+  .mkt-hero-scene-badge,
+  .mkt-hero-scene-badge-2 {
+    display: none;
+  }
+
+  .mkt-hero-track-panel {
+    padding: 1rem !important;
+  }
+
+  .mkt-hero-track-panel-body,
+  .mkt-tracking-widget-body {
+    grid-template-columns: 1fr !important;
+  }
+
+  .mkt-hero-track-panel-body button,
+  .mkt-tracking-widget-body button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .mkt-stats {
+    margin-top: 0 !important;
+  }
+
+  .mkt-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .mkt-grid-3,
+  .mkt-why-grid,
+  .mkt-network-grid,
+  .mkt-process-grid,
+  .mkt-solutions-dark-grid,
+  .mkt-quote-grid,
+  .mkt-highlight-grid,
+  .mkt-value-grid,
+  .mkt-solution-grid,
+  .mkt-contact-grid,
+  .mkt-form-grid,
+  .mkt-tracking-meta,
+  .mkt-gc-band {
+    grid-template-columns: 1fr !important;
+  }
+
+  .mkt-section {
+    padding: 2.5rem 0 !important;
+  }
+
+  .mkt-section-head h2,
+  .mkt-page-hero h1,
+  .mkt-tracking-head-dark h2,
+  .mkt-cta-panel-content h2 {
+    font-size: clamp(1.6rem, 7vw, 2rem) !important;
+  }
+
+  .mkt-service-card-premium {
+    min-height: 0;
+    padding: 1.4rem !important;
+  }
+
+  .mkt-why-item {
+    grid-template-columns: auto 1fr !important;
+  }
+
+  .mkt-why-num {
+    display: none;
+  }
+
+  .mkt-cta-panel-content {
+    padding: 1.75rem 1.25rem !important;
+  }
+
+  .mkt-chat {
+    right: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .mkt-chat-btn span {
+    display: none;
+  }
+
+  .mkt-chat-btn {
+    padding: 0.8rem;
+    border-radius: 50%;
+  }
+
+  .mkt-mobile-nav {
+    padding: 0.75rem;
+    padding-top: calc(var(--mkt-header-height) + 0.5rem);
+  }
+
+  .mkt-mobile-links {
+    max-height: calc(100dvh - var(--mkt-header-height) - 2rem);
+    overflow-y: auto;
+  }
+}
+
+/* ── 640–767 phones landscape / large phones ── */
+@media (min-width: 640px) and (max-width: 767px) {
+  .mkt-header-inner {
+    grid-template-columns: 1fr auto !important;
+  }
+
+  .mkt-nav,
+  .mkt-header-phone,
+  .mkt-header-track-btn {
+    display: none !important;
+  }
+
+  .mkt-hero-grid,
+  .mkt-why-grid,
+  .mkt-network-grid,
+  .mkt-contact-grid,
+  .mkt-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .mkt-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* ── 768–1023 tablet: stacked hero, 2-col cards ── */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .marketing-site {
+    --mkt-header-height: 80px;
+    --mkt-container-pad: 1.75rem;
+  }
+
+  .mkt-header-inner {
+    grid-template-columns: 1fr auto !important;
+  }
+
+  .mkt-nav,
+  .mkt-header-phone {
+    display: none !important;
+  }
+
+  .mkt-header-track-btn {
+    display: none !important;
+  }
+
+  .mkt-menu-btn {
+    display: grid !important;
+  }
+
+  .mkt-hero-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .mkt-hero-copy h1 {
+    font-size: clamp(2.4rem, 6vw, 3.4rem) !important;
+  }
+
+  .mkt-hero-track-panel {
+    margin-top: 0 !important;
+  }
+
+  .mkt-why-grid,
+  .mkt-network-grid,
+  .mkt-contact-grid,
+  .mkt-gc-band {
+    grid-template-columns: 1fr !important;
+  }
+
+  .mkt-stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .mkt-grid-3,
+  .mkt-form-grid,
+  .mkt-process-grid,
+  .mkt-solutions-dark-grid,
+  .mkt-quote-grid,
+  .mkt-highlight-grid,
+  .mkt-value-grid,
+  .mkt-solution-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .mkt-tracking-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* ── 1024–1099 small desktop: still hamburger, wider content ── */
+@media (min-width: 1024px) and (max-width: 1099px) {
+  .mkt-header-inner {
+    grid-template-columns: 1fr auto !important;
+  }
+
+  .mkt-nav {
+    display: none !important;
+  }
+
+  .mkt-header-phone {
+    display: none !important;
+  }
+
+  .mkt-header-track-btn {
+    display: inline-flex !important;
+  }
+
+  .mkt-menu-btn {
+    display: grid !important;
+  }
+
+  .mkt-hero-grid {
+    grid-template-columns: 1.05fr 0.95fr !important;
+  }
+
+  .mkt-why-grid,
+  .mkt-network-grid,
+  .mkt-contact-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .mkt-stats-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+
+  .mkt-grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* ── 1100+ full desktop nav ── */
+@media (min-width: 1100px) {
+  .mkt-nav {
+    display: flex !important;
+  }
+
+  .mkt-header-phone {
+    display: inline-flex !important;
+  }
+
+  .mkt-header-track-btn {
+    display: inline-flex !important;
+  }
+
+  .mkt-menu-btn {
+    display: none !important;
+  }
+
+  .mkt-header-inner {
+    grid-template-columns: auto 1fr auto !important;
+  }
+
+  .mkt-hero-grid {
+    grid-template-columns: 1.05fr 0.95fr !important;
+  }
+
+  .mkt-why-grid,
+  .mkt-network-grid {
+    grid-template-columns: 1fr 1.1fr !important;
+  }
+
+  .mkt-stats-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+
+  .mkt-grid-3,
+  .mkt-solutions-dark-grid,
+  .mkt-quote-grid,
+  .mkt-highlight-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .mkt-process-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+
+  .mkt-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .mkt-contact-grid {
+    grid-template-columns: 0.9fr 1.1fr !important;
+  }
+
+  .mkt-tracking-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (min-width: 1280px) {
+  .mkt-tracking-meta {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  }
+}
+
+body.mkt-nav-open {
+  overflow: hidden;
+}

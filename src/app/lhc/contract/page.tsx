@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, SelectField } from "@/components/ui/FormField";
+import { InputField, ManualNumberField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -218,7 +218,7 @@ export default function LorryHireContractPage() {
 
   return (
     <>
-      <PageHeader title="New Lorry Hire Contract" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/" }, { label: "LHC" }]} />
+      <PageHeader title="New Lorry Hire Contract" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "LHC" }]} />
       <Flash message={message} />
       <form onSubmit={saveChallan}>
         <FormCard>
@@ -257,16 +257,16 @@ export default function LorryHireContractPage() {
         <FormCard>
           <TwoCol>
             <div>
-              <InputField label="Lorry Freight" type="number" value={form.lorryFreight ?? 0} onChange={(e) => setForm({ ...form, lorryFreight: Number(e.target.value) || 0 })} />
-              <InputField label="Transfer" type="number" value={form.transfer ?? 0} onChange={(e) => setForm({ ...form, transfer: Number(e.target.value) || 0 })} />
-              <InputField label="Cash" type="number" value={form.cash ?? 0} onChange={(e) => setForm({ ...form, cash: Number(e.target.value) || 0 })} />
-              <InputField label="Diesel Ltr" type="number" value={form.dieselLtr ?? 0} onChange={(e) => setForm({ ...form, dieselLtr: Number(e.target.value) || 0 })} />
+              <ManualNumberField label="Lorry Freight" value={form.lorryFreight ?? 0} onChange={(n) => setForm({ ...form, lorryFreight: n })} />
+              <ManualNumberField label="Transfer" value={form.transfer ?? 0} onChange={(n) => setForm({ ...form, transfer: n })} />
+              <ManualNumberField label="Cash" value={form.cash ?? 0} onChange={(n) => setForm({ ...form, cash: n })} />
+              <ManualNumberField label="Diesel Ltr" value={form.dieselLtr ?? 0} onChange={(n) => setForm({ ...form, dieselLtr: n })} />
             </div>
             <div>
-              <InputField label="Fuel / Diesel" type="number" value={form.fuel ?? 0} onChange={(e) => setForm({ ...form, fuel: Number(e.target.value) || 0 })} />
+              <ManualNumberField label="Fuel / Diesel" value={form.fuel ?? 0} onChange={(n) => setForm({ ...form, fuel: n })} />
               <SelectField label="Fuel / Diesel Vendor Name" name="fuelVendor" value={form.fuelVendor ?? ""} onChange={(e) => setForm({ ...form, fuelVendor: e.target.value })} options={fuelVendors.length ? fuelVendors : vendors.map((v) => v.name)} />
-              <InputField label="Total Advance" value={totalAdvance} readOnly />
-              <InputField label="Balance" value={balance} readOnly />
+              <InputField label="Total Advance" value={totalAdvance || ""} readOnly />
+              <InputField label="Balance" value={balance || ""} readOnly />
             </div>
           </TwoCol>
         </FormCard>

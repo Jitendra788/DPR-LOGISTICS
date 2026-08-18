@@ -53,7 +53,7 @@ export default function DriverVoucherPage() {
 
   return (
     <>
-      <PageHeader title="Driver Voucher" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/" }, { label: "Driver Voucher" }]} />
+      <PageHeader title="Driver Voucher" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Driver Voucher" }]} />
       <Flash message={message} />
       <form onSubmit={onSubmit}>
         <FormCard>

@@ -53,7 +53,6 @@ const FLOAT_FIELDS = new Set([
   "other",
   "hamali",
   "total",
-  "gst",
   "grandTotal",
   "lorryFreight",
   "transfer",
@@ -74,19 +73,35 @@ const FLOAT_FIELDS = new Set([
   "igstAmt",
   "paidRs",
   "lhcFreight",
+  "tdsPct",
+  "tdsAmt",
+  "paidAmt",
+  "otherDed",
 ]);
 
 const INT_FIELDS = new Set(["lrCount"]);
 const BOOL_FIELDS = new Set(["billed", "paid"]);
 const SKIP_FIELDS = new Set(["id", "createdAt", "sr", "srNo"]);
+const NUMERIC_GST_RESOURCES = new Set<ResourceKey>(["bookings"]);
 
-export function sanitize(body: Record<string, unknown>) {
+function gstin(value: unknown) {
+  if (value === null || value === undefined || value === 0) return "";
+  const text = String(value).trim();
+  return text === "0" ? "" : text;
+}
+
+export function sanitize(body: Record<string, unknown>, resource?: ResourceKey) {
   const data: Record<string, unknown> = {};
+  const gstIsAmount = resource ? NUMERIC_GST_RESOURCES.has(resource) : false;
   for (const [key, value] of Object.entries(body)) {
     if (SKIP_FIELDS.has(key) || value === undefined) continue;
     if (key === "password" && !value) continue;
     if (BOOL_FIELDS.has(key)) {
       data[key] = value === true || value === "true" || value === "1" || value === "on";
+      continue;
+    }
+    if (key === "gst") {
+      data[key] = gstIsAmount ? Number(value) || 0 : gstin(value);
       continue;
     }
     if (FLOAT_FIELDS.has(key)) {

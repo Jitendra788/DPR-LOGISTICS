@@ -30,15 +30,18 @@
 }
 
 .erp-header-logo {
-  font-size: 15px;
-  font-weight: 700;
-  color: #0f766e;
+  display: inline-flex;
+  align-items: center;
   text-decoration: none;
-  letter-spacing: -0.02em;
+}
+
+.erp-header-logo-img {
+  max-height: 42px;
+  width: auto;
 }
 
 .erp-header-logo:hover {
-  color: #115e59;
+  opacity: 0.92;
 }
 
 .erp-icon-btn {
@@ -222,7 +225,41 @@
 }
 
 .erp-dropdown-wide {
-  min-width: 240px;
+  min-width: 300px;
+  max-width: min(360px, calc(100vw - 24px));
+  padding: 10px 8px 8px;
+}
+
+.erp-note-item {
+  align-items: flex-start;
+}
+
+.erp-note-title {
+  display: block;
+  font-weight: 600;
+}
+
+.erp-note-detail {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.erp-dropdown-foot {
+  display: block;
+  margin-top: 6px;
+  padding: 8px;
+  border-top: 1px solid #e6ebf0;
+  color: #0f766e;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+}
+
+.erp-dropdown-foot:hover {
+  color: #115e59;
 }
 
 .erp-dropdown-title {
@@ -277,13 +314,15 @@
   inset: 0 auto 0 0;
   z-index: 45;
   display: flex;
-  width: 264px;
+  width: 288px;
   flex-direction: column;
   background: #0f172a;
-  color: #e2e8f0;
+  color: #f1f5f9;
   transform: translateX(-100%);
   transition: width 0.2s ease, transform 0.2s ease;
   pointer-events: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .erp-sidebar.is-open {
@@ -334,6 +373,19 @@
   font-weight: 700;
 }
 
+.erp-brand-logo {
+  max-height: 52px;
+  width: auto;
+}
+
+.erp-brand-logo-collapsed {
+  max-height: 34px;
+  max-width: 34px;
+  object-fit: cover;
+  object-position: left center;
+  border-radius: 6px;
+}
+
 .erp-brand-text {
   display: flex;
   min-width: 0;
@@ -341,42 +393,126 @@
 }
 
 .erp-brand-text strong {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.02em;
+  color: #fff;
+  line-height: 1.2;
 }
 
 .erp-brand-text small {
-  font-size: 11px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: #94a3b8;
 }
 
 .erp-sidebar-user {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin: 12px 12px 4px;
-  padding: 10px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04);
+  gap: 12px;
+  margin: 14px 12px 8px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(15, 118, 110, 0.22) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
 }
 
-.erp-sidebar-user-name {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 600;
+.erp-sidebar-user .erp-avatar {
+  height: 40px;
+  width: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #14b8a6 0%, #0f766e 100%);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(15, 118, 110, 0.35);
 }
 
 .erp-sidebar-user-role {
   margin: 0;
   font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   color: #94a3b8;
+}
+
+.erp-sidebar-user-name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.015em;
+  color: #f8fafc;
+}
+
+/* ── Premium form cards (User Creation, master forms, etc.) ── */
+.erp-main .erp-form-card {
+  margin-bottom: 24px;
+  border: 1px solid #e2e8f0;
+  border-top: none;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 8px 28px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+
+.erp-main .erp-form-card:hover {
+  box-shadow:
+    0 2px 4px rgba(15, 23, 42, 0.05),
+    0 12px 36px rgba(15, 118, 110, 0.08);
+}
+
+.erp-form-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 20px 16px;
+  background: linear-gradient(180deg, #f8fbfc 0%, #fff 100%);
+  border-bottom: 1px solid #e8eef3;
+  border-top: 3px solid #0f766e;
+}
+
+.erp-form-card-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #0f172a;
+  line-height: 1.3;
+}
+
+.erp-form-card-sub {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #64748b;
+}
+
+.erp-main .erp-form-card-body {
+  padding: 20px;
+}
+
+@media (min-width: 640px) {
+  .erp-main .erp-form-card-body {
+    padding: 22px 24px 24px;
+  }
+}
+
+.erp-main .erp-form-card-body > .btn-admin,
+.erp-main .erp-form-card-body > button[type="submit"] {
+  margin-top: 8px;
 }
 
 .erp-nav {
   flex: 1;
-  padding: 8px;
+  padding: 10px 10px 16px;
   overflow-y: auto;
+  overflow-x: hidden;
   overscroll-behavior: contain;
 }
 
@@ -384,28 +520,40 @@
   position: relative;
   display: flex;
   width: 100%;
-  align-items: center;
-  gap: 10px;
-  min-height: 40px;
-  padding: 8px 10px;
+  align-items: flex-start;
+  gap: 11px;
+  min-height: 44px;
+  padding: 10px 12px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 10px;
   background: transparent;
-  color: #cbd5e1;
-  font-size: 13px;
+  color: #e2e8f0;
+  font-size: 14px;
   font-weight: 500;
   text-align: left;
   text-decoration: none;
   cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
-.erp-nav-item:hover {
-  background: rgba(255, 255, 255, 0.06);
+.erp-nav-label {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  color: inherit;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.erp-nav-item:hover .erp-nav-label {
   color: #fff;
 }
 
-.erp-nav-item.is-active {
-  background: rgba(15, 118, 110, 0.28);
+.erp-nav-item.is-active .erp-nav-label {
   color: #fff;
 }
 
@@ -413,13 +561,27 @@
   width: 18px;
   height: 18px;
   flex-shrink: 0;
+  margin-top: 2px;
+  opacity: 0.95;
+}
+
+.erp-nav-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.erp-nav-item.is-active {
+  background: rgba(15, 118, 110, 0.32);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(45, 212, 191, 0.15);
 }
 
 .erp-chevron {
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 15px;
   flex-shrink: 0;
-  opacity: 0.6;
+  margin-top: 3px;
+  opacity: 0.75;
   transition: transform 0.2s ease;
 }
 
@@ -429,6 +591,7 @@
 
 .erp-sidebar.is-collapsed .erp-nav-item {
   justify-content: center;
+  align-items: center;
   padding: 10px 0;
 }
 
@@ -446,12 +609,17 @@
   position: absolute;
   left: calc(100% + 10px);
   z-index: 60;
-  padding: 6px 8px;
-  border-radius: 6px;
+  padding: 8px 12px;
+  border-radius: 8px;
   background: #0b1220;
   color: #fff;
-  font-size: 12px;
-  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  max-width: 240px;
+  white-space: normal;
+  overflow-wrap: anywhere;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
@@ -465,11 +633,13 @@
   top: 0;
   left: calc(100% + 8px);
   z-index: 70;
-  min-width: 220px;
-  padding: 8px;
-  border-radius: 10px;
+  min-width: 260px;
+  max-width: 320px;
+  padding: 10px;
+  border-radius: 12px;
   background: #111827;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
 }
 
 .erp-sidebar.is-collapsed .erp-nav-group:hover .erp-flyout,
@@ -478,30 +648,45 @@
 }
 
 .erp-flyout-title {
-  margin: 0 8px 6px;
+  margin: 0 8px 8px;
   font-size: 11px;
   font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: #94a3b8;
 }
 
 .erp-flyout-link {
   display: block;
-  padding: 8px;
-  border-radius: 6px;
-  color: #cbd5e1;
-  font-size: 13px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  color: #dce4ee;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.015em;
+  line-height: 1.45;
   text-decoration: none;
+}
+
+.erp-flyout-link .erp-sub-link-label {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .erp-flyout-link:hover,
 .erp-flyout-link.is-active {
-  background: rgba(15, 118, 110, 0.28);
+  background: rgba(15, 118, 110, 0.32);
+  color: #fff;
+  font-weight: 600;
+}
+
+.erp-nav-group.has-active > .erp-nav-parent .erp-nav-label {
   color: #fff;
 }
 
 .erp-submenu {
   display: none;
-  padding: 2px 0 8px;
+  padding: 6px 0 12px 2px;
 }
 
 .erp-submenu.is-open {
@@ -510,22 +695,42 @@
 
 .erp-sub-link {
   display: block;
-  margin-left: 16px;
-  padding: 7px 10px 7px 22px;
-  border-left: 2px solid rgba(148, 163, 184, 0.2);
-  color: #94a3b8;
-  font-size: 12.5px;
+  margin: 3px 0 3px 12px;
+  padding: 9px 12px 9px 18px;
+  border-left: 3px solid rgba(148, 163, 184, 0.35);
+  border-radius: 0 10px 10px 0;
+  color: #dce4ee;
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: 0.018em;
+  line-height: 1.5;
   text-decoration: none;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.erp-sub-link-label {
+  display: block;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .erp-sub-link:hover {
   color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border-left-color: rgba(45, 212, 191, 0.55);
 }
 
 .erp-sub-link.is-active {
   border-left-color: #2dd4bf;
+  background: rgba(15, 118, 110, 0.3);
   color: #fff;
   font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(45, 212, 191, 0.12);
+}
+
+.erp-sub-link.is-active .erp-sub-link-label {
+  letter-spacing: 0.025em;
 }
 
 .erp-sidebar.is-collapsed .erp-submenu {
@@ -541,7 +746,7 @@
 
 @media (min-width: 1024px) {
   .erp-main-open {
-    margin-left: 264px;
+    margin-left: 288px;
   }
   .erp-main-rail {
     margin-left: 72px;

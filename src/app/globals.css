@@ -30,6 +30,14 @@ body {
   font-size: 14px;
 }
 
+.brand-logo {
+  display: block;
+  height: auto;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
 .form-group {
   margin-bottom: 15px;
 }

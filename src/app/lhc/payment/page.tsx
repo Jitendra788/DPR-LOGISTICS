@@ -92,7 +92,7 @@ export default function LhcPaymentPage() {
 
   return (
     <>
-      <PageHeader title="LHC Payment Entry" subtitle="Select and fill data for the payment" crumbs={[{ label: "Home", href: "/" }, { label: "LHC Payment" }]} />
+      <PageHeader title="LHC Payment Entry" subtitle="Select and fill data for the payment" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "LHC Payment" }]} />
       <Flash message={message} />
       <form onSubmit={showDetails}>
         <FormCard>

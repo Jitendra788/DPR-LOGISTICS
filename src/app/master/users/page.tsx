@@ -47,10 +47,10 @@ export default function UserCreationPage() {
 
   return (
     <>
-      <PageHeader title="User Creation" subtitle="Create login users and assign roles" crumbs={[{ label: "Home", href: "/" }, { label: "User Creation" }]} />
+      <PageHeader title="User Creation" subtitle="Create login users and assign roles" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "User Creation" }]} />
       <Flash message={message} />
       <form onSubmit={onSubmit}>
-        <FormCard>
+        <FormCard title="User Details" subtitle="Create or update login credentials and role access">
           <TwoCol>
             <div>
               <InputField label="Username" name="username" value={form.username ?? ""} onChange={(e) => setForm({ ...form, username: e.target.value })} required />

@@ -50,7 +50,7 @@ export default function BookingSlipOutstandingPage() {
         title="Booking Slip Outstanding Report"
         subtitle="Select Date and View Report"
         subtitleClass="text-red-600"
-        crumbs={[{ label: "Home", href: "/" }, { label: "Booking Slip Outstanding Report" }]}
+        crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Booking Slip Outstanding Report" }]}
       />
       <Flash message={message} />
       <form onSubmit={show}>

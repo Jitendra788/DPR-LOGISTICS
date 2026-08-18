@@ -36,7 +36,7 @@ export default function SearchBillStatusPage() {
       <PageHeader
         title="Search Bill For Update"
         subtitle="Enter Details For Search"
-        crumbs={[{ label: "Home", href: "/" }, { label: "Search Bill" }]}
+        crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Search Bill" }]}
       />
       <Flash message={message} />
       <form onSubmit={search}>

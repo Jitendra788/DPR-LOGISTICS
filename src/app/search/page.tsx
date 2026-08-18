@@ -37,7 +37,7 @@ export default function SearchPage() {
       <PageHeader
         title="Search"
         subtitle={q ? `Results for “${q}”` : "Type LR no, vehicle, driver or party"}
-        crumbs={[{ label: "Home", href: "/" }, { label: "Search" }]}
+        crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Search" }]}
       />
       {loading ? <p className="erp-empty">Searching…</p> : null}
       {!loading && !results.length ? <p className="erp-empty">No records found.</p> : null}

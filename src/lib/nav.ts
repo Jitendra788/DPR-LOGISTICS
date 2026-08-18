@@ -11,14 +11,14 @@ export type NavItem = {
 };
 
 export const navItems: NavItem[] = [
-  { label: "Dashboard", href: "/", icon: "gauge" },
+  { label: "Dashboard", href: "/dashboard", icon: "gauge" },
   {
     label: "Master Data",
     icon: "monitor",
     children: [
       { label: "Party Creation", href: "/master/party" },
       { label: "User Creation", href: "/master/users" },
-      { label: "Driver /Staff A/C", href: "/master/drivers" },
+      { label: "Driver / Staff A/C", href: "/master/drivers" },
       { label: "Vehicle Creation", href: "/master/vehicles" },
       { label: "Vendor Creation", href: "/master/vendors" },
     ],

@@ -2,9 +2,11 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { BrandLogo } from "@/components/BrandLogo";
 import { api } from "@/lib/api-client";
 import { todayIso } from "@/lib/dates";
 import { SearchSelect } from "@/components/ui/SearchSelect";
+import { company } from "@/data/marketing/company";
 import "./public.css";
 
 type FormState = {
@@ -148,9 +150,17 @@ export default function CustomerBookingPage() {
   return (
     <div className="pub">
       <header className="pub-top">
-        <Link href="/login" className="pub-brand">
-          DPR Logistics
+        <Link href="/" className="pub-brand">
+          <BrandLogo width={140} height={56} className="pub-brand-logo" />
         </Link>
+        <nav className="pub-nav" aria-label="Public pages">
+          <Link href="/tracking">Track Shipment</Link>
+          <Link href="/contact">Contact</Link>
+          <Link href="/quote">Pickup Request</Link>
+          <Link href="/tracking" className="pub-nav-accent">
+            GC Tracking
+          </Link>
+        </nav>
         <Link href="/login" className="pub-login">
           Staff Sign In
         </Link>
@@ -158,9 +168,18 @@ export default function CustomerBookingPage() {
 
       <main className="pub-wrap">
         <div className="pub-head">
-          <p className="pub-kicker">Public booking</p>
-          <h1>LR Booking Customer</h1>
-          <p>Fill all the fields and save to print your lorry receipt.</p>
+          <p className="pub-kicker">DPR Logistics — Public booking</p>
+          <h1>LR Booking</h1>
+          <p>
+            Create a lorry receipt for your shipment. Fill in the details below and save to generate a printable LR copy.
+            Need help? Call us at{" "}
+            <a href={`tel:${company.phone.replace(/\s/g, "")}`}>{company.phone}</a>.
+          </p>
+          <div className="pub-help">
+            <Link href="/tracking">Track existing shipment</Link>
+            <Link href="/contact/care">Customer care</Link>
+            <Link href="/">Back to website</Link>
+          </div>
         </div>
 
         {message ? (
@@ -227,6 +246,14 @@ export default function CustomerBookingPage() {
             {saving ? "Saving…" : "Save & Print LR"}
           </button>
         </form>
+
+        <footer className="pub-foot">
+          <p>
+            {company.name} · {company.address} ·{" "}
+            <a href={`mailto:${company.email}`}>{company.email}</a> ·{" "}
+            <a href={`tel:${company.phone.replace(/\s/g, "")}`}>{company.phone}</a>
+          </p>
+        </footer>
       </main>
     </div>
   );

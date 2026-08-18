@@ -65,7 +65,7 @@ export default function PartyLedgerPage() {
 
   return (
     <>
-      <PageHeader title="Party Ledger" subtitle="Select Date and View Ledger" crumbs={[{ label: "Home", href: "/" }, { label: "Party Ledger" }]} />
+      <PageHeader title="Party Ledger" subtitle="Select Date and View Ledger" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Party Ledger" }]} />
       <Flash message={message} />
       <form onSubmit={exportExcel}>
         <FormCard>

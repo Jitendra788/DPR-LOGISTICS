@@ -59,6 +59,15 @@
   color: #5eead4;
 }
 
+[data-theme="dark"] .erp-note-detail {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .erp-dropdown-foot {
+  border-top-color: #1f2937;
+  color: #5eead4;
+}
+
 [data-theme="dark"] .erp-search-copy strong {
   color: #f3f4f6;
 }
@@ -88,6 +97,20 @@
   background: #111827;
   border-color: #1f2937;
   box-shadow: none;
+}
+
+[data-theme="dark"] .erp-form-card-head {
+  background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+  border-bottom-color: #1f2937;
+  border-top-color: #14b8a6;
+}
+
+[data-theme="dark"] .erp-form-card-title {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .erp-form-card-sub {
+  color: #94a3b8;
 }
 
 [data-theme="dark"] .erp-kpi-hit {

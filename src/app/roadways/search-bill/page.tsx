@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
 import { DateField, InputField, SelectField } from "@/components/ui/FormField";
@@ -14,6 +15,7 @@ type Party = { name: string };
 type Bill = { billNo: string; partyName: string; fromDate: string; toDate: string; amount: number; lrCount: number; source?: string };
 
 export default function RoadwaysSearchBillPage() {
+  const router = useRouter();
   const [parties, setParties] = useState<Party[]>([]);
   const [rows, setRows] = useState<Bill[] | null>(null);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
@@ -52,7 +54,7 @@ export default function RoadwaysSearchBillPage() {
         title="Search Bill"
         subtitle="Select Date and View Report"
         subtitleClass="text-red-600"
-        crumbs={[{ label: "Home", href: "/" }, { label: "Search Bill" }]}
+        crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Search Bill" }]}
       />
       <Flash message={message} />
       <form onSubmit={show}>
@@ -86,6 +88,15 @@ export default function RoadwaysSearchBillPage() {
           <DataTable
             rows={rows}
             columns={[
+              {
+                key: "view",
+                header: "View",
+                render: (row) => (
+                  <Button type="button" size="sm" variant="teal" onClick={() => router.push(`/roadways/bill-weightwise?billNo=${encodeURIComponent(row.billNo)}`)}>
+                    View
+                  </Button>
+                ),
+              },
               { key: "billNo", header: "Bill No" },
               { key: "partyName", header: "Party" },
               { key: "fromDate", header: "From" },

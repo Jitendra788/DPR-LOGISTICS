@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, InputField, MoneyField, SelectField } from "@/components/ui/FormField";
+import { DateField, InputField, ManualNumberField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
 import { DataTable } from "@/components/ui/DataTable";
@@ -50,8 +50,9 @@ type Bill = {
   source: string;
 };
 
-function matchesBillAs(row: LrRow, variant: "weight" | "meter") {
+function matchesBillAs(row: LrRow, variant: "weight" | "meter", billAs?: string) {
   const as = (row.billAs || "Weight").toLowerCase();
+  if (billAs) return as === billAs.toLowerCase();
   if (variant === "meter") return as === "mtr" || as === "meter";
   return as !== "mtr" && as !== "meter";
 }
@@ -65,10 +66,14 @@ export function BillEntryForm({
   title,
   variant,
   source = "DPR",
+  searchHref = "/bills/search",
+  crumb = "Bill Prepration",
 }: {
   title: string;
   variant: "weight" | "meter";
   source?: string;
+  searchHref?: string;
+  crumb?: string;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -82,11 +87,12 @@ export function BillEntryForm({
     billNo: "220",
     poNo: "",
     billAt: "",
+    billAs: "",
     billDate: todayIso(),
     partyName: "",
     amount: 0,
-    cgstPct: 9,
-    sgstPct: 9,
+    cgstPct: 0,
+    sgstPct: 0,
     igstPct: 0,
     paidRs: 0,
     remark: "",
@@ -107,10 +113,10 @@ export function BillEntryForm({
       (row) =>
         row.billingParty === form.partyName &&
         !row.billed &&
-        matchesBillAs(row, variant) &&
+        matchesBillAs(row, variant, form.billAs) &&
         matchesSource(row, source),
     );
-  }, [bookings, form.partyName, form.billNo, editId, variant, source]);
+  }, [bookings, form.partyName, form.billNo, form.billAs, editId, variant, source]);
 
   useEffect(() => {
     Promise.all([api<Party[]>("/api/parties"), api<{ value: string }>("/api/next-no?type=bill"), api<LrRow[]>("/api/bookings")]).then(
@@ -156,12 +162,13 @@ export function BillEntryForm({
       billNo: row.billNo,
       poNo: row.poNo,
       billAt: row.billAt,
+      billAs: row.billAt || "",
       billDate: row.billDate || todayIso(),
       partyName: row.partyName,
       amount: row.amount,
       cgstPct: row.cgstPct,
       sgstPct: row.sgstPct,
-      igstPct: variant === "weight" ? row.igstPct : row.igstAmt,
+      igstPct: row.igstPct,
       paidRs: row.paidRs,
       remark: row.remark,
       scanDate: row.scanDate || todayIso(),
@@ -175,6 +182,7 @@ export function BillEntryForm({
   function billFields() {
     return {
       ...form,
+      billAt: form.billAs || form.billAt,
       fromDate: form.billDate,
       toDate: form.billDate,
       cgstAmt,
@@ -203,7 +211,7 @@ export function BillEntryForm({
         method: "POST",
         body: JSON.stringify({
           ...billFields(),
-          billAs: variant === "meter" ? "Mtr" : "Weight",
+          billAs: form.billAs || (variant === "meter" ? "Mtr" : "Weight"),
           lrIds: selectedIds,
         }),
       });
@@ -244,11 +252,12 @@ export function BillEntryForm({
       billNo: next.value,
       poNo: "",
       billAt: "",
+      billAs: "",
       billDate: todayIso(),
       partyName: "",
       amount: 0,
-      cgstPct: 9,
-      sgstPct: 9,
+      cgstPct: 0,
+      sgstPct: 0,
       igstPct: 0,
       paidRs: 0,
       remark: "",
@@ -261,111 +270,150 @@ export function BillEntryForm({
 
   return (
     <>
-      <PageHeader title={title} subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/" }, { label: "Bill Prepration" }]} />
+      <PageHeader title={title} subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/dashboard" }, { label: crumb }]} />
       <Flash message={message} />
       <form onSubmit={saveNew}>
-        <FormCard>
-          <TwoCol>
-            <div>
-              {variant === "meter" ? (
-                <SelectField label="Bill At" value={form.billAt} onChange={(e) => setForm({ ...form, billAt: e.target.value })} options={["HO", "Delhi", "Punjab Roadways", "DPR Logistics"]} />
-              ) : null}
-              <InputField label="Bill No" value={form.billNo} onChange={(e) => setForm({ ...form, billNo: e.target.value })} required />
-              {variant === "meter" ? <InputField label="PO No" value={form.poNo} onChange={(e) => setForm({ ...form, poNo: e.target.value })} /> : null}
-              <DateField label="Bill Date" value={form.billDate} onChange={(billDate) => setForm({ ...form, billDate })} />
-            </div>
-            <div>
-              {variant === "weight" ? <InputField label="PO No" value={form.poNo} onChange={(e) => setForm({ ...form, poNo: e.target.value })} /> : null}
-              <SelectField
-                label="Party Name"
-                value={form.partyName}
-                onChange={(e) => setForm({ ...form, partyName: e.target.value })}
-                options={parties.map((p) => p.name)}
-              />
-            </div>
-          </TwoCol>
-        </FormCard>
-
-        {form.partyName ? (
+        {variant === "meter" ? (
           <FormCard>
-            <p className="mb-3 text-sm font-semibold text-[#333]">
-              {editId ? `Linked LRs (${visibleLrs.length})` : `Unbilled LRs auto-selected (${selectedIds.length}/${visibleLrs.length})`}
-            </p>
-            <DataTable
-              rows={visibleLrs.map((row, i) => ({ ...row, sr: i + 1 }))}
-              searchKeys={["lrNo", "vehNo", "fromStation", "toStation"]}
-              columns={[
-                {
-                  key: "select",
-                  header: "Select",
-                  render: (row) => (
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.includes(row.id)}
-                      disabled={!!editId}
-                      onChange={(e) => toggleLr(row.id, e.target.checked)}
-                    />
-                  ),
-                },
-                { key: "lrNo", header: "LR No" },
-                { key: "lrDate", header: "LR Date", render: (row) => isoToDisplay(row.lrDate) },
-                { key: "vehNo", header: "Veh No" },
-                { key: "fromStation", header: "From" },
-                { key: "toStation", header: "To" },
-                { key: "billAs", header: "Bill As" },
-                { key: variant === "meter" ? "totalMeter" : "chargedWeight", header: variant === "meter" ? "Meter" : "Weight" },
-                { key: "grandTotal", header: "Amount" },
-              ]}
-            />
-            {!editId && !visibleLrs.length ? <p className="mt-2 text-sm text-[#a94442]">No unbilled LRs found for this party.</p> : null}
+            <TwoCol>
+              <div>
+                <SelectField
+                  label="Bill As"
+                  value={form.billAs}
+                  onChange={(e) => setForm({ ...form, billAs: e.target.value, billAt: e.target.value })}
+                  options={["Mtr", "Weight", "Package"]}
+                />
+                <InputField label="Bill No" value={form.billNo} onChange={(e) => setForm({ ...form, billNo: e.target.value })} required />
+                <DateField label="Bill Date" value={form.billDate} onChange={(billDate) => setForm({ ...form, billDate })} />
+              </div>
+              <div>
+                <InputField label="PO No" value={form.poNo} onChange={(e) => setForm({ ...form, poNo: e.target.value })} />
+                <SelectField
+                  label="Party Name"
+                  value={form.partyName}
+                  onChange={(e) => setForm({ ...form, partyName: e.target.value })}
+                  options={parties.map((p) => p.name)}
+                />
+              </div>
+            </TwoCol>
           </FormCard>
+        ) : (
+          <FormCard>
+            <TwoCol>
+              <div>
+                <DateField label="Bill Date" value={form.billDate} onChange={(billDate) => setForm({ ...form, billDate })} />
+                <ManualNumberField label="Total Amount" value={form.amount} onChange={(amount) => setForm({ ...form, amount })} />
+                <ManualNumberField label="IGST %" value={form.igstPct} onChange={(igstPct) => setForm({ ...form, igstPct })} />
+                <ManualNumberField label="CGST %" value={form.cgstPct} onChange={(cgstPct) => setForm({ ...form, cgstPct })} />
+                <ManualNumberField label="IGST Amount" value={igstAmt} readOnly />
+                <ManualNumberField label="CGST Amount" value={cgstAmt} readOnly />
+              </div>
+              <div>
+                <InputField label="Bill No" value={form.billNo} onChange={(e) => setForm({ ...form, billNo: e.target.value })} required />
+                <InputField label="PO No" value={form.poNo} onChange={(e) => setForm({ ...form, poNo: e.target.value })} />
+                <SelectField
+                  label="Party Name"
+                  value={form.partyName}
+                  onChange={(e) => setForm({ ...form, partyName: e.target.value })}
+                  options={parties.map((p) => p.name)}
+                />
+                <InputField label="Remark" value={form.remark} onChange={(e) => setForm({ ...form, remark: e.target.value })} />
+                <ManualNumberField label="Total Amount" value={grand} readOnly />
+                <ManualNumberField label="SGST %" value={form.sgstPct} onChange={(sgstPct) => setForm({ ...form, sgstPct })} />
+                <ManualNumberField label="SGST Amount" value={sgstAmt} readOnly />
+                <DateField label="Subm Date" value={form.submitDate} onChange={(submitDate) => setForm({ ...form, submitDate })} />
+              </div>
+            </TwoCol>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <Button type="submit" disabled={!!editId || saving}>
+                {saving ? "Saving..." : "Save Bill"}
+              </Button>
+              <Button type="button" variant="teal" disabled={!editId} onClick={modify}>
+                Modify Bill
+              </Button>
+              <Button type="button" variant="danger" disabled={!editId} onClick={del}>
+                Delete Bill
+              </Button>
+              <Button type="button" variant="teal" onClick={() => router.push(searchHref)}>
+                Search Bill
+              </Button>
+            </div>
+          </FormCard>
+        )}
+
+        {variant === "meter" || form.partyName ? (
+        <FormCard className={variant === "meter" && !form.partyName ? "min-h-16" : ""}>
+          {form.partyName ? (
+            <>
+              <p className="mb-3 text-sm font-semibold text-[#333]">
+                {editId ? `Linked LRs (${visibleLrs.length})` : `Unbilled LRs auto-selected (${selectedIds.length}/${visibleLrs.length})`}
+              </p>
+              <DataTable
+                rows={visibleLrs.map((row, i) => ({ ...row, sr: i + 1 }))}
+                searchKeys={["lrNo", "vehNo", "fromStation", "toStation"]}
+                columns={[
+                  {
+                    key: "select",
+                    header: "Select",
+                    render: (row) => (
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(row.id)}
+                        disabled={!!editId}
+                        onChange={(e) => toggleLr(row.id, e.target.checked)}
+                      />
+                    ),
+                  },
+                  { key: "lrNo", header: "LR No" },
+                  { key: "lrDate", header: "LR Date", render: (row) => isoToDisplay(row.lrDate) },
+                  { key: "vehNo", header: "Veh No" },
+                  { key: "fromStation", header: "From" },
+                  { key: "toStation", header: "To" },
+                  { key: "billAs", header: "Bill As" },
+                  { key: variant === "meter" ? "totalMeter" : "chargedWeight", header: variant === "meter" ? "Meter" : "Weight" },
+                  { key: "grandTotal", header: "Amount" },
+                ]}
+              />
+              {!editId && !visibleLrs.length ? <p className="mt-2 text-sm text-[#a94442]">No unbilled LRs found for this party.</p> : null}
+            </>
+          ) : null}
+        </FormCard>
         ) : null}
 
-        <FormCard>
-          <TwoCol>
-            <div>
-              <MoneyField label="Total Amount" value={form.amount} onChange={(amount) => setForm({ ...form, amount })} />
-              <InputField label="CGST %" value={form.cgstPct} onChange={(e) => setForm({ ...form, cgstPct: Number(e.target.value) || 0 })} />
-              <MoneyField label="CGST Amount" value={cgstAmt} readOnly />
-              <InputField label="SGST %" value={form.sgstPct} onChange={(e) => setForm({ ...form, sgstPct: Number(e.target.value) || 0 })} />
-              <MoneyField label="SGST Amount" value={sgstAmt} readOnly />
+        {variant === "meter" ? (
+          <FormCard>
+            <TwoCol>
+              <div>
+                <ManualNumberField label="Total Amount" value={form.amount} onChange={(amount) => setForm({ ...form, amount })} />
+                <ManualNumberField label="IGST %" value={form.igstPct} onChange={(igstPct) => setForm({ ...form, igstPct })} />
+                <ManualNumberField label="CGST %" value={form.cgstPct} onChange={(cgstPct) => setForm({ ...form, cgstPct })} />
+                <ManualNumberField label="IGST Amount" value={igstAmt} readOnly />
+                <ManualNumberField label="CGST Amount" value={cgstAmt} readOnly />
+              </div>
+              <div>
+                <ManualNumberField label="Total Amount" value={grand} readOnly />
+                <ManualNumberField label="SGST %" value={form.sgstPct} onChange={(sgstPct) => setForm({ ...form, sgstPct })} />
+                <InputField label="Remark" value={form.remark} onChange={(e) => setForm({ ...form, remark: e.target.value })} />
+                <ManualNumberField label="SGST Amount" value={sgstAmt} readOnly />
+                <DateField label="Subm. Date" value={form.submitDate} onChange={(submitDate) => setForm({ ...form, submitDate })} />
+              </div>
+            </TwoCol>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <Button type="submit" disabled={!!editId || saving}>
+                {saving ? "Saving..." : "Save Bill"}
+              </Button>
+              <Button type="button" variant="teal" disabled={!editId} onClick={modify}>
+                Modify Bill
+              </Button>
+              <Button type="button" variant="danger" disabled={!editId} onClick={del}>
+                Delete Bill
+              </Button>
+              <Button type="button" variant="teal" onClick={() => router.push(searchHref)}>
+                Search Bill
+              </Button>
             </div>
-            <div>
-              {variant === "weight" ? (
-                <>
-                  <InputField label="GST %" value={form.igstPct} onChange={(e) => setForm({ ...form, igstPct: Number(e.target.value) || 0 })} />
-                  <MoneyField label="IGST Amount" value={igstAmt} readOnly />
-                </>
-              ) : (
-                <>
-                  <InputField label="IGST %" value={form.igstPct} onChange={(e) => setForm({ ...form, igstPct: Number(e.target.value) || 0 })} />
-                  <MoneyField label="IGST Amount" value={Number(((form.amount * form.igstPct) / 100).toFixed(2))} readOnly />
-                </>
-              )}
-              <MoneyField label="Total Amount" value={grand} readOnly />
-              <InputField label="Remark" value={form.remark} onChange={(e) => setForm({ ...form, remark: e.target.value })} />
-              <DateField
-                label={variant === "weight" ? "Subm.Date" : "Submit Date"}
-                value={form.submitDate}
-                onChange={(submitDate) => setForm({ ...form, submitDate })}
-              />
-            </div>
-          </TwoCol>
-          <div className="mt-2 flex flex-wrap gap-2">
-            <Button type="submit" disabled={!!editId || saving}>
-              {saving ? "Saving..." : "Save Bill"}
-            </Button>
-            <Button type="button" variant="teal" disabled={!editId} onClick={modify}>
-              Update Bill
-            </Button>
-            <Button type="button" variant="danger" disabled={!editId} onClick={del}>
-              Delete Bill
-            </Button>
-            <Button type="button" variant="teal" onClick={() => router.push("/bills/search")}>
-              Search Bill
-            </Button>
-          </div>
-        </FormCard>
+          </FormCard>
+        ) : null}
       </form>
     </>
   );

@@ -69,7 +69,7 @@ export default function BillGenerationPage() {
 
   return (
     <>
-      <PageHeader title="Bill Generation" subtitle="Prepare party bills" crumbs={[{ label: "Home", href: "/" }, { label: "Bill Generation" }]} />
+      <PageHeader title="Bill Generation" subtitle="Prepare party bills" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Bill Generation" }]} />
       <Flash message={message} />
       <form onSubmit={onSubmit}>
         <FormCard>

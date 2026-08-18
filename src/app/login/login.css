@@ -65,38 +65,21 @@
 
 .dpr-login-brand {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
   margin-bottom: 28px;
 }
 
-.dpr-login-mark {
-  display: grid;
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-  place-items: center;
-  border-radius: 12px;
-  background: linear-gradient(160deg, #0f766e, #115e59);
-  color: #fff;
-  box-shadow: 0 6px 14px rgba(15, 118, 110, 0.28);
-}
-
-.dpr-login-brand h1 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  line-height: 1.2;
-  color: var(--login-text);
+.dpr-login-logo {
+  max-height: 84px;
+  width: auto;
 }
 
 .dpr-login-brand p {
-  margin: 3px 0 0;
-  font-size: 12px;
-  font-weight: 500;
+  margin: 0;
   color: var(--login-muted);
-  letter-spacing: 0.01em;
+  font-size: 14px;
 }
 
 .dpr-login-intro h2 {

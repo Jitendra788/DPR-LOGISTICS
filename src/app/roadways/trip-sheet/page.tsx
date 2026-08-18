@@ -35,7 +35,7 @@ export default function TripSheetPage() {
 
   return (
     <>
-      <PageHeader title="Trip Sheet" subtitle="DPR Roadways trip entry" crumbs={[{ label: "Home", href: "/" }, { label: "Trip Sheet" }]} />
+      <PageHeader title="Trip Sheet" subtitle="DPR Roadways trip entry" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Trip Sheet" }]} />
       <Flash message={message} />
       <form onSubmit={onSubmit}>
         <FormCard>

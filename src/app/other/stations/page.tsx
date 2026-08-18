@@ -30,7 +30,7 @@ export default function StationMasterPage() {
 
   return (
     <>
-      <PageHeader title="Station Master" subtitle="Add source and destination stations" crumbs={[{ label: "Home", href: "/" }, { label: "Station Master" }]} />
+      <PageHeader title="Station Master" subtitle="Add source and destination stations" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Station Master" }]} />
       <Flash message={message} />
       <form onSubmit={onSubmit}>
         <FormCard>

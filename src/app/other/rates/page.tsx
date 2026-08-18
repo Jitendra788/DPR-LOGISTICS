@@ -35,7 +35,7 @@ export default function RateMasterPage() {
 
   return (
     <>
-      <PageHeader title="Rate Master" subtitle="Maintain freight rates" crumbs={[{ label: "Home", href: "/" }, { label: "Rate Master" }]} />
+      <PageHeader title="Rate Master" subtitle="Maintain freight rates" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Rate Master" }]} />
       <Flash message={message} />
       <form onSubmit={onSubmit}>
         <FormCard>

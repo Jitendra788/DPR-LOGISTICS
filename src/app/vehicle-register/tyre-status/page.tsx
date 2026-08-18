@@ -64,7 +64,7 @@ export default function TyreStatusPage() {
 
   return (
     <>
-      <PageHeader title="Vehicle LHC Booking" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/" }, { label: "Self Vehicle Data Entry" }]} />
+      <PageHeader title="Vehicle LHC Booking" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Self Vehicle Data Entry" }]} />
       <Flash message={message} />
       <form onSubmit={onSubmit}>
         <FormCard>

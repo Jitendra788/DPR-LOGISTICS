@@ -22,7 +22,7 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
   try {
     const updated = await getModel(resource).update({
       where: { id: Number(id) },
-      data: sanitize(body),
+      data: sanitize(body, resource),
     });
     return NextResponse.json(updated);
   } catch (err) {

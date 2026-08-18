@@ -1,7 +1,7 @@
 "use client";
 
-import { MoneyReceiptSearch } from "@/components/pages/MoneyReceiptSearch";
+import { MoneyReceiptEdit } from "@/components/pages/MoneyReceiptEdit";
 
 export default function RoadwaysMoneyReceiptPage() {
-  return <MoneyReceiptSearch reportHref="/roadways/outstanding" source="ROADWAYS" />;
+  return <MoneyReceiptEdit source="ROADWAYS" backHref="/roadways/money-receipt/new" />;
 }

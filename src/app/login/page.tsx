@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Eye, EyeOff, Lock, ShieldCheck, Truck, UserRound } from "lucide-react";
+import { BrandLogo } from "@/components/BrandLogo";
 import { api } from "@/lib/api-client";
 import "./login.css";
 
@@ -42,7 +43,7 @@ export default function LoginPage() {
         method: "POST",
         body: JSON.stringify({ username, password }),
       });
-      router.push("/");
+      router.push("/dashboard");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
@@ -57,11 +58,8 @@ export default function LoginPage() {
         <div className="dpr-login-stack">
           <section className="dpr-login-card" aria-labelledby="login-heading">
             <div className="dpr-login-brand">
-              <div className="dpr-login-mark" aria-hidden="true">
-                <Truck size={22} strokeWidth={2} />
-              </div>
+              <BrandLogo width={200} height={80} priority className="dpr-login-logo" />
               <div>
-                <h1>DPR LOGISTICS</h1>
                 <p>Transport & Logistics Management System</p>
               </div>
             </div>

@@ -23,7 +23,7 @@ type Vendor = {
 export default function VendorCreationPage() {
   const { rows, message, create, update, remove, setMessage } = useCrud<Vendor>("vendors");
   const [editId, setEditId] = useState<number | null>(null);
-  const [form, setForm] = useState<Partial<Vendor>>({ type: "Other" });
+  const [form, setForm] = useState<Partial<Vendor>>({ type: "Other", gst: "" });
 
   function load(row: Vendor) {
     setEditId(row.id);
@@ -33,18 +33,19 @@ export default function VendorCreationPage() {
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const body = { ...form, ...formToObject(e.currentTarget) };
+    const raw = { ...form, ...formToObject(e.currentTarget) };
+    const body = { ...raw, gst: String(raw.gst ?? "").trim() };
     const saved = editId ? await update(editId, body) : await create(body);
     if (saved) {
       setEditId(null);
       e.currentTarget.reset();
-      setForm({ type: "Other" });
+      setForm({ type: "Other", gst: "" });
     }
   }
 
   return (
     <>
-      <PageHeader title="Vendor Creation" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/" }, { label: "Vendor Creation" }]} />
+      <PageHeader title="Vendor Creation" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Vendor Creation" }]} />
       <Flash message={message} />
       <form onSubmit={onSubmit}>
         <FormCard>

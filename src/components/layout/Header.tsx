@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api-client";
+import { ADMIN_HOME } from "@/lib/admin-routes";
+import { BrandLogo } from "@/components/BrandLogo";
 import { useTheme } from "@/hooks/useTheme";
 import { GlobalSearch } from "./GlobalSearch";
 
@@ -17,33 +19,39 @@ type Props = {
 
 type SessionUser = { username?: string; name?: string; branch?: string };
 
-type DashStats = {
-  pendingLorryHire: number;
-  pendingBill: number;
+type NoteItem = {
+  id: string;
+  title: string;
+  detail: string;
+  href: string;
+  count: number;
 };
 
 export function Header({ collapsed, onToggle, isDesktop, mobileOpen }: Props) {
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
   const [user, setUser] = useState<SessionUser | null>(null);
-  const [stats, setStats] = useState<DashStats>({ pendingLorryHire: 0, pendingBill: 0 });
+  const [notes, setNotes] = useState<NoteItem[]>([]);
+  const [badge, setBadge] = useState(0);
   const [profileOpen, setProfileOpen] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const notesRef = useRef<HTMLDivElement>(null);
 
+  function loadNotes() {
+    api<{ badge: number; items: NoteItem[] }>("/api/notifications")
+      .then((res) => {
+        setNotes(res.items ?? []);
+        setBadge(res.badge ?? 0);
+      })
+      .catch(() => undefined);
+  }
+
   useEffect(() => {
     api<{ user: SessionUser | null }>("/api/auth/me")
       .then((res) => setUser(res.user))
       .catch(() => undefined);
-    api<DashStats>("/api/dashboard")
-      .then((res) =>
-        setStats({
-          pendingLorryHire: res.pendingLorryHire ?? 0,
-          pendingBill: res.pendingBill ?? 0,
-        }),
-      )
-      .catch(() => undefined);
+    loadNotes();
   }, []);
 
   useEffect(() => {
@@ -63,7 +71,6 @@ export function Header({ collapsed, onToggle, isDesktop, mobileOpen }: Props) {
   }
 
   const displayName = user?.name || (user?.username ? capitalize(user.username) : "Admin User");
-  const badge = stats.pendingBill + stats.pendingLorryHire;
 
   return (
     <header className="erp-header">
@@ -78,8 +85,8 @@ export function Header({ collapsed, onToggle, isDesktop, mobileOpen }: Props) {
           <Menu className="h-5 w-5" />
         </button>
         {(!isDesktop || collapsed) && (
-          <Link href="/" className="erp-header-logo">
-            DPR Logistics
+          <Link href={ADMIN_HOME} className="erp-header-logo">
+            <BrandLogo width={120} height={48} className="erp-header-logo-img" />
           </Link>
         )}
       </div>
@@ -102,7 +109,11 @@ export function Header({ collapsed, onToggle, isDesktop, mobileOpen }: Props) {
             aria-label={`Notifications${badge ? `, ${badge} pending` : ""}`}
             aria-expanded={notesOpen}
             onClick={() => {
-              setNotesOpen((v) => !v);
+              setNotesOpen((v) => {
+                const next = !v;
+                if (next) loadNotes();
+                return next;
+              });
               setProfileOpen(false);
             }}
           >
@@ -111,16 +122,23 @@ export function Header({ collapsed, onToggle, isDesktop, mobileOpen }: Props) {
           </button>
           {notesOpen ? (
             <div className="erp-dropdown erp-dropdown-wide" role="menu">
-              <p className="erp-dropdown-title">Alerts</p>
-              <Link href="/bills/generation" className="erp-dropdown-item" onClick={() => setNotesOpen(false)}>
-                <span>Pending bills</span>
-                <strong>{stats.pendingBill}</strong>
+              <p className="erp-dropdown-title">{badge ? `You have ${badge} notification${badge === 1 ? "" : "s"}` : "Notifications"}</p>
+              {notes.length ? (
+                notes.map((n) => (
+                  <Link key={n.id} href={n.href} className="erp-dropdown-item erp-note-item" onClick={() => setNotesOpen(false)}>
+                    <span>
+                      <span className="erp-note-title">{n.title}</span>
+                      <span className="erp-note-detail">{n.detail}</span>
+                    </span>
+                    <strong>{n.count}</strong>
+                  </Link>
+                ))
+              ) : (
+                <p className="erp-dropdown-empty">No pending alerts</p>
+              )}
+              <Link href="/dashboard" className="erp-dropdown-foot" onClick={() => setNotesOpen(false)}>
+                View dashboard
               </Link>
-              <Link href="/lhc/contract" className="erp-dropdown-item" onClick={() => setNotesOpen(false)}>
-                <span>Pending lorry hire</span>
-                <strong>{stats.pendingLorryHire}</strong>
-              </Link>
-              {badge === 0 ? <p className="erp-dropdown-empty">No pending alerts</p> : null}
             </div>
           ) : null}
         </div>

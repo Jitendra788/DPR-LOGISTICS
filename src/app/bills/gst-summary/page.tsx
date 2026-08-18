@@ -20,7 +20,7 @@ export default function GstSummaryPage() {
 
   return (
     <>
-      <PageHeader title="GST Summary Report" subtitle="Select Date and View Report" subtitleClass="text-red-600" crumbs={[{ label: "Home", href: "/" }, { label: "GST Summary Report" }]} />
+      <PageHeader title="GST Summary Report" subtitle="Select Date and View Report" subtitleClass="text-red-600" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "GST Summary Report" }]} />
       <FormCard>
         <p className="mb-3 text-sm font-semibold">Total GST: ₹ {totalGst.toFixed(2)}</p>
         <Button type="button" onClick={() => downloadCsv("gst-summary.csv", rows as unknown as Record<string, unknown>[])}>Export to Excel</Button>

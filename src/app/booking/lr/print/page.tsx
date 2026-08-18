@@ -1,66 +1,53 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { LrConsignmentNote, type LrPrintBooking } from "@/components/print/LrConsignmentNote";
 import { api } from "@/lib/api-client";
 
-type Booking = {
-  lrNo: string;
-  lrDate: string;
-  fromStation: string;
-  toStation: string;
-  vehNo: string;
-  billingParty: string;
-  consignor: string;
-  consignee: string;
-  particulars: string;
-  articles: string;
-  chargedWeight: string;
-  freight: number;
-  gst: number;
-  grandTotal: number;
-  deliveryAt: string;
+type Party = { name: string; address: string; gst: string };
+
+const copyMap: Record<string, string> = {
+  Consignor: "Consignor Copy",
+  Lorry: "Lorry Copy",
+  Consignee: "Consignee Copy",
 };
+
+function findParty(parties: Party[], name: string) {
+  const q = name.trim().toLowerCase();
+  return parties.find((p) => p.name.trim().toLowerCase() === q);
+}
 
 function PrintInner() {
   const params = useSearchParams();
   const lrNo = params.get("lrNo") ?? "";
   const copies = (params.get("copies") || "Consignor").split(",").filter(Boolean);
-  const [row, setRow] = useState<Booking | null>(null);
+  const [row, setRow] = useState<LrPrintBooking | null>(null);
+  const [parties, setParties] = useState<Party[]>([]);
 
   useEffect(() => {
-    api<Booking[]>("/api/bookings").then((rows) => {
+    Promise.all([api<LrPrintBooking[]>("/api/bookings"), api<Party[]>("/api/parties")]).then(([rows, partyRows]) => {
+      setParties(partyRows);
       setRow(rows.find((r) => r.lrNo === lrNo) ?? null);
-      setTimeout(() => window.print(), 400);
+      setTimeout(() => window.print(), 500);
     });
   }, [lrNo]);
+
+  const consignorParty = useMemo(() => (row ? findParty(parties, row.consignor) : undefined), [parties, row]);
+  const consigneeParty = useMemo(() => (row ? findParty(parties, row.consignee) : undefined), [parties, row]);
 
   if (!row) return <p className="p-8">Loading LR...</p>;
 
   return (
-    <div className="space-y-8 p-8 print:p-4">
+    <div className="lr-print-page">
       {copies.map((copy) => (
-        <div key={copy} className="break-after-page border p-6">
-          <h1 className="text-center text-xl font-bold">DPR Logistics — Lorry Receipt</h1>
-          <p className="mb-4 text-center text-sm">{copy} Copy</p>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <p><b>LR No:</b> {row.lrNo}</p>
-            <p><b>Date:</b> {row.lrDate}</p>
-            <p><b>From:</b> {row.fromStation}</p>
-            <p><b>To:</b> {row.toStation}</p>
-            <p><b>Vehicle:</b> {row.vehNo}</p>
-            <p><b>Delivery:</b> {row.deliveryAt}</p>
-            <p><b>Billing Party:</b> {row.billingParty}</p>
-            <p><b>Consignor:</b> {row.consignor}</p>
-            <p><b>Consignee:</b> {row.consignee}</p>
-            <p><b>Articles:</b> {row.articles}</p>
-            <p><b>Particulars:</b> {row.particulars}</p>
-            <p><b>Weight:</b> {row.chargedWeight}</p>
-            <p><b>Freight:</b> {row.freight}</p>
-            <p><b>GST:</b> {row.gst}</p>
-            <p><b>Grand Total:</b> {row.grandTotal}</p>
-          </div>
-        </div>
+        <LrConsignmentNote
+          key={copy}
+          booking={row}
+          copyLabel={copyMap[copy] || `${copy} Copy`}
+          consignorParty={consignorParty}
+          consigneeParty={consigneeParty}
+        />
       ))}
     </div>
   );

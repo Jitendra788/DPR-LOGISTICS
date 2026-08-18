@@ -314,6 +314,10 @@ model MoneyReceipt {
   remarks    String @default("")
   source     String @default("DPR")
   billNo     String @default("")
+  tdsPct     Float  @default(0)
+  tdsAmt     Float  @default(0)
+  paidAmt    Float  @default(0)
+  otherDed   Float  @default(0)
 }
 
 model VendorVoucher {
@@ -374,4 +378,13 @@ model TyreStatus {
   tyreChangeStatus  String @default("Yes")
   servicingStatus   String @default("Yes")
   entryDate         String @default("")
+}
+
+model PodDocument {
+  id         Int      @id @default(autoincrement())
+  lrNo       String
+  fileName   String
+  storedName String
+  mimeType   String   @default("application/octet-stream")
+  createdAt  DateTime @default(now())
 }

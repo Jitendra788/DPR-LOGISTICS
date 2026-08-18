@@ -30,7 +30,7 @@ export default function ExpenseEntryPage() {
 
   return (
     <>
-      <PageHeader title="Expense Entry" subtitle="Roadways vehicle expenses" crumbs={[{ label: "Home", href: "/" }, { label: "Expense Entry" }]} />
+      <PageHeader title="Expense Entry" subtitle="Roadways vehicle expenses" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Expense Entry" }]} />
       <Flash message={message} />
       <form onSubmit={onSubmit}>
         <FormCard>

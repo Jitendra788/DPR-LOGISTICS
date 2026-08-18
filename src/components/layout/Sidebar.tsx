@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { ADMIN_HOME } from "@/lib/admin-routes";
+import { BrandLogo } from "@/components/BrandLogo";
 import { usePathname } from "next/navigation";
 import {
   Car,
@@ -59,14 +61,12 @@ export function Sidebar({ open, collapsed, isDesktop, onNavigate }: Props) {
       aria-label="Main navigation"
     >
       <div className="erp-sidebar-brand">
-        <Link href="/" className="erp-brand-link" onClick={onNavigate} title="DPR Logistics">
-          <span className="erp-brand-mark" aria-hidden>
-            D
-          </span>
+        <Link href={ADMIN_HOME} className="erp-brand-link" onClick={onNavigate} title="DPR Logistics">
+          <BrandLogo width={collapsed ? 36 : 140} height={collapsed ? 36 : 56} className={`erp-brand-logo ${collapsed ? "erp-brand-logo-collapsed" : ""}`} />
           {!collapsed ? (
             <span className="erp-brand-text">
               <strong>DPR Logistics</strong>
-              <small>Transport ERP</small>
+              <small>Operations Console</small>
             </span>
           ) : null}
         </Link>
@@ -105,7 +105,7 @@ export function Sidebar({ open, collapsed, isDesktop, onNavigate }: Props) {
                 className={`erp-nav-item ${active ? "is-active" : ""}`}
               >
                 <Icon className="erp-nav-icon" />
-                {!collapsed ? <span className="truncate">{item.label}</span> : null}
+                {!collapsed ? <span className="erp-nav-label">{item.label}</span> : null}
                 {collapsed ? <span className="erp-tooltip">{item.label}</span> : null}
               </Link>
             );
@@ -126,7 +126,7 @@ export function Sidebar({ open, collapsed, isDesktop, onNavigate }: Props) {
                 <Icon className="erp-nav-icon" />
                 {!collapsed ? (
                   <>
-                    <span className="min-w-0 flex-1 truncate text-left">{item.label}</span>
+                    <span className="erp-nav-label flex-1 text-left">{item.label}</span>
                     <ChevronDown className={`erp-chevron ${openMenu ? "is-open" : ""}`} />
                   </>
                 ) : (
@@ -142,8 +142,9 @@ export function Sidebar({ open, collapsed, isDesktop, onNavigate }: Props) {
                       href={child.href}
                       onClick={onNavigate}
                       className={`erp-flyout-link ${pathname === child.href ? "is-active" : ""}`}
+                      title={child.label}
                     >
-                      {child.label}
+                      <span className="erp-sub-link-label">{child.label}</span>
                     </Link>
                   ))}
                 </div>
@@ -158,8 +159,9 @@ export function Sidebar({ open, collapsed, isDesktop, onNavigate }: Props) {
                         href={child.href}
                         onClick={onNavigate}
                         className={`erp-sub-link ${childActive ? "is-active" : ""}`}
+                        title={child.label}
                       >
-                        {child.label}
+                        <span className="erp-sub-link-label">{child.label}</span>
                       </Link>
                     );
                   })}

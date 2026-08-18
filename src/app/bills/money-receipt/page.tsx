@@ -3,5 +3,11 @@
 import { MoneyReceiptSearch } from "@/components/pages/MoneyReceiptSearch";
 
 export default function MoneyReceiptPage() {
-  return <MoneyReceiptSearch reportHref="/bills/money-receipt/report" source="DPR" />;
+  return (
+    <MoneyReceiptSearch
+      source="DPR"
+      editHref="/bills/money-receipt/edit"
+      reportHref="/bills/money-receipt/report"
+    />
+  );
 }
