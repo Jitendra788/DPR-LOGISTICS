@@ -1,8 +1,8 @@
 export const heroContent = {
-  badge: "Trusted Logistics Partner",
-  headline: "Moving India Forward,\nOne Shipment at a Time.",
+  badge: "DPR Logistics — Trusted Partner",
+  headline: "DPR Logistics — Moving India Forward,\nOne Shipment at a Time.",
   description:
-    "From Kolhapur to every major industrial corridor — reliable part load, FTL, trailer and warehousing solutions with real-time GC/LR tracking for businesses that never stop moving.",
+    "DPR Logistics is your Kolhapur-based pan-India cargo partner — part load, FTL, trailer and warehousing with real-time GC/LR tracking for businesses that never stop moving.",
   trustPoints: ["Pan-India Coverage", "Real-time GC/LR Tracking", "Secure Cargo Handling"],
 } as const;
 

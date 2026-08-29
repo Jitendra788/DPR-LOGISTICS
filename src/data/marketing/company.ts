@@ -6,9 +6,9 @@ export const company = {
   shortDescription:
     "DPR Logistics delivers end-to-end cargo, warehousing and distribution services across India with online GC/LR tracking, pickup requests and GST-compliant billing.",
   seo: {
-    homeTitle: "Pan-India Cargo Transport, FTL & Part Load",
+    homeTitle: "DPR Logistics — Cargo Transport, FTL & Part Load",
     homeDescription:
-      "DPR Logistics — trusted logistics partner from Kolhapur for part load, FTL, trailers, containers and warehousing across Maharashtra, Gujarat and pan-India. Track shipments online or call +91 93562 59949.",
+      "DPR Logistics (dprlogistics.in) — trusted pan-India cargo transport company from Kolhapur. Part load, FTL, trailers, containers, warehousing. Track GC/LR online or call +91 93562 59949.",
   },
   phone: "+91 93562 59949",
   supportPhone: "+91 93562 59949",

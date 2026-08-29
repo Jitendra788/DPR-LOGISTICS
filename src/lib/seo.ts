@@ -117,6 +117,7 @@ export function organizationJsonLd() {
     "@type": "Organization",
     name: company.name,
     legalName: company.name,
+    alternateName: ["DPR", "DPR Logistics Kolhapur", "dprlogistics.in", "DPR Logistics SP Group"],
     url: SITE_URL,
     logo: absoluteUrl(DEFAULT_OG_IMAGE),
     description: company.description,

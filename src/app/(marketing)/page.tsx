@@ -22,6 +22,9 @@ export const metadata = createPageMetadata({
   path: "/",
   keywords: [
     "DPR Logistics",
+    "DPR",
+    "dprlogistics.in",
+    "DPR Logistics Kolhapur",
     "logistics company India",
     "cargo transport Kolhapur",
     "part load FTL transport",

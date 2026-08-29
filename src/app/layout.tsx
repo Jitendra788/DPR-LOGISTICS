@@ -6,8 +6,9 @@ import "./theme-dark.css";
 import "./responsive.css";
 
 export const metadata: Metadata = {
-  title: "DPR Logistics",
-  description: "DPR Logistics management system",
+  title: "DPR Logistics | Transport & Logistics India",
+  description:
+    "DPR Logistics — pan-India cargo transport, part load, FTL, tracking and warehousing from Kolhapur, Maharashtra.",
 };
 
 export const viewport: Viewport = {

@@ -7,6 +7,9 @@ export function middleware(req: Request) {
   const isPublic =
     isMarketingRoute(pathname) ||
     pathname === "/login" ||
+    pathname === "/robots.txt" ||
+    pathname === "/sitemap.xml" ||
+    pathname.endsWith(".html") ||
     pathname.startsWith("/customer-booking") ||
     pathname.startsWith("/api/public/") ||
     pathname.startsWith("/api/auth/login") ||
