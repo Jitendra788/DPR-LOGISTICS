@@ -2,7 +2,7 @@ export const lrPrintCompany = {
   name: "DPR LOGISTICS",
   tagline: "Fleet Owners & Transport Contractors",
   address: "Shree Mahalaxmi Petrol Pump 5 Star MIDC Road, Kagal Dist.Kolhapur 416216",
-  email: "dprkolhapur@gmail.com",
+  email: "dprlogistics2142@gmail.com",
   phones: "9356259949",
   jurisdiction: "Subject To Kolhapur Jurisdiction",
   customerCare: "9356259949",
