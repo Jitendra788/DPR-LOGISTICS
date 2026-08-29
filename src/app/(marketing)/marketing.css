@@ -1584,4 +1584,141 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Blog cards */
+.mkt-blog-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  background: #fff;
+  border: 1px solid var(--mkt-border);
+  border-radius: 16px;
+  padding: 1.35rem;
+  height: 100%;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.mkt-blog-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(11, 31, 58, 0.07);
+}
+.mkt-blog-card h2, .mkt-blog-card h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.4;
+  color: var(--mkt-navy);
+}
+.mkt-blog-card h2 a, .mkt-blog-card h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+.mkt-blog-card h2 a:hover, .mkt-blog-card h3 a:hover { color: var(--mkt-teal-dark); }
+.mkt-blog-card p {
+  margin: 0;
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--mkt-muted);
+  line-height: 1.6;
+}
+.mkt-blog-card time { font-size: 0.75rem; color: var(--mkt-muted); }
+.mkt-blog-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+.mkt-blog-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--mkt-teal-dark);
+  background: #ecfeff;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+}
+.mkt-blog-read {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--mkt-muted);
+}
+.mkt-blog-hero-meta { font-size: 0.9rem; color: var(--mkt-muted); margin-top: 0.5rem; }
+.mkt-blog-article { max-width: 720px; }
+
+/* Route cards */
+.mkt-route-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  background: #fff;
+  border: 1px solid var(--mkt-border);
+  border-radius: 16px;
+  padding: 1.35rem;
+  height: 100%;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+.mkt-route-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(11, 31, 58, 0.07);
+  border-color: rgba(13, 148, 136, 0.25);
+}
+.mkt-route-card-compact h3 { font-size: 1rem; margin: 0; }
+.mkt-route-card-compact p { font-size: 0.8125rem; margin: 0; color: var(--mkt-muted); }
+.mkt-route-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--mkt-teal-dark);
+}
+.mkt-route-card h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.4;
+  color: var(--mkt-navy);
+}
+.mkt-route-card h2 a, .mkt-route-card h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+.mkt-route-card h2 a:hover, .mkt-route-card h3 a:hover { color: var(--mkt-teal-dark); }
+.mkt-route-card p {
+  margin: 0;
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--mkt-muted);
+  line-height: 1.55;
+}
+.mkt-route-stats {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--mkt-muted);
+}
+.mkt-route-stats li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.mkt-route-hero-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+.mkt-route-hero-stats span {
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(13, 148, 136, 0.1);
+  color: var(--mkt-teal-dark);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
 /* Responsive rules live in marketing-responsive.css (loaded last) */

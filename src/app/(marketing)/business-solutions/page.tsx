@@ -3,11 +3,13 @@ import { businessSolutions } from "@/data/marketing/businessSolutions";
 import { company } from "@/data/marketing/company";
 import { SectionHeading } from "@/components/marketing/SectionHeading";
 import { MarketingButton } from "@/components/marketing/Button";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
   title: "Business Solutions",
-  description: `B2B, e-commerce, retail and industrial logistics solutions from ${company.name}.`,
-};
+  description: `B2B, e-commerce, retail, industrial and bulk logistics solutions from ${company.name}. Contract transport, warehousing and distribution programmes for enterprise shippers.`,
+  path: "/business-solutions",
+});
 
 export default function BusinessSolutionsPage() {
   return (

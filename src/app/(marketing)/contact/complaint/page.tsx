@@ -2,7 +2,13 @@ import type { Metadata } from "next";
 import { ContactForm } from "@/components/marketing/ContactForm";
 import { InnerPage } from "@/components/marketing/InnerPage";
 
-export const metadata: Metadata = { title: "Service Complaint" };
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createPageMetadata({
+  title: "Service Complaint",
+  description: "Raise a service complaint with DPR Logistics. Share your LR number and shipment details for prompt resolution.",
+  path: "/contact/complaint",
+});
 
 export default function ComplaintPage() {
   return (

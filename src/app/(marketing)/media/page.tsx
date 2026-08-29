@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { InnerPage } from "@/components/marketing/InnerPage";
 
-export const metadata: Metadata = { title: "Media Center" };
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createPageMetadata({
+  title: "Media Center",
+  description: "DPR Logistics media center — gallery, press updates and company news from India's trusted cargo transport partner.",
+  path: "/media",
+});
 
 export default function MediaPage() {
   return (

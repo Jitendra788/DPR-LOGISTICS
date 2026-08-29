@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { company } from "@/data/marketing/company";
 
-export const metadata: Metadata = {
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createPageMetadata({
   title: "Terms & Conditions",
-  description: `Terms and conditions for using ${company.name} services and website.`,
-};
+  description: `Terms and conditions for using ${company.name} cargo transport, tracking and booking services at dprlogistics.in.`,
+  path: "/terms",
+});
 
 export default function TermsPage() {
   return (

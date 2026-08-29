@@ -2,8 +2,8 @@ export const heroContent = {
   badge: "Trusted Logistics Partner",
   headline: "Moving India Forward,\nOne Shipment at a Time.",
   description:
-    "Reliable transportation and logistics solutions built for businesses that never stop moving.",
-  trustPoints: ["Pan-India Coverage", "Real-time Tracking", "Secure Handling"],
+    "From Kolhapur to every major industrial corridor — reliable part load, FTL, trailer and warehousing solutions with real-time GC/LR tracking for businesses that never stop moving.",
+  trustPoints: ["Pan-India Coverage", "Real-time GC/LR Tracking", "Secure Cargo Handling"],
 } as const;
 
 export type HomeService = {

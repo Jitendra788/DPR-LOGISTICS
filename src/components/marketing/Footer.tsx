@@ -40,6 +40,8 @@ export function MarketingFooter() {
               <li><Link href="/tracking">GC Tracking</Link></li>
               <li><Link href="/customer-booking">LR Booking</Link></li>
               <li><Link href="/quote">Pickup Request</Link></li>
+              <li><Link href="/routes">Popular Routes</Link></li>
+              <li><Link href="/blog">Blog</Link></li>
               <li><Link href="/network">Network</Link></li>
             </ul>
           </div>

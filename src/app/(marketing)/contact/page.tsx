@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { company } from "@/data/marketing/company";
 import { ContactForm } from "@/components/marketing/ContactForm";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description: `Contact ${company.name} for support, sales enquiries and business partnerships.`,
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "Contact Us",
+  description: `Contact ${company.name} for cargo booking, FTL/part load enquiries, tracking support and business partnerships. Call ${company.phone} or visit Kolhapur head office.`,
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return (

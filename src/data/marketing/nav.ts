@@ -32,6 +32,7 @@ export const marketingNav: NavItem[] = [
       { label: "Value Added Service", href: "/services/value-added" },
       { label: "Customized Service", href: "/services/customized" },
       { label: "Excellence in Service", href: "/services/excellence" },
+      { label: "Popular Routes", href: "/routes" },
     ],
   },
   {
@@ -50,6 +51,7 @@ export const marketingNav: NavItem[] = [
     children: [
       { label: "Awards & Recognitions", href: "/media/awards" },
       { label: "Gallery", href: "/media" },
+      { label: "Blog", href: "/blog" },
     ],
   },
   {
@@ -72,11 +74,13 @@ export const MARKETING_ROUTES = [
   "/services",
   "/tracking",
   "/network",
+  "/routes",
   "/business-solutions",
   "/quote",
   "/contact",
   "/careers",
   "/media",
+  "/blog",
   "/privacy",
   "/terms",
 ] as const;
@@ -88,11 +92,13 @@ export function isMarketingRoute(pathname: string) {
     "/services",
     "/tracking",
     "/network",
+    "/routes",
     "/business-solutions",
     "/quote",
     "/contact",
     "/careers",
     "/media",
+    "/blog",
     "/privacy",
     "/terms",
   ].some((route) => pathname === route || pathname.startsWith(`${route}/`));

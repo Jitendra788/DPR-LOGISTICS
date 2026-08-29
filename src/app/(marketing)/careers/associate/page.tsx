@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { InnerPage } from "@/components/marketing/InnerPage";
 
-export const metadata: Metadata = { title: "Business Associate" };
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createPageMetadata({
+  title: "Business Associate",
+  description: "Become a DPR Logistics business associate — booking and delivery partner programme across Maharashtra and pan-India lanes.",
+  path: "/careers/associate",
+});
 
 export default function AssociatePage() {
   return (

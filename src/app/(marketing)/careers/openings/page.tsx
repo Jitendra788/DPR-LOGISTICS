@@ -2,7 +2,13 @@ import type { Metadata } from "next";
 import { InnerPage } from "@/components/marketing/InnerPage";
 import { company } from "@/data/marketing/company";
 
-export const metadata: Metadata = { title: "Current Openings" };
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createPageMetadata({
+  title: "Current Openings",
+  description: "Current job openings at DPR Logistics — operations, booking desk, fleet coordination and customer care roles.",
+  path: "/careers/openings",
+});
 
 export default function OpeningsPage() {
   return (

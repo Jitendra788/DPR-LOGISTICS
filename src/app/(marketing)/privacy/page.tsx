@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { company } from "@/data/marketing/company";
 
-export const metadata: Metadata = {
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createPageMetadata({
   title: "Privacy Policy",
-  description: `Privacy policy for ${company.name}.`,
-};
+  description: `Privacy policy for ${company.name} website and online booking services at dprlogistics.in.`,
+  path: "/privacy",
+});
 
 export default function PrivacyPage() {
   return (

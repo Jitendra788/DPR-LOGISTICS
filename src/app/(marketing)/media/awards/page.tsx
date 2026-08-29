@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { InnerPage } from "@/components/marketing/InnerPage";
 
-export const metadata: Metadata = { title: "Awards & Recognitions" };
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createPageMetadata({
+  title: "Awards & Recognitions",
+  description: "Awards and recognitions earned by DPR Logistics for on-time delivery, customer service and operational excellence.",
+  path: "/media/awards",
+});
 
 export default function AwardsPage() {
   return (

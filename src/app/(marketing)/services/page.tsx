@@ -4,11 +4,20 @@ import { extraServices, transportServices } from "@/data/marketing/services";
 import { SectionHeading } from "@/components/marketing/SectionHeading";
 import { ServiceCard } from "@/components/marketing/ServiceCard";
 import { MarketingButton } from "@/components/marketing/Button";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Services",
-  description: "Part load, FTL, trailers, containers, warehousing and value-added logistics services.",
-};
+export const metadata: Metadata = createPageMetadata({
+  title: "Transport Services",
+  description:
+    "DPR Logistics transport services — part load, full truck load (FTL), trailers, containers, warehousing and value-added logistics across India. Book pickup online.",
+  path: "/services",
+  keywords: [
+    "part load transport India",
+    "FTL transport services",
+    "trailer container transport",
+    "warehousing logistics Maharashtra",
+  ],
+});
 
 export default function ServicesPage() {
   return (
@@ -16,8 +25,11 @@ export default function ServicesPage() {
       <section className="mkt-page-hero">
         <div className="mkt-container">
           <span className="mkt-eyebrow">Services</span>
-          <h1>Transport Service</h1>
-          <p>Part load, full truck load, trailers, containers and warehousing — with tracking and customer care.</p>
+          <h1>Transport & Cargo Services</h1>
+          <p>
+            Part load, full truck load, trailers, containers and warehousing — with online GC/LR tracking, pickup
+            requests and dedicated customer care across India.
+          </p>
         </div>
       </section>
       <section className="mkt-section">

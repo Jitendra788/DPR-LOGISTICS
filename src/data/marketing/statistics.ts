@@ -19,19 +19,27 @@ export const statistics: StatItem[] = [
 
 export const faqs = [
   {
-    q: "How do I track my consignment?",
-    a: "Use GC Tracking on this website. Enter your GC / LR / Docket number to see the latest status.",
+    q: "How do I track my DPR Logistics consignment?",
+    a: "Visit dprlogistics.in/tracking and enter your GC, LR or docket number. You will see booking details, current status and expected delivery timeline.",
   },
   {
-    q: "How do I request a pickup?",
-    a: "Open Pickup Request, share from–to stations, cargo details and a contact number. Our desk will confirm.",
+    q: "How do I request a pickup for part load or FTL?",
+    a: "Open the Pickup Request form on dprlogistics.in/quote. Share origin, destination, cargo weight, dimensions and contact number. Our booking desk confirms vehicle allocation and pickup time.",
   },
   {
-    q: "Do you offer part load and full truck load?",
-    a: "Yes. Part load for shared cargo and FTL / trailers / containers for dedicated movement.",
+    q: "Which routes does DPR Logistics cover?",
+    a: "We operate from Kolhapur with regular lanes across Maharashtra, Gujarat, Delhi NCR, Bangalore, Hyderabad, Chennai, Kolkata and other major industrial metros. Visit the Network page for branch details.",
+  },
+  {
+    q: "Do you offer part load and full truck load transport?",
+    a: "Yes. Part load for cost-effective shared cargo on scheduled routes. FTL, trailers and containers for dedicated high-volume, ODC and project cargo movement.",
+  },
+  {
+    q: "Does DPR Logistics provide warehousing?",
+    a: "Yes. We offer short-term and contract warehousing with loading, unloading, cross-dock and onward dispatch from key corridor points.",
   },
   {
     q: "How can I raise a service complaint?",
-    a: "Use Service Complaint under Contact Us, or call customer care with your LR number.",
+    a: "Use the Service Complaint form under Contact Us, or call customer care at +91 93562 59949 with your LR number and shipment details.",
   },
 ];

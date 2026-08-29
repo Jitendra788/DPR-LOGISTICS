@@ -2,7 +2,13 @@ import type { Metadata } from "next";
 import { managementTeam } from "@/data/marketing/company";
 import { InnerPage } from "@/components/marketing/InnerPage";
 
-export const metadata: Metadata = { title: "Management Team" };
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createPageMetadata({
+  title: "Management Team",
+  description: "Meet the DPR Logistics leadership team — operations, customer care and fleet management driving pan-India cargo delivery.",
+  path: "/about/management",
+});
 
 export default function ManagementPage() {
   return (

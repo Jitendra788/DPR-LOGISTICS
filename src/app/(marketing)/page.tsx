@@ -9,8 +9,26 @@ import { BusinessSolutionsSection } from "@/components/marketing/sections/Busine
 import { CtaSection } from "@/components/marketing/sections/CtaSection";
 import { HowItWorksSection } from "@/components/marketing/sections/HowItWorksSection";
 import { NetworkSection } from "@/components/marketing/sections/NetworkSection";
+import { PopularRoutesSection } from "@/components/marketing/sections/PopularRoutesSection";
+import { BlogPreviewSection } from "@/components/marketing/sections/BlogPreviewSection";
 import { TrackingSection } from "@/components/marketing/sections/TrackingSection";
 import { WhyDprSection } from "@/components/marketing/sections/WhyDprSection";
+import { company } from "@/data/marketing/company";
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata = createPageMetadata({
+  title: company.seo.homeTitle,
+  description: company.seo.homeDescription,
+  path: "/",
+  keywords: [
+    "DPR Logistics",
+    "logistics company India",
+    "cargo transport Kolhapur",
+    "part load FTL transport",
+    "GC LR tracking online",
+    "pan India logistics partner",
+  ],
+});
 
 export default function HomePage() {
   return (
@@ -42,6 +60,7 @@ export default function HomePage() {
       <HowItWorksSection />
       <TrackingSection />
       <NetworkSection />
+      <PopularRoutesSection />
       <BusinessSolutionsSection />
 
       <section className="mkt-section mkt-section-alt">
@@ -70,6 +89,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <BlogPreviewSection />
 
       <CtaSection />
     </>

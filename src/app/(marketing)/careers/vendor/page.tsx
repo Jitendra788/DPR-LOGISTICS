@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { InnerPage } from "@/components/marketing/InnerPage";
 
-export const metadata: Metadata = { title: "Vendor Registration" };
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createPageMetadata({
+  title: "Vendor Registration",
+  description: "Register as a transport vendor with DPR Logistics — lorry hire, fleet partners and contract vehicle suppliers.",
+  path: "/careers/vendor",
+});
 
 export default function VendorPage() {
   return (

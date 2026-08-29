@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import { company } from "@/data/marketing/company";
 import { QuoteForm } from "@/components/marketing/QuoteForm";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
   title: "Pickup Request",
-  description: `Request a cargo pickup from ${company.name}.`,
-};
+  description: `Request a cargo pickup from ${company.name}. Share route, weight and dimensions for part load, FTL, trailer or container booking across India.`,
+  path: "/quote",
+  keywords: ["pickup request", "cargo booking Kolhapur", "part load pickup", "FTL booking India"],
+});
 
 export default function QuotePage() {
   return (

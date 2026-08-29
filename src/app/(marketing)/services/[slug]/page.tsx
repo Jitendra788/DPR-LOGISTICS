@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { extraServices, services } from "@/data/marketing/services";
 import { InnerPage } from "@/components/marketing/InnerPage";
+import { JsonLd } from "@/components/marketing/JsonLd";
+import { absoluteUrl, createPageMetadata, serviceJsonLd } from "@/lib/seo";
 
 const extras = extraServices.map((s) => ({
   id: s.id,
@@ -19,8 +21,18 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const service = services.find((s) => s.id === slug) ?? extras.find((s) => s.id === slug);
-  return { title: service?.title ?? "Service" };
+  const service = services.find((s) => s.id === slug);
+  const extra = extraServices.find((s) => s.id === slug);
+  const title = service?.title ?? extra?.title ?? "Service";
+  const description =
+    service?.seoDescription ??
+    (extra ? `${extra.title} by DPR Logistics — ${extra.points[0]}` : "Logistics service by DPR Logistics.");
+  return createPageMetadata({
+    title,
+    description,
+    path: `/services/${slug}`,
+    keywords: [title, "DPR Logistics", "cargo transport India", "logistics Kolhapur"],
+  });
 }
 
 export default async function ServiceDetailPage({ params }: Props) {
@@ -31,9 +43,18 @@ export default async function ServiceDetailPage({ params }: Props) {
 
   const title = service?.title ?? extra?.title ?? "";
   const subtitle = service?.description ?? extra?.description;
+  const seoDescription = service?.seoDescription ?? subtitle ?? "";
 
   return (
-    <InnerPage eyebrow="Services" title={title} subtitle={subtitle} cta={{ href: "/quote", label: "Pickup Request" }}>
+    <>
+      <JsonLd
+        data={serviceJsonLd({
+          title,
+          description: seoDescription,
+          url: absoluteUrl(`/services/${slug}`),
+        })}
+      />
+      <InnerPage eyebrow="Services" title={title} subtitle={subtitle} cta={{ href: "/quote", label: "Pickup Request" }}>
       {service ? <p>{service.body}</p> : null}
       {extra ? (
         <ul>
@@ -43,5 +64,6 @@ export default async function ServiceDetailPage({ params }: Props) {
         </ul>
       ) : null}
     </InnerPage>
+    </>
   );
 }

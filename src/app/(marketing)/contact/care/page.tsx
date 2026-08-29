@@ -2,7 +2,13 @@ import type { Metadata } from "next";
 import { company } from "@/data/marketing/company";
 import { InnerPage } from "@/components/marketing/InnerPage";
 
-export const metadata: Metadata = { title: "Customer Care" };
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createPageMetadata({
+  title: "Customer Care",
+  description: "DPR Logistics customer care — booking support, GC/LR tracking help, POD follow-up and billing assistance. Call +91 93562 59949.",
+  path: "/contact/care",
+});
 
 export default function CarePage() {
   return (

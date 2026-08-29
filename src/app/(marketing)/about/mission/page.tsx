@@ -2,7 +2,14 @@ import type { Metadata } from "next";
 import { company } from "@/data/marketing/company";
 import { InnerPage } from "@/components/marketing/InnerPage";
 
-export const metadata: Metadata = { title: "Mission, Vision & Value" };
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createPageMetadata({
+  title: "Mission, Vision & Values",
+  description:
+    "DPR Logistics mission, vision and core values — reliable cargo transport, transparent operations and technology-first logistics across India.",
+  path: "/about/mission",
+});
 
 export default function MissionPage() {
   return (

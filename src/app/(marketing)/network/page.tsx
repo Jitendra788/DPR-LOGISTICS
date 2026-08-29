@@ -33,8 +33,9 @@ export default function NetworkPage() {
           <span className="mkt-eyebrow">Network</span>
           <h1>India logistics network</h1>
           <p>
-            DPR Logistics operates from Kolhapur with regular lanes across Maharashtra, Gujarat and major metros.
-            Contact our team for booking, tracking and delivery support on any route below.
+            DPR Logistics operates from Kolhapur with 50+ network points and regular lanes across Maharashtra, Gujarat,
+            Delhi NCR, Bangalore, Hyderabad, Chennai and major industrial metros. Search branches or contact our team
+            for part load, FTL and trailer booking on any route.
           </p>
         </div>
       </section>
