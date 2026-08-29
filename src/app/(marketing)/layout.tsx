@@ -3,7 +3,6 @@ import { MarketingFooter } from "@/components/marketing/Footer";
 import { MarketingHeader } from "@/components/marketing/Header";
 import { GoogleAnalytics } from "@/components/marketing/GoogleAnalytics";
 import { JsonLd } from "@/components/marketing/JsonLd";
-import { SiteChat } from "@/components/marketing/SiteChat";
 import { company } from "@/data/marketing/company";
 import { BRAND_LOGO } from "@/lib/brand";
 import { localBusinessJsonLd, organizationJsonLd, SITE_URL, websiteJsonLd } from "@/lib/seo";
@@ -74,7 +73,6 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       <MarketingHeader />
       <main>{children}</main>
       <MarketingFooter />
-      <SiteChat />
     </div>
   );
 }

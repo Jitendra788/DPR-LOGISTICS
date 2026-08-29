@@ -1,6 +1,4 @@
-import { testimonials } from "@/data/marketing/company";
 import { homeServices } from "@/data/marketing/homepage";
-import { HeroBannerCarousel } from "@/components/marketing/HeroBannerCarousel";
 import { Hero } from "@/components/marketing/Hero";
 import { HomeServiceCard } from "@/components/marketing/HomeServiceCard";
 import { SectionHeading } from "@/components/marketing/SectionHeading";
@@ -10,9 +8,6 @@ import { BusinessSolutionsSection } from "@/components/marketing/sections/Busine
 import { CtaSection } from "@/components/marketing/sections/CtaSection";
 import { HowItWorksSection } from "@/components/marketing/sections/HowItWorksSection";
 import { NetworkSection } from "@/components/marketing/sections/NetworkSection";
-import { PopularRoutesSection } from "@/components/marketing/sections/PopularRoutesSection";
-import { BlogPreviewSection } from "@/components/marketing/sections/BlogPreviewSection";
-import { TrackingSection } from "@/components/marketing/sections/TrackingSection";
 import { WhyDprSection } from "@/components/marketing/sections/WhyDprSection";
 import { company } from "@/data/marketing/company";
 import { createPageMetadata } from "@/lib/seo";
@@ -37,7 +32,6 @@ export const metadata = createPageMetadata({
 export default function HomePage() {
   return (
     <>
-      <HeroBannerCarousel />
       <Hero />
 
       <Statistics />
@@ -48,7 +42,7 @@ export default function HomePage() {
             <SectionHeading
               eyebrow="Our Services"
               title="Complete Logistics. One Reliable Partner."
-              subtitle="From part-load shipments to dedicated transportation, we provide end-to-end logistics solutions."
+              subtitle="Part load, full truck load, trailers, containers and warehousing — with tracking and customer care."
             />
           </ScrollReveal>
           <div className="mkt-grid-3 mkt-services-grid">
@@ -63,40 +57,8 @@ export default function HomePage() {
 
       <WhyDprSection />
       <HowItWorksSection />
-      <TrackingSection />
       <NetworkSection />
-      <PopularRoutesSection />
       <BusinessSolutionsSection />
-
-      <section className="mkt-section mkt-section-alt">
-        <div className="mkt-container">
-          <ScrollReveal>
-            <SectionHeading
-              eyebrow="Feedback"
-              title="What shippers value in a logistics partner"
-              subtitle="Illustrative examples — representative of common customer priorities, not verified reviews."
-              align="center"
-            />
-          </ScrollReveal>
-          <div className="mkt-quote-grid">
-            {testimonials.map((t, idx) => (
-              <ScrollReveal key={t.author + idx} delay={idx * 60}>
-                <blockquote className="mkt-quote-card mkt-quote-card-premium">
-                  <span className="mkt-demo-label">Illustrative</span>
-                  <p>{t.quote}</p>
-                  <footer>
-                    <strong>{t.author}</strong>
-                    <span>{t.company}</span>
-                  </footer>
-                </blockquote>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <BlogPreviewSection />
-
       <CtaSection />
     </>
   );
