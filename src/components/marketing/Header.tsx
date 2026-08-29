@@ -3,15 +3,20 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, Phone, X } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { company } from "@/data/marketing/company";
-import { marketingMobileNav, marketingNav, type NavItem } from "@/data/marketing/nav";
+import { marketingNav, type NavItem } from "@/data/marketing/nav";
+
+const TRACKING_HREF = "/tracking";
 
 function isActive(pathname: string, item: NavItem) {
   if (item.href && pathname === item.href) return true;
   return item.children?.some((c) => pathname === c.href || pathname.startsWith(`${c.href}/`)) ?? false;
 }
+
+/** Nav items excluding GC Tracking — shown as header CTA instead */
+const headerNav = marketingNav.filter((item) => item.href !== TRACKING_HREF);
 
 export function MarketingHeader() {
   const pathname = usePathname();
@@ -46,7 +51,7 @@ export function MarketingHeader() {
         </div>
 
         <nav className="mkt-nav" aria-label="Main navigation">
-          {marketingNav.map((item) =>
+          {headerNav.map((item) =>
             item.children ? (
               <div key={item.label} className="mkt-nav-drop">
                 <Link
@@ -77,11 +82,17 @@ export function MarketingHeader() {
         </nav>
 
         <div className="mkt-header-cta">
-          <Link href="/tracking" className="mkt-header-track-btn">
-            Track Shipment
-          </Link>
-          <Link href="/quote" className="mkt-header-quote-btn">
-            Get Quote
+          <a href={`tel:${company.phone.replace(/\s/g, "")}`} className="mkt-header-phone">
+            <span className="mkt-header-phone-icon">
+              <Phone aria-hidden />
+            </span>
+            <span className="mkt-header-phone-text">
+              <span className="mkt-header-phone-label">Talk To Us</span>
+              <span className="mkt-header-phone-num">{company.phone}</span>
+            </span>
+          </a>
+          <Link href={TRACKING_HREF} className="mkt-header-track-btn">
+            GC Tracking
           </Link>
           <button type="button" className="mkt-menu-btn" aria-label="Open menu" onClick={() => setOpen(true)}>
             <Menu aria-hidden />
@@ -95,7 +106,7 @@ export function MarketingHeader() {
             <X aria-hidden />
           </button>
           <nav className="mkt-mobile-links">
-            {marketingMobileNav.map((item) =>
+            {marketingNav.map((item) =>
               item.children ? (
                 <div key={item.label}>
                   <button
@@ -124,6 +135,9 @@ export function MarketingHeader() {
                 </Link>
               ),
             )}
+            <a href={`tel:${company.phone.replace(/\s/g, "")}`} className="mkt-mobile-phone">
+              <Phone aria-hidden /> Talk to us — {company.phone}
+            </a>
           </nav>
         </div>
       ) : null}

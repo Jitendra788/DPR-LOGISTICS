@@ -1,137 +1,79 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, MapPin } from "lucide-react";
+import { networkCities } from "@/data/marketing/branches";
 import { SectionHeading } from "@/components/marketing/SectionHeading";
 import { ScrollReveal } from "@/components/marketing/ScrollReveal";
 import { MarketingButton } from "@/components/marketing/Button";
 
-/** Primary north–south corridor shown on the India network map */
-const corridor = [
-  { id: "delhi", label: "Delhi", x: 52, y: 12, labelSide: "top" as const },
-  { id: "ahmedabad", label: "Ahmedabad", x: 34, y: 34, labelSide: "left" as const },
-  { id: "mumbai", label: "Mumbai", x: 48, y: 52, labelSide: "right" as const },
-  { id: "kolhapur", label: "Kolhapur", x: 56, y: 70, labelSide: "right" as const, hub: true },
-  { id: "bangalore", label: "Bangalore", x: 68, y: 88, labelSide: "right" as const },
-];
+const cityPositions: Record<string, { x: number; y: number }> = {
+  Kolhapur: { x: 30, y: 70 },
+  "Delhi NCR": { x: 42, y: 28 },
+  Jaipur: { x: 38, y: 38 },
+  Ahmedabad: { x: 28, y: 48 },
+  Surat: { x: 26, y: 55 },
+  Mumbai: { x: 24, y: 62 },
+  Pune: { x: 32, y: 66 },
+  Indore: { x: 40, y: 52 },
+  Nagpur: { x: 48, y: 58 },
+  Hyderabad: { x: 48, y: 72 },
+  Bangalore: { x: 44, y: 88 },
+  Chennai: { x: 52, y: 92 },
+  Kolkata: { x: 68, y: 52 },
+};
 
 export function NetworkSection() {
-  const pathD = corridor.map((c, i) => `${i === 0 ? "M" : "L"} ${c.x} ${c.y}`).join(" ");
-
   return (
     <section className="mkt-section mkt-network-section mkt-network-section-premium">
       <div className="mkt-container mkt-network-grid">
         <ScrollReveal>
           <SectionHeading
-            eyebrow="India Network Map"
-            title="Our network across India"
-            subtitle="A clear north–south corridor linking Delhi, Ahmedabad, Mumbai, Kolhapur and Bangalore — with pan-India branch coverage beyond these hubs."
+            eyebrow="Pan-India Network"
+            title="Our Network Across India"
+            subtitle="Strategic coverage from Kolhapur across Maharashtra, Gujarat and major industrial metros."
           />
+          <p className="mkt-network-note">
+            <MapPin aria-hidden className="inline-icon" />
+            Network cities are representative. Visit the network page for branch details.
+          </p>
           <MarketingButton href="/network" variant="primary" className="mkt-btn-lg">
             Explore Network <ArrowRight aria-hidden className="mkt-btn-icon" />
           </MarketingButton>
         </ScrollReveal>
 
         <ScrollReveal delay={100}>
-          <div className="mkt-network-map-wrap mkt-network-map-premium mkt-network-corridor">
-            <svg
-              viewBox="0 0 100 100"
-              className="mkt-network-map"
-              role="img"
-              aria-label="India network corridor: Delhi to Ahmedabad to Mumbai to Kolhapur to Bangalore"
-            >
+          <div className="mkt-network-map-wrap mkt-network-map-premium" aria-hidden>
+            <svg viewBox="0 0 100 100" className="mkt-network-map">
               <defs>
-                <linearGradient id="corridorGlow" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#0b1f33" stopOpacity="0.04" />
-                  <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.1" />
-                  <stop offset="100%" stopColor="#0b1f33" stopOpacity="0.04" />
-                </linearGradient>
-                <linearGradient id="corridorLine" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stopColor="#f59e0b" />
-                  <stop offset="100%" stopColor="#d97706" />
-                </linearGradient>
+                <radialGradient id="netGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#0d9488" stopOpacity="0.12" />
+                  <stop offset="100%" stopColor="#0b1f3a" stopOpacity="0" />
+                </radialGradient>
               </defs>
-
-              <rect width="100" height="100" fill="url(#corridorGlow)" rx="3" />
-
-              {/* Soft India silhouette hint */}
+              <rect width="100" height="100" fill="url(#netGlow)" rx="4" />
               <path
-                className="mkt-network-india-hint"
-                d="M48 8 C58 10 66 18 68 28 C72 40 78 48 76 58 C74 70 70 80 64 90 C58 96 50 98 42 94 C34 90 28 80 26 68 C24 56 28 46 32 36 C36 24 40 12 48 8 Z"
-                fill="rgba(11,31,51,0.04)"
-                stroke="rgba(11,31,51,0.08)"
-                strokeWidth="0.35"
-              />
-
-              {/* Corridor spine */}
-              <path
-                d={pathD}
+                d="M30 70 L32 66 L24 62 M30 70 L38 38 L28 48 L24 62 M42 28 L38 38 L40 52 L48 58 M48 58 L48 72 L44 88 M40 52 L48 72"
                 fill="none"
-                stroke="url(#corridorLine)"
-                strokeWidth="0.9"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="mkt-network-corridor-line"
+                stroke="rgba(13,148,136,0.35)"
+                strokeWidth="0.4"
+                strokeDasharray="1.5 1.5"
               />
-              <path
-                d={pathD}
-                fill="none"
-                stroke="rgba(245,158,11,0.25)"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-
-              {corridor.map((city) => {
-                const labelX =
-                  city.labelSide === "left" ? city.x - 4 : city.labelSide === "top" ? city.x : city.x + 4;
-                const labelY =
-                  city.labelSide === "top" ? city.y - 5 : city.y + 1.2;
-                const anchor =
-                  city.labelSide === "left" ? "end" : city.labelSide === "top" ? "middle" : "start";
-
+              {networkCities.map((city) => {
+                const pos = cityPositions[city] ?? { x: 50, y: 50 };
                 return (
-                  <g key={city.id} className={city.hub ? "mkt-network-hub" : undefined}>
-                    <circle
-                      cx={city.x}
-                      cy={city.y}
-                      r={city.hub ? 4.2 : 3.2}
-                      fill="rgba(245,158,11,0.18)"
-                      className="mkt-network-node-ring"
-                    />
-                    <circle
-                      cx={city.x}
-                      cy={city.y}
-                      r={city.hub ? 2.2 : 1.7}
-                      fill={city.hub ? "#0b1f33" : "#f59e0b"}
-                      stroke="#ffffff"
-                      strokeWidth="0.6"
-                    />
-                    <text
-                      x={labelX}
-                      y={labelY}
-                      textAnchor={anchor}
-                      className="mkt-network-city-label"
-                      fill="#172033"
-                      fontSize="3.6"
-                      fontWeight="700"
-                      letterSpacing="0.06"
-                    >
-                      {city.label.toUpperCase()}
+                  <g key={city}>
+                    <circle cx={pos.x} cy={pos.y} r="1.8" fill="#0d9488" />
+                    <circle cx={pos.x} cy={pos.y} r="3.5" fill="#0d9488" opacity="0.15" />
+                    <text x={pos.x + 2.5} y={pos.y + 0.8} fontSize="3.2" fill="#334155" fontWeight="600">
+                      {city.split(" ")[0]}
                     </text>
-                    {city.hub ? (
-                      <text
-                        x={city.x + 4}
-                        y={city.y + 5}
-                        textAnchor="start"
-                        fill="#d97706"
-                        fontSize="2.4"
-                        fontWeight="600"
-                      >
-                        HQ
-                      </text>
-                    ) : null}
                   </g>
                 );
               })}
             </svg>
+            <div className="mkt-network-tags">
+              {networkCities.slice(0, 6).map((city) => (
+                <span key={city}>{city}</span>
+              ))}
+            </div>
           </div>
         </ScrollReveal>
       </div>

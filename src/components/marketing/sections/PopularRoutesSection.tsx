@@ -14,8 +14,8 @@ export function PopularRoutesSection() {
         <ScrollReveal>
           <SectionHeading
             eyebrow="Popular Routes"
-            title="Cargo on key India lanes"
-            subtitle="Regular part load and FTL from Kolhapur to Pune, Mumbai, Gujarat and pan-India metros."
+            title="Cargo Transport on Key Lanes"
+            subtitle="Regular part load and FTL services from Kolhapur to Pune, Mumbai, Gujarat and pan-India metros."
           />
         </ScrollReveal>
         <div className="mkt-grid-3">
@@ -24,9 +24,7 @@ export function PopularRoutesSection() {
               <article className="mkt-route-card mkt-route-card-compact">
                 <div className="mkt-route-card-head">
                   <MapPin aria-hidden size={16} />
-                  <span>
-                    {route.from} → {route.to}
-                  </span>
+                  <span>{route.from} → {route.to}</span>
                 </div>
                 <h3>
                   <Link href={`/routes/${route.slug}`}>{route.title}</Link>
@@ -39,7 +37,7 @@ export function PopularRoutesSection() {
             </ScrollReveal>
           ))}
         </div>
-        <div className="mkt-section-more">
+        <div style={{ marginTop: "2rem", textAlign: "center" }}>
           <MarketingButton href="/routes" variant="outline">
             View All Routes <ArrowRight aria-hidden className="mkt-btn-icon" />
           </MarketingButton>

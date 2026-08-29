@@ -14,8 +14,8 @@ export function BlogPreviewSection() {
         <ScrollReveal>
           <SectionHeading
             eyebrow="Blog"
-            title="Logistics insights"
-            subtitle="Guides on tracking, booking and choosing the right transport option for your cargo."
+            title="Logistics Guides & Tips"
+            subtitle="Practical advice on tracking, booking and choosing the right transport option for your cargo."
           />
         </ScrollReveal>
         <div className="mkt-grid-3">
@@ -37,7 +37,7 @@ export function BlogPreviewSection() {
             </ScrollReveal>
           ))}
         </div>
-        <div className="mkt-section-more">
+        <div style={{ marginTop: "2rem", textAlign: "center" }}>
           <MarketingButton href="/blog" variant="outline">
             View All Articles <ArrowRight aria-hidden className="mkt-btn-icon" />
           </MarketingButton>

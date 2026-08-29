@@ -6,7 +6,6 @@ export type NavItem = {
   children?: NavChild[];
 };
 
-/** Primary header nav — matches site IA wireframe */
 export const marketingNav: NavItem[] = [
   { label: "Home", href: "/" },
   {
@@ -33,17 +32,7 @@ export const marketingNav: NavItem[] = [
       { label: "Value Added Service", href: "/services/value-added" },
       { label: "Customized Service", href: "/services/customized" },
       { label: "Excellence in Service", href: "/services/excellence" },
-    ],
-  },
-  { label: "Network", href: "/network" },
-  { label: "Routes", href: "/routes" },
-  {
-    label: "Media",
-    href: "/media",
-    children: [
-      { label: "Awards & Recognitions", href: "/media/awards" },
-      { label: "Gallery", href: "/media" },
-      { label: "Blog", href: "/blog" },
+      { label: "Popular Routes", href: "/routes" },
     ],
   },
   {
@@ -56,13 +45,15 @@ export const marketingNav: NavItem[] = [
       { label: "Vendor Registration", href: "/careers/vendor" },
     ],
   },
-];
-
-/** Full mobile menu (includes tracking + contact) */
-export const marketingMobileNav: NavItem[] = [
-  ...marketingNav,
-  { label: "Track Shipment", href: "/tracking", highlight: true },
-  { label: "Get Quote", href: "/quote" },
+  {
+    label: "Media Center",
+    href: "/media",
+    children: [
+      { label: "Awards & Recognitions", href: "/media/awards" },
+      { label: "Gallery", href: "/media" },
+      { label: "Blog", href: "/blog" },
+    ],
+  },
   {
     label: "Contact Us",
     href: "/contact",
@@ -74,6 +65,7 @@ export const marketingMobileNav: NavItem[] = [
       { label: "Service Complaint", href: "/contact/complaint" },
     ],
   },
+  { label: "GC Tracking", href: "/tracking", highlight: true },
 ];
 
 export const MARKETING_ROUTES = [

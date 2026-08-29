@@ -85,8 +85,7 @@
 
   .mkt-nav,
   .mkt-header-phone,
-  .mkt-header-track-btn,
-  .mkt-header-quote-btn {
+  .mkt-header-track-btn {
     display: none !important;
   }
 
@@ -249,8 +248,7 @@
 
   .mkt-nav,
   .mkt-header-phone,
-  .mkt-header-track-btn,
-  .mkt-header-quote-btn {
+  .mkt-header-track-btn {
     display: none !important;
   }
 
@@ -344,8 +342,7 @@
     display: none !important;
   }
 
-  .mkt-header-track-btn,
-  .mkt-header-quote-btn {
+  .mkt-header-track-btn {
     display: inline-flex !important;
   }
 
@@ -379,11 +376,10 @@
   }
 
   .mkt-header-phone {
-    display: none !important;
+    display: inline-flex !important;
   }
 
-  .mkt-header-track-btn,
-  .mkt-header-quote-btn {
+  .mkt-header-track-btn {
     display: inline-flex !important;
   }
 

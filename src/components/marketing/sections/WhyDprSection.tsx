@@ -65,7 +65,7 @@ export function WhyDprSection() {
         <div>
           <SectionHeading
             eyebrow="Why DPR Logistics"
-            title="Why businesses choose DPR"
+            title="Why Businesses Choose DPR"
             subtitle={whyDprSubtitle}
           />
           <ol className="mkt-why-list">
