@@ -43,6 +43,7 @@ export const company = {
   social: {
     linkedin: "https://linkedin.com",
     facebook: "https://facebook.com",
+    instagram: "https://instagram.com",
   },
 } as const;
 

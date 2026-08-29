@@ -10,6 +10,7 @@ import "./marketing.css";
 import "./marketing-premium.css";
 import "./marketing-advanced.css";
 import "./marketing-responsive.css";
+import "./marketing-home.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

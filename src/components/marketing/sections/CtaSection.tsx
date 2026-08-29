@@ -9,16 +9,14 @@ export function CtaSection() {
           <div className="mkt-cta-panel mkt-cta-panel-premium">
             <div className="mkt-cta-panel-bg" aria-hidden />
             <div className="mkt-cta-panel-content">
-              <h2>Ready to Move Your Business Forward?</h2>
-              <p>
-                Talk to our logistics experts and find the right transportation solution for your business.
-              </p>
+              <h2>Ready to move cargo with DPR?</h2>
+              <p>Track a shipment, request a quote, or talk to our booking desk today.</p>
               <div className="mkt-cta-panel-actions">
-                <MarketingButton href="/quote" variant="primary">
-                  Get a Quote
+                <MarketingButton href="/tracking" variant="primary">
+                  Track Shipment
                 </MarketingButton>
-                <MarketingButton href="/contact" variant="outline">
-                  Talk to an Expert
+                <MarketingButton href="/quote" variant="outline">
+                  Get a Quote
                 </MarketingButton>
               </div>
             </div>

@@ -682,7 +682,7 @@
 
 /* Network map */
 .mkt-network-section-premium {
-  background: linear-gradient(180deg, #ffffff 0%, #f5f8fa 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #f6f8fb 100%);
 }
 
 .mkt-network-map-premium {
@@ -702,6 +702,46 @@
   border: 1px solid rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(8px);
   font-weight: 600;
+}
+
+/* Clean corridor diagram (Delhi → Bangalore) */
+.mkt-network-corridor.mkt-network-map-premium {
+  background: linear-gradient(160deg, #ffffff 0%, #f6f8fb 55%, #fff7ed 100%);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 20px 48px rgba(11, 31, 51, 0.08);
+  padding: clamp(1rem, 3vw, 1.75rem);
+}
+
+.mkt-network-corridor .mkt-network-map {
+  min-height: clamp(320px, 48vw, 460px);
+  font-family: var(--mkt-font-display, Outfit, sans-serif);
+}
+
+.mkt-network-corridor-line {
+  stroke-dasharray: 4 3;
+  animation: mkt-corridor-flow 14s linear infinite;
+}
+
+.mkt-network-node-ring {
+  animation: mkt-node-pulse 2.8s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.mkt-network-hub .mkt-network-node-ring {
+  animation-duration: 2.2s;
+}
+
+@keyframes mkt-corridor-flow {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: -80; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mkt-network-corridor-line,
+  .mkt-network-node-ring {
+    animation: none;
+  }
 }
 
 /* CTA panel ultra */
