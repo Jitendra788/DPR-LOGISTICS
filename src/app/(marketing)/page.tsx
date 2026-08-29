@@ -1,5 +1,6 @@
 import { testimonials } from "@/data/marketing/company";
 import { homeServices } from "@/data/marketing/homepage";
+import { HeroBannerCarousel } from "@/components/marketing/HeroBannerCarousel";
 import { Hero } from "@/components/marketing/Hero";
 import { HomeServiceCard } from "@/components/marketing/HomeServiceCard";
 import { SectionHeading } from "@/components/marketing/SectionHeading";
@@ -36,6 +37,7 @@ export const metadata = createPageMetadata({
 export default function HomePage() {
   return (
     <>
+      <HeroBannerCarousel />
       <Hero />
 
       <Statistics />
