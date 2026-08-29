@@ -5,6 +5,7 @@ import { GoogleAnalytics } from "@/components/marketing/GoogleAnalytics";
 import { JsonLd } from "@/components/marketing/JsonLd";
 import { SiteChat } from "@/components/marketing/SiteChat";
 import { company } from "@/data/marketing/company";
+import { BRAND_LOGO } from "@/lib/brand";
 import { localBusinessJsonLd, organizationJsonLd, SITE_URL, websiteJsonLd } from "@/lib/seo";
 import "./marketing.css";
 import "./marketing-premium.css";
@@ -54,6 +55,15 @@ export const metadata: Metadata = {
   verification: {
     google: "L0nGHhK4YuuEZF9W77Ao_qlpmENIrrLyATFVYrwNldI",
   },
+  icons: {
+    icon: [
+      { url: BRAND_LOGO, type: "image/jpeg" },
+      { url: "/dpr-logo-header.png", type: "image/png" },
+    ],
+    apple: BRAND_LOGO,
+    shortcut: BRAND_LOGO,
+  },
+  applicationName: company.name,
 };
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {

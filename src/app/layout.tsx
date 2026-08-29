@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { AppShell } from "@/components/layout/AppShell";
+import { BRAND_LOGO, BRAND_LOGO_ALT } from "@/lib/brand";
 import "./globals.css";
 import "./erp.css";
 import "./theme-dark.css";
@@ -9,6 +10,15 @@ export const metadata: Metadata = {
   title: "DPR Logistics | Transport & Logistics India",
   description:
     "DPR Logistics — pan-India cargo transport, part load, FTL, tracking and warehousing from Kolhapur, Maharashtra.",
+  icons: {
+    icon: [
+      { url: BRAND_LOGO, type: "image/jpeg" },
+      { url: "/dpr-logo-header.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: BRAND_LOGO,
+    shortcut: BRAND_LOGO,
+  },
+  applicationName: BRAND_LOGO_ALT,
 };
 
 export const viewport: Viewport = {
