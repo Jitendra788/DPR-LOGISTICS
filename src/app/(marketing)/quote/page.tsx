@@ -8,7 +8,14 @@ export const metadata: Metadata = createPageMetadata({
   title: "Pickup Request",
   description: `Request a cargo pickup from ${company.name}. Share route, weight and dimensions for part load, FTL, trailer or container booking across India.`,
   path: "/quote",
-  keywords: ["pickup request", "cargo booking Kolhapur", "part load pickup", "FTL booking India"],
+  keywords: [
+    "pickup request",
+    "cargo booking Kolhapur",
+    "part load pickup",
+    "FTL booking India",
+    "DPR Logistics quote",
+    "Kagal MIDC cargo pickup",
+  ],
 });
 
 const steps = [

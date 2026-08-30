@@ -5,24 +5,48 @@ import { JsonLd } from "@/components/marketing/JsonLd";
 import { createPageMetadata, faqJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = createPageMetadata({
-  title: "FAQs",
+  title: "FAQs — Tracking, Booking, GST Billing & Customer Care",
   description:
-    "Frequently asked questions about DPR Logistics — shipment tracking, part load & FTL booking, pickup requests, routes, warehousing and customer care.",
+    "DPR Logistics FAQs: how to track GC / LR online, mobile last 4 digit verification, WhatsApp secret track link, part load & FTL pickup, GST billing, POD and customer care in Kolhapur.",
   path: "/contact/faq",
+  keywords: [
+    "DPR Logistics FAQ",
+    "GC LR tracking FAQ",
+    "how to track shipment India",
+    "part load FTL booking FAQ",
+    "GST logistics billing Kolhapur",
+    "POD proof of delivery",
+    "DPR Logistics customer care",
+    "WhatsApp shipment tracking link",
+    "lorry receipt tracking",
+    "Kagal MIDC transport company FAQ",
+  ],
 });
 
 export default function FaqPage() {
   return (
     <>
       <JsonLd data={faqJsonLd(faqs)} />
-      <InnerPage eyebrow="Contact Us" title="FAQs" subtitle="Common questions about booking, tracking and billing.">
-        {faqs.map((f) => (
-          <p key={f.q}>
-            <strong>{f.q}</strong>
-            <br />
-            {f.a}
-          </p>
-        ))}
+      <InnerPage
+        eyebrow="Contact Us"
+        title="Frequently asked questions"
+        subtitle="Tracking, pickup booking, GST billing, POD and customer care — answers from the DPR desk."
+        cta={{ href: "/tracking", label: "Track your shipment" }}
+        highlights={[
+          "Exact GC / LR tracking",
+          "Mobile last-4 privacy check",
+          "WhatsApp / SMS track link",
+          "GST billing & POD help",
+        ]}
+      >
+        <div className="mkt-faq-list">
+          {faqs.map((f, i) => (
+            <details key={f.q} className="mkt-faq-item" open={i < 2}>
+              <summary>{f.q}</summary>
+              <p>{f.a}</p>
+            </details>
+          ))}
+        </div>
       </InnerPage>
     </>
   );

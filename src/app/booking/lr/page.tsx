@@ -85,6 +85,7 @@ function LrBookingInner() {
   const [searchLr, setSearchLr] = useState("");
   const [printOpts, setPrintOpts] = useState({ consignor: true, lorry: false, consignee: false });
   const [email, setEmail] = useState("");
+  const [lastShare, setLastShare] = useState<{ lrNo: string; url: string } | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -159,6 +160,11 @@ function LrBookingInner() {
     };
     const saved = editId ? await update(editId, body) : await create(body);
     if (saved) {
+      const token = String((saved as { trackToken?: string }).trackToken ?? "");
+      if (token) {
+        const origin = typeof window !== "undefined" ? window.location.origin : "";
+        setLastShare({ lrNo: String((saved as { lrNo?: string }).lrNo || body.lrNo || ""), url: `${origin}/track/${token}` });
+      }
       setEditId(null);
       const next = await api<{ value: string }>("/api/next-no?type=lr");
       setForm({
@@ -205,6 +211,49 @@ function LrBookingInner() {
     <>
       <PageHeader title="LR Booking" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "LR Booking" }]} />
       <Flash message={message} />
+      {lastShare ? (
+        <FormCard title="Customer track link" subtitle="Share this secret link on WhatsApp / SMS — full details without guessing LR numbers">
+          <p style={{ marginBottom: 12, wordBreak: "break-all" }}>
+            LR {lastShare.lrNo}: <a href={lastShare.url}>{lastShare.url}</a>
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              onClick={() =>
+                window.open(
+                  `https://wa.me/?text=${encodeURIComponent(`Track your DPR Logistics shipment ${lastShare.lrNo}: ${lastShare.url}`)}`,
+                  "_blank",
+                )
+              }
+            >
+              WhatsApp
+            </Button>
+            <Button
+              type="button"
+              variant="teal"
+              onClick={() => {
+                window.location.href = `sms:?body=${encodeURIComponent(`Track your DPR Logistics shipment ${lastShare.lrNo}: ${lastShare.url}`)}`;
+              }}
+            >
+              SMS
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(lastShare.url);
+                  setMessage({ type: "ok", text: "Track link copied" });
+                } catch {
+                  setMessage({ type: "err", text: lastShare.url });
+                }
+              }}
+            >
+              Copy link
+            </Button>
+          </div>
+        </FormCard>
+      ) : null}
       <AdminForm onSubmit={onSubmit}>
         <FormCard>
           <TwoCol>

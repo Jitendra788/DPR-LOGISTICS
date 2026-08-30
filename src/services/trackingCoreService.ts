@@ -57,14 +57,31 @@ export async function findTripByCustomerToken(token: string) {
 export async function findTripByLrNo(lrRaw: string) {
   const q = lrRaw.trim();
   if (!q) return null;
-  const qLower = q.toLowerCase();
+  const qNorm = q.toUpperCase().replace(/\s+/g, "");
+  const qDigits = qNorm.replace(/\D/g, "");
 
   let lr = await prisma.lrBooking.findFirst({ where: { lrNo: q } });
+  if (!lr && q !== qNorm) {
+    lr = await prisma.lrBooking.findFirst({ where: { lrNo: qNorm } });
+  }
   if (!lr) {
-    const allLr = await prisma.lrBooking.findMany({ take: 500, orderBy: { id: "desc" } });
-    lr = allLr.find((r) => r.lrNo.toLowerCase() === qLower) ?? null;
+    const allLr = await prisma.lrBooking.findMany({ take: 2000, orderBy: { id: "desc" } });
+    lr =
+      allLr.find((r) => r.lrNo.toUpperCase().replace(/\s+/g, "") === qNorm) ??
+      allLr.find((r) => r.lrNo.replace(/\D/g, "") === qDigits && qDigits.length >= 4) ??
+      null;
+
+    if (!lr && qNorm.length >= 6) {
+      const prefixHits = allLr.filter((r) => {
+        const n = r.lrNo.toUpperCase().replace(/\s+/g, "");
+        const d = n.replace(/\D/g, "");
+        return qNorm.startsWith(n) || (d.length >= 4 && qDigits.startsWith(d));
+      });
+      if (prefixHits.length === 1) lr = prefixHits[0]!;
+    }
   }
 
+  const qLower = qNorm.toLowerCase();
   const trips = await prisma.tripDesk.findMany({
     where: { lrNos: { not: "" } },
     orderBy: { id: "desc" },
@@ -75,9 +92,9 @@ export async function findTripByLrNo(lrRaw: string) {
     trips.find((t) =>
       t.lrNos
         .split(/[,;\s]+/)
-        .map((s) => s.trim().toLowerCase())
+        .map((s) => s.trim().toUpperCase().replace(/\s+/g, ""))
         .filter(Boolean)
-        .includes(qLower),
+        .some((n) => n === qNorm || qNorm.startsWith(n)),
     ) ??
     trips.find((t) => t.lrNos.toLowerCase().includes(qLower)) ??
     null;

@@ -149,6 +149,7 @@ model LrBooking {
   lhcNo          String   @default("")
   podStatus      String   @default("Pending")
   source         String   @default("DPR")
+  trackToken     String   @default("")
   createdAt      DateTime @default(now())
 }
 

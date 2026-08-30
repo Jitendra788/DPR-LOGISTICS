@@ -26,9 +26,12 @@ export const metadata = createPageMetadata({
     "DPR Logistics Kolhapur",
     "logistics company India",
     "cargo transport Kolhapur",
+    "Kagal MIDC logistics",
     "part load FTL transport",
     "GC LR tracking online",
+    "lorry receipt tracking",
     "pan India logistics partner",
+    "warehousing Maharashtra",
   ],
 });
 

@@ -8,6 +8,13 @@ export const metadata: Metadata = createPageMetadata({
   title: "Contact Us",
   description: `Contact ${company.name} for cargo booking, FTL/part load enquiries, tracking support and business partnerships. Call ${company.phone} or visit Kolhapur head office.`,
   path: "/contact",
+  keywords: [
+    "DPR Logistics contact",
+    "cargo booking Kolhapur",
+    "logistics customer care Maharashtra",
+    "Kagal MIDC transport office",
+    "DPR Logistics phone WhatsApp",
+  ],
 });
 
 export default function ContactPage() {

@@ -16,6 +16,8 @@ export const metadata: Metadata = createPageMetadata({
     "FTL transport services",
     "trailer container transport",
     "warehousing logistics Maharashtra",
+    "ODC project cargo India",
+    "DPR Logistics services Kolhapur",
   ],
 });
 

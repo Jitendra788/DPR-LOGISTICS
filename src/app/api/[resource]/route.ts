@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getModel, isResource, sanitize } from "@/lib/resources";
 import { prisma } from "@/lib/prisma";
+import { attachBookingTrackToken, stripBookingTrackToken } from "@/services/trackingService";
 
 type Ctx = { params: Promise<{ resource: string }> };
 
@@ -20,7 +21,6 @@ export async function POST(req: NextRequest, ctx: Ctx) {
   }
   const body = (await req.json()) as Record<string, unknown>;
   try {
-    // Block accidental double-save of the same party within a short window
     if (resource === "parties") {
       const name = String(body.name ?? "").trim();
       const gst = String(body.gst ?? "").trim().toUpperCase();
@@ -35,13 +35,18 @@ export async function POST(req: NextRequest, ctx: Ctx) {
           const ageMs = Date.now() - new Date(row.createdAt).getTime();
           return sameGst && ageMs < 60_000;
         });
-        if (match) {
-          return NextResponse.json(match);
-        }
+        if (match) return NextResponse.json(match);
       }
     }
 
-    const created = await getModel(resource).create({ data: sanitize(body, resource) });
+    let data = sanitize(body, resource);
+    if (resource === "bookings") data = stripBookingTrackToken(data);
+
+    const created = await getModel(resource).create({ data });
+    if (resource === "bookings" && created && typeof created === "object" && "id" in created) {
+      const withToken = await attachBookingTrackToken(created as { id: number });
+      return NextResponse.json(withToken);
+    }
     return NextResponse.json(created);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Create failed";

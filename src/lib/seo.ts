@@ -11,9 +11,11 @@ export const DEFAULT_OG_IMAGE = "/dpr-logo-header.png";
 export const SEO_KEYWORDS = [
   "DPR Logistics",
   "dprlogistics.in",
+  "DPR Logistics Kolhapur",
   "logistics company India",
   "cargo transport India",
   "transport company Kolhapur",
+  "Kagal MIDC transport",
   "part load transport",
   "part load cargo Maharashtra",
   "full truck load FTL",
@@ -23,12 +25,17 @@ export const SEO_KEYWORDS = [
   "warehousing logistics",
   "GC tracking",
   "LR tracking",
+  "lorry receipt tracking",
+  "docket tracking online",
   "shipment tracking India",
+  "track consignment online",
   "pan India logistics",
   "Kolhapur to Pune transport",
   "Maharashtra Gujarat transport",
   "B2B logistics India",
   "freight transport company",
+  "GST logistics billing",
+  "POD proof of delivery",
 ] as const;
 
 type PageMetaOptions = {

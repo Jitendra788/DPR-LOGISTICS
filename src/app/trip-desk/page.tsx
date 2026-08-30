@@ -298,6 +298,26 @@ export default function TripDeskPage() {
     }
   }
 
+  function whatsappCustomerLink(row: TripRow) {
+    if (!row.customerTrackToken) {
+      setMessage({ type: "err", text: "Start trip first." });
+      return;
+    }
+    const url = customerUrl(row.customerTrackToken);
+    const text = `Track your DPR Logistics shipment (${row.lrNos || row.tripNo}): ${url}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+  }
+
+  function smsCustomerLink(row: TripRow) {
+    if (!row.customerTrackToken) {
+      setMessage({ type: "err", text: "Start trip first." });
+      return;
+    }
+    const url = customerUrl(row.customerTrackToken);
+    const text = `Track your DPR Logistics shipment (${row.lrNos || row.tripNo}): ${url}`;
+    window.location.href = `sms:?body=${encodeURIComponent(text)}`;
+  }
+
   async function copySimConsentLink(row: TripRow) {
     if (!row.simConsentToken) {
       setMessage({ type: "err", text: "Start SIM trip first." });
@@ -352,6 +372,8 @@ export default function TripDeskPage() {
                 <TdActionBtn label="Driver Link" variant="link" icon={Smartphone} onClick={() => copyShareLink(row)} />
               )}
               <TdActionBtn label="Customer" variant="link" icon={Link2} onClick={() => copyCustomerLink(row)} />
+              <TdActionBtn label="WhatsApp" variant="link" icon={ExternalLink} onClick={() => whatsappCustomerLink(row)} />
+              <TdActionBtn label="SMS" variant="link" icon={Copy} onClick={() => smsCustomerLink(row)} />
               <a className="td-action-btn td-action-view" href={`/live-track?phone=${encodeURIComponent(row.driverPhone)}`} target="_blank" rel="noreferrer">
                 <ExternalLink size={14} aria-hidden />
                 <span>Live Map</span>
