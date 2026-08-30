@@ -140,6 +140,17 @@ export function organizationJsonLd() {
         areaServed: "IN",
         availableLanguage: ["English", "Hindi", "Marathi"],
       },
+      ...(company.phoneAlt
+        ? [
+            {
+              "@type": "ContactPoint",
+              telephone: company.phoneAlt,
+              contactType: "customer service",
+              areaServed: "IN",
+              availableLanguage: ["English", "Hindi", "Marathi"],
+            },
+          ]
+        : []),
     ],
     sameAs: [company.social.linkedin, company.social.facebook],
   };
@@ -154,6 +165,7 @@ export function localBusinessJsonLd() {
     url: SITE_URL,
     telephone: company.phone,
     email: company.email,
+    taxID: company.gstin,
     description: company.description,
     address: {
       "@type": "PostalAddress",

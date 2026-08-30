@@ -4,6 +4,7 @@ export type BlogPost = {
   excerpt: string;
   seoDescription: string;
   category: string;
+  cover: string;
   publishedAt: string;
   readTime: string;
   author: string;
@@ -19,6 +20,7 @@ export const blogPosts: BlogPost[] = [
     seoDescription:
       "Learn how to track DPR Logistics shipments online. Enter your GC, LR or docket number at dprlogistics.in/tracking for real-time cargo status.",
     category: "Tracking",
+    cover: "/marketing/blog/track-gc-lr.jpg",
     publishedAt: "2026-08-15",
     readTime: "4 min",
     author: "DPR Logistics Team",
@@ -38,6 +40,7 @@ export const blogPosts: BlogPost[] = [
     seoDescription:
       "Part load vs FTL transport guide by DPR Logistics. Compare shared cargo and dedicated truck options for cost-effective and time-sensitive shipments across India.",
     category: "Services",
+    cover: "/marketing/blog/part-load-ftl.jpg",
     publishedAt: "2026-08-10",
     readTime: "6 min",
     author: "DPR Logistics Team",
@@ -57,6 +60,7 @@ export const blogPosts: BlogPost[] = [
     seoDescription:
       "Guide for Kolhapur manufacturers on choosing a reliable logistics partner. DPR Logistics — part load, FTL, trailers, GST billing and pan-India network from Kagal MIDC.",
     category: "Industry",
+    cover: "/marketing/blog/kolhapur-manufacturers.jpg",
     publishedAt: "2026-08-05",
     readTime: "5 min",
     author: "DPR Logistics Team",
@@ -76,6 +80,7 @@ export const blogPosts: BlogPost[] = [
     seoDescription:
       "Warehousing and distribution tips for Indian trading houses. Short-term storage, cross-dock and onward part load or FTL dispatch from DPR Logistics corridor hubs.",
     category: "Warehousing",
+    cover: "/marketing/blog/warehousing-distribution.jpg",
     publishedAt: "2026-07-28",
     readTime: "5 min",
     author: "DPR Logistics Team",
@@ -95,6 +100,7 @@ export const blogPosts: BlogPost[] = [
     seoDescription:
       "Maharashtra to Gujarat transport guide — Kolhapur, Pune, Mumbai to Ahmedabad and Surat. Part load, FTL and trailer services by DPR Logistics on the western industrial corridor.",
     category: "Routes",
+    cover: "/marketing/blog/maharashtra-gujarat-corridor.jpg",
     publishedAt: "2026-07-20",
     readTime: "6 min",
     author: "DPR Logistics Team",

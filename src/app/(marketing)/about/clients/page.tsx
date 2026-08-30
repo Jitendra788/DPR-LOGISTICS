@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { clients } from "@/data/marketing/company";
+import Image from "next/image";
+import { clients, valuableCustomers } from "@/data/marketing/company";
 import { InnerPage } from "@/components/marketing/InnerPage";
-
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = createPageMetadata({
@@ -13,8 +13,15 @@ export const metadata: Metadata = createPageMetadata({
 
 export default function ClientsPage() {
   return (
-    <InnerPage eyebrow="About Us" title="Our Clients" subtitle="A sample of industry partners we serve.">
-      <div className="mkt-client-row">
+    <InnerPage eyebrow="About Us" title="Our Clients" subtitle="Industry partners we serve across key corridors.">
+      <div className="mkt-clients-static">
+        {valuableCustomers.map((client) => (
+          <div key={client.id} className="mkt-clients-item">
+            <Image src={client.logo} alt={client.name} width={180} height={72} className="mkt-clients-logo" />
+          </div>
+        ))}
+      </div>
+      <div className="mkt-client-row" style={{ marginTop: "1.5rem" }}>
         {clients.map((c) => (
           <span key={c}>{c}</span>
         ))}

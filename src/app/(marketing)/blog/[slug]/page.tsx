@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { blogPosts, getBlogPost } from "@/data/marketing/blog";
 import { company } from "@/data/marketing/company";
+import { BlogCover } from "@/components/marketing/BlogCover";
 import { JsonLd } from "@/components/marketing/JsonLd";
 import { MarketingButton } from "@/components/marketing/Button";
 import { absoluteUrl, articleJsonLd, createPageMetadata } from "@/lib/seo";
@@ -56,30 +57,38 @@ export default async function BlogPostPage({ params }: Props) {
                 year: "numeric",
               })}
             </time>
-            {" · "}{post.readTime} read
+            {" · "}
+            {post.readTime} read
           </p>
         </div>
       </section>
 
       <section className="mkt-section">
-        <div className="mkt-container mkt-prose mkt-blog-article">
-          {post.content.map((para) => (
-            <p key={para.slice(0, 40)}>{para}</p>
-          ))}
+        <div className="mkt-container mkt-blog-article">
+          <div className="mkt-blog-article-cover">
+            <BlogCover src={post.cover} alt={post.title} />
+          </div>
+          <div className="mkt-prose mkt-prose-rich mkt-inner-panel">
+            {post.content.map((para) => (
+              <p key={para.slice(0, 40)}>{para}</p>
+            ))}
+          </div>
 
-          <div className="mkt-cta-band" style={{ marginTop: "2.5rem" }}>
+          <div className="mkt-cta-band mkt-cta-band-rich">
             <div>
               <h3>Need transport on this lane?</h3>
               <p>Book a pickup or track your shipment with {company.name}.</p>
             </div>
-            <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-              <MarketingButton href="/quote" variant="secondary">Pickup Request</MarketingButton>
-              <MarketingButton href="/tracking" variant="outline">Track Shipment</MarketingButton>
+            <div className="mkt-cta-band-actions">
+              <MarketingButton href="/quote">Pickup Request</MarketingButton>
+              <MarketingButton href="/tracking" variant="outline">
+                Track Shipment
+              </MarketingButton>
             </div>
           </div>
 
-          <p style={{ marginTop: "2rem" }}>
-            <Link href="/blog" className="mkt-service-link">← Back to Blog</Link>
+          <p className="mkt-blog-back">
+            <Link href="/blog">← Back to all articles</Link>
           </p>
         </div>
       </section>

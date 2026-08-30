@@ -11,13 +11,20 @@ export const company = {
       "DPR Logistics (dprlogistics.in) — trusted pan-India cargo transport company from Kolhapur. Part load, FTL, trailers, containers, warehousing. Track GC/LR online or call +91 93562 59949.",
   },
   phone: "+91 93562 59949",
+  phoneAlt: "+91 93716 62142",
   supportPhone: "+91 93562 59949",
   email: "dprlogistics2142@gmail.com",
   salesEmail: "dprlogistics2142@gmail.com",
   address: "Shree Mahalaxmi Petrol Pump, 5 Star MIDC Road, Kagal, Dist. Kolhapur 416216",
+  addressLines: [
+    "Shree Mahalaxmi Petrol Pump",
+    "5 Star M.I.D.C Road, Kagal",
+    "Distt. Kolhapur, Maharashtra - 416216",
+  ],
+  gstin: "27BNLPK2073C1Z5",
   workingHours: "Mon – Sat: 9:00 AM – 7:00 PM",
   foundedYear: 2014,
-  customerCare: "9356259949",
+  customerCare: "9356259949 / 9371662142",
   mission:
     "To simplify logistics for businesses of every size through dependable service, transparent operations and technology-first execution.",
   vision:
@@ -60,13 +67,27 @@ export const milestones = [
 ];
 
 export const clients = [
-  "Kirloskar",
   "Indo Count",
+  "SR Tyres",
+  "Godawari Udyog",
+  "Ghodawat Consumer",
+  "Epic Yarns",
+  "Kirloskar",
   "Param Tex",
   "Shamma Cotfab",
   "Welco Logistics",
   "CITCO Roadways",
 ];
+
+/** Client logos for homepage marquee — files in /public/marketing/clients/ */
+export const valuableCustomers = [
+  { id: "indo-count", name: "Indo Count", logo: "/marketing/clients/indo-count.png" },
+  { id: "aditya-birla", name: "Aditya Birla Group", logo: "/marketing/clients/sun-gear.png" },
+  { id: "sr-tyres", name: "SJR Tyres", logo: "/marketing/clients/sr-tyres.png" },
+  { id: "godawari", name: "Godawari Udyog", logo: "/marketing/clients/godawari.png" },
+  { id: "ghodawat", name: "Ghodawat Consumer", logo: "/marketing/clients/ghodawat.png" },
+  { id: "epic-yarns", name: "Epic Yarns", logo: "/marketing/clients/epic-yarns.png" },
+] as const;
 
 export const testimonials = [
   {

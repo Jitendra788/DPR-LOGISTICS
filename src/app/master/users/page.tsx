@@ -7,6 +7,7 @@ import { InputField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { formToObject } from "@/lib/api-client";
 
@@ -49,7 +50,7 @@ export default function UserCreationPage() {
     <>
       <PageHeader title="User Creation" subtitle="Create login users and assign roles" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "User Creation" }]} />
       <Flash message={message} />
-      <form onSubmit={onSubmit}>
+      <AdminForm onSubmit={onSubmit}>
         <FormCard title="User Details" subtitle="Create or update login credentials and role access">
           <TwoCol>
             <div>
@@ -67,7 +68,7 @@ export default function UserCreationPage() {
           </TwoCol>
           <Button type="submit">{editId ? "Update User" : "Save Data"}</Button>
         </FormCard>
-      </form>
+      </AdminForm>
       <DataTable
         rows={rows}
         columns={[

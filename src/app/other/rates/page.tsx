@@ -7,6 +7,7 @@ import { InputField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { api, formToObject } from "@/lib/api-client";
 
@@ -37,7 +38,7 @@ export default function RateMasterPage() {
     <>
       <PageHeader title="Rate Master" subtitle="Maintain freight rates" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Rate Master" }]} />
       <Flash message={message} />
-      <form onSubmit={onSubmit}>
+      <AdminForm onSubmit={onSubmit}>
         <FormCard>
           <TwoCol>
             <div>
@@ -51,7 +52,7 @@ export default function RateMasterPage() {
           </TwoCol>
           <Button type="submit">{editId ? "Update Rate" : "Save Rate"}</Button>
         </FormCard>
-      </form>
+      </AdminForm>
       <DataTable
         rows={rows}
         columns={[

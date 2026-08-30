@@ -7,6 +7,7 @@ import { DateField, InputField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { api } from "@/lib/api-client";
 import { todayIso } from "@/lib/dates";
@@ -38,7 +39,7 @@ export default function MaintenancePage() {
     <>
       <PageHeader title="New Vehicle Maintanace Entry" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Vehicle Maintenance" }]} />
       <Flash message={message} />
-      <form onSubmit={onSubmit}>
+      <AdminForm onSubmit={onSubmit}>
         <FormCard>
           <TwoCol>
             <div>
@@ -56,7 +57,7 @@ export default function MaintenancePage() {
             Save Data
           </Button>
         </FormCard>
-      </form>
+      </AdminForm>
       <DataTable
         rows={rows}
         columns={[

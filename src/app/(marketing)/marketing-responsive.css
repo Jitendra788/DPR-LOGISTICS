@@ -163,6 +163,16 @@
     justify-content: center;
   }
 
+  .mkt-banner-branches {
+    max-height: min(240px, 42dvh);
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mkt-banner-copy h2 {
+    max-width: none !important;
+  }
+
   .mkt-stats {
     margin-top: 0 !important;
   }
@@ -188,7 +198,7 @@
   }
 
   .mkt-section {
-    padding: 2.5rem 0 !important;
+    padding: 1.5rem 0 !important;
   }
 
   .mkt-section-head h2,
@@ -437,3 +447,127 @@
 body.mkt-nav-open {
   overflow: hidden;
 }
+
+/* ── Extra marketing density + touch / overflow safety ── */
+.mkt-lead-grid,
+.mkt-lead-aside,
+.mkt-lead-form-wrap,
+.mkt-quote-steps,
+.mkt-banner-slide-inner,
+.mkt-banner-copy,
+.mkt-banner-branches,
+.mkt-clients-track,
+.mkt-footer-grid {
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .mkt-lead-grid,
+  .mkt-lead-grid-quote {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .mkt-quote-steps {
+    grid-template-columns: 1fr !important;
+  }
+
+  .mkt-banner-slide-inner {
+    grid-template-columns: 1fr !important;
+    padding: 1.1rem 0 2.25rem !important;
+  }
+
+  .mkt-banner-branches {
+    max-height: min(220px, 40dvh);
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mkt-banner-copy h2 {
+    font-size: clamp(1.25rem, 6vw, 1.65rem) !important;
+    max-width: none !important;
+  }
+
+  .mkt-banner-copy p {
+    font-size: 0.9rem !important;
+  }
+
+  .mkt-form-grid input,
+  .mkt-form-grid select,
+  .mkt-form-grid textarea,
+  .mkt-tracking-widget-body input,
+  .mkt-search-bar input {
+    font-size: 16px !important; /* iOS zoom prevent */
+    min-height: 44px;
+  }
+
+  .mkt-form-grid textarea {
+    min-height: 110px;
+  }
+
+  .mkt-btn,
+  .mkt-banner-cta {
+    min-height: 44px;
+  }
+
+  .mkt-page-hero,
+  .mkt-page-hero-premium {
+    padding: 1.15rem 0 !important;
+  }
+
+  .mkt-page-hero h1,
+  .mkt-page-hero-premium h1 {
+    max-width: none !important;
+  }
+
+  .mkt-footer.mkt-footer-premium .mkt-footer-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1.15rem !important;
+  }
+
+  .mkt-footer-brand-col {
+    grid-column: 1 / -1;
+  }
+
+  .mkt-clients-item {
+    width: 130px;
+    height: 64px;
+  }
+
+  .mkt-cta-band {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.85rem;
+    text-align: left;
+  }
+
+  .mkt-cta-band .mkt-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 479px) {
+  .mkt-footer.mkt-footer-premium .mkt-footer-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .mkt-stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .mkt-header-cta {
+    gap: 0.4rem !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1099px) {
+  .mkt-lead-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .mkt-quote-steps {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+

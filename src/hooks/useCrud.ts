@@ -1,12 +1,31 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api-client";
+
+export type FlashState = { type: "ok" | "err"; text: string; at: number } | null;
+
+/** Blocks identical create payloads while a request is in flight (and briefly after). */
+const recentCreates = new Map<string, number>();
+
+function bodyKey(resource: string, body: unknown) {
+  try {
+    return `${resource}:${JSON.stringify(body)}`;
+  } catch {
+    return `${resource}:${String(body)}`;
+  }
+}
 
 export function useCrud<T extends { id: number }>(resource: string) {
   const [rows, setRows] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessageState] = useState<FlashState>(null);
+  const busyRef = useRef(false);
+
+  const setMessage = useCallback((msg: { type: "ok" | "err"; text: string } | null) => {
+    setMessageState(msg ? { ...msg, at: Date.now() } : null);
+  }, []);
 
   const reload = useCallback(async () => {
     const data = await api<T[]>(`/api/${resource}`);
@@ -19,44 +38,73 @@ export function useCrud<T extends { id: number }>(resource: string) {
       setMessage({ type: "err", text: err.message });
       setLoading(false);
     });
-  }, [reload]);
+  }, [reload, setMessage]);
 
-  async function create(body: unknown) {
+  async function withLock<R>(fn: () => Promise<R>): Promise<R | null> {
+    if (busyRef.current) return null;
+    busyRef.current = true;
+    setSaving(true);
     try {
-      const saved = await api<T>(`/api/${resource}`, { method: "POST", body: JSON.stringify(body) });
-      setMessage({ type: "ok", text: "Saved successfully" });
-      await reload();
-      return saved;
-    } catch (err) {
-      setMessage({ type: "err", text: err instanceof Error ? err.message : "Save failed" });
-      return null;
+      return await fn();
+    } finally {
+      busyRef.current = false;
+      setSaving(false);
     }
   }
 
-  async function update(id: number, body: unknown) {
-    try {
-      const saved = await api<T>(`/api/${resource}/${id}`, { method: "PUT", body: JSON.stringify(body) });
-      setMessage({ type: "ok", text: "Updated successfully" });
-      await reload();
-      return saved;
-    } catch (err) {
-      setMessage({ type: "err", text: err instanceof Error ? err.message : "Update failed" });
+  async function create(body: unknown) {
+    const key = bodyKey(resource, body);
+    const now = Date.now();
+    const last = recentCreates.get(key) ?? 0;
+    if (now - last < 4000) {
+      setMessage({ type: "err", text: "Already saving — please wait" });
       return null;
     }
+    recentCreates.set(key, now);
+
+    return withLock(async () => {
+      try {
+        const saved = await api<T>(`/api/${resource}`, { method: "POST", body: JSON.stringify(body) });
+        setMessage({ type: "ok", text: "Saved successfully" });
+        await reload();
+        return saved;
+      } catch (err) {
+        recentCreates.delete(key);
+        setMessage({ type: "err", text: err instanceof Error ? err.message : "Save failed" });
+        return null;
+      }
+    });
+  }
+
+  async function update(id: number, body: unknown) {
+    return withLock(async () => {
+      try {
+        const saved = await api<T>(`/api/${resource}/${id}`, { method: "PUT", body: JSON.stringify(body) });
+        setMessage({ type: "ok", text: "Updated successfully" });
+        await reload();
+        return saved;
+      } catch (err) {
+        setMessage({ type: "err", text: err instanceof Error ? err.message : "Update failed" });
+        return null;
+      }
+    });
   }
 
   async function remove(id: number) {
     if (!confirm("Delete this record?")) return false;
-    try {
-      await api(`/api/${resource}/${id}`, { method: "DELETE" });
-      setMessage({ type: "ok", text: "Deleted successfully" });
-      await reload();
-      return true;
-    } catch (err) {
-      setMessage({ type: "err", text: err instanceof Error ? err.message : "Delete failed" });
-      return false;
-    }
+    const result = await withLock(async () => {
+      try {
+        await api(`/api/${resource}/${id}`, { method: "DELETE" });
+        setMessage({ type: "ok", text: "Deleted successfully" });
+        await reload();
+        return true;
+      } catch (err) {
+        setMessage({ type: "err", text: err instanceof Error ? err.message : "Delete failed" });
+        return false;
+      }
+    });
+    return result ?? false;
   }
 
-  return { rows, loading, message, setMessage, reload, create, update, remove };
+  return { rows, loading, saving, message, setMessage, reload, create, update, remove };
 }

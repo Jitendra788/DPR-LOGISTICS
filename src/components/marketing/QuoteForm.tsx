@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { CheckCircle2, Send } from "lucide-react";
 import { submitQuoteViaApi, type QuoteRequest } from "@/services/quoteService";
 import { ErrorState, LoadingState } from "./States";
 
@@ -43,10 +44,13 @@ export function QuoteForm() {
 
   if (success) {
     return (
-      <div className="mkt-form-success">
-        <h3>Quote request submitted</h3>
+      <div className="mkt-form-success mkt-form-success-card">
+        <CheckCircle2 aria-hidden className="mkt-form-success-icon" />
+        <h3>Request submitted</h3>
         <p>{success.message}</p>
-        <p className="mkt-ref">Reference: <strong>{success.referenceId}</strong></p>
+        <p className="mkt-ref">
+          Reference: <strong>{success.referenceId}</strong>
+        </p>
         <button type="button" className="mkt-btn mkt-btn-outline" onClick={() => setSuccess(null)}>
           Submit another request
         </button>
@@ -55,31 +59,42 @@ export function QuoteForm() {
   }
 
   return (
-    <form className="mkt-form" onSubmit={onSubmit} noValidate>
-      {loading ? <LoadingState label="Calculating your request…" /> : null}
+    <form className="mkt-form mkt-form-card" onSubmit={onSubmit} noValidate>
+      {loading ? <LoadingState label="Sending pickup request…" /> : null}
       {error ? <ErrorState title="Unable to submit" description={error} /> : null}
       <div className="mkt-form-grid">
         <label>
-          Pickup Location
-          <input value={form.pickupLocation} onChange={(e) => set("pickupLocation", e.target.value)} required />
+          Pickup Location *
+          <input
+            value={form.pickupLocation}
+            onChange={(e) => set("pickupLocation", e.target.value)}
+            placeholder="City / area"
+            required
+          />
         </label>
         <label>
-          Delivery Location
-          <input value={form.deliveryLocation} onChange={(e) => set("deliveryLocation", e.target.value)} required />
+          Delivery Location *
+          <input
+            value={form.deliveryLocation}
+            onChange={(e) => set("deliveryLocation", e.target.value)}
+            placeholder="City / area"
+            required
+          />
         </label>
         <label>
-          Shipment Type
+          Shipment Type *
           <select value={form.shipmentType} onChange={(e) => set("shipmentType", e.target.value)} required>
             <option value="">Select type</option>
             <option>Part Load</option>
             <option>Full Truck Load</option>
+            <option>Trailers</option>
             <option>Express Cargo</option>
             <option>Warehousing</option>
           </select>
         </label>
         <label>
-          Weight (approx.)
-          <input value={form.weight} onChange={(e) => set("weight", e.target.value)} placeholder="e.g. 500 kg" />
+          Weight (approx.) *
+          <input value={form.weight} onChange={(e) => set("weight", e.target.value)} placeholder="e.g. 500 kg" required />
         </label>
         <label>
           Number of Packages
@@ -90,20 +105,32 @@ export function QuoteForm() {
           <input type="date" value={form.pickupDate} onChange={(e) => set("pickupDate", e.target.value)} />
         </label>
         <label>
-          Name
-          <input value={form.name} onChange={(e) => set("name", e.target.value)} required />
+          Name *
+          <input value={form.name} onChange={(e) => set("name", e.target.value)} placeholder="Your full name" required />
         </label>
         <label>
-          Mobile
-          <input type="tel" value={form.mobile} onChange={(e) => set("mobile", e.target.value)} required />
+          Mobile *
+          <input
+            type="tel"
+            inputMode="numeric"
+            value={form.mobile}
+            onChange={(e) => set("mobile", e.target.value)}
+            placeholder="10-digit mobile"
+            required
+          />
         </label>
         <label className="mkt-form-full">
           Email
-          <input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} />
+          <input
+            type="email"
+            value={form.email}
+            onChange={(e) => set("email", e.target.value)}
+            placeholder="you@company.com (optional)"
+          />
         </label>
       </div>
-      <button type="submit" className="mkt-btn mkt-btn-primary" disabled={loading}>
-        Get Estimated Quote
+      <button type="submit" className="mkt-btn mkt-btn-primary mkt-btn-lg" disabled={loading}>
+        <Send aria-hidden size={16} /> Get Estimated Quote
       </button>
     </form>
   );

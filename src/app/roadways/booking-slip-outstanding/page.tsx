@@ -7,6 +7,7 @@ import { DateField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { api, downloadCsv } from "@/lib/api-client";
 import { todayIso } from "@/lib/dates";
 
@@ -53,7 +54,7 @@ export default function BookingSlipOutstandingPage() {
         crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Booking Slip Outstanding Report" }]}
       />
       <Flash message={message} />
-      <form onSubmit={show}>
+      <AdminForm onSubmit={show}>
         <FormCard>
           <TwoCol>
             <div>
@@ -63,7 +64,7 @@ export default function BookingSlipOutstandingPage() {
             <DateField label="To Date" value={toDate} onChange={setToDate} />
           </TwoCol>
         </FormCard>
-      </form>
+      </AdminForm>
       {rows ? (
         <>
           <FormCard>

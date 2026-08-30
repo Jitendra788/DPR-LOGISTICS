@@ -7,6 +7,7 @@ import { InputField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { api } from "@/lib/api-client";
 
@@ -32,7 +33,7 @@ export default function DriverAdvancePage() {
     <>
       <PageHeader title="Driver Advance" subtitle="Record driver cash / diesel advance" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Driver Advance" }]} />
       <Flash message={message} />
-      <form onSubmit={onSubmit}>
+      <AdminForm onSubmit={onSubmit}>
         <FormCard>
           <TwoCol>
             <div>
@@ -48,7 +49,7 @@ export default function DriverAdvancePage() {
           </TwoCol>
           <Button type="submit">Save Advance</Button>
         </FormCard>
-      </form>
+      </AdminForm>
       <DataTable
         rows={rows}
         columns={[

@@ -7,6 +7,7 @@ import { InputField, SelectField, TextAreaField } from "@/components/ui/FormFiel
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { formToObject } from "@/lib/api-client";
 
@@ -47,7 +48,7 @@ export default function VendorCreationPage() {
     <>
       <PageHeader title="Vendor Creation" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Vendor Creation" }]} />
       <Flash message={message} />
-      <form onSubmit={onSubmit}>
+      <AdminForm onSubmit={onSubmit}>
         <FormCard>
           <TwoCol>
             <div>
@@ -63,7 +64,7 @@ export default function VendorCreationPage() {
           </TwoCol>
           <Button type="submit">{editId ? "Update Data" : "Save Data"}</Button>
         </FormCard>
-      </form>
+      </AdminForm>
       <DataTable
         rows={rows}
         columns={[

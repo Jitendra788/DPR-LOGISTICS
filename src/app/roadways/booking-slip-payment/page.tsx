@@ -7,6 +7,7 @@ import { DateField, InputField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { api } from "@/lib/api-client";
 import { todayIso } from "@/lib/dates";
 
@@ -81,7 +82,7 @@ export default function BookingSlipPaymentPage() {
         crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Booking Slip Payment" }]}
       />
       <Flash message={message} />
-      <form onSubmit={show}>
+      <AdminForm onSubmit={show}>
         <FormCard>
           <TwoCol>
             <div>
@@ -101,7 +102,7 @@ export default function BookingSlipPaymentPage() {
             </div>
           </TwoCol>
         </FormCard>
-      </form>
+      </AdminForm>
       {rows ? (
         <DataTable
           rows={rows}

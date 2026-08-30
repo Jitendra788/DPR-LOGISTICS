@@ -24,6 +24,19 @@ export type ShipmentTracking = {
   vehicleNumber: string;
   expectedDelivery: string;
   events: TrackingEvent[];
+  /** Live GPS from Trip Desk when LR is linked to an active trip */
+  live?: {
+    tripNo: string;
+    status: string;
+    lastLat: number | null;
+    lastLng: number | null;
+    lastLocationAt: string | null;
+    etaMinutes: number | null;
+    distanceRemainingKm: number | null;
+    route: { lat: number; lng: number; at: string; source: string }[];
+    mapsUrl: string | null;
+    customerTrackUrl: string | null;
+  } | null;
 };
 
 const STAGE_LABELS: Record<TrackingStage, string> = {

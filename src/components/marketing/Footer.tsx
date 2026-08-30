@@ -1,7 +1,17 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { Mail, MapPin, Phone } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { company } from "@/data/marketing/company";
+
+function FooterCol({ title, children, className = "" }: { title: string; children: ReactNode; className?: string }) {
+  return (
+    <div className={`mkt-footer-col ${className}`.trim()}>
+      <h3 className="mkt-footer-col-title">{title}</h3>
+      {children}
+    </div>
+  );
+}
 
 export function MarketingFooter() {
   return (
@@ -9,22 +19,20 @@ export function MarketingFooter() {
       <div className="mkt-container">
         <div className="mkt-footer-grid">
           <div className="mkt-footer-brand-col">
-            <BrandLogo variant="header" width={180} height={70} className="mkt-footer-logo" />
+            <BrandLogo variant="header" width={160} height={62} className="mkt-footer-logo" />
             <p className="mkt-footer-text">{company.shortDescription}</p>
           </div>
 
-          <div>
-            <h3>Company</h3>
+          <FooterCol title="Company">
             <ul>
               <li><Link href="/about">About Us</Link></li>
               <li><Link href="/careers">Careers</Link></li>
               <li><Link href="/media">Media Center</Link></li>
               <li><Link href="/contact">Contact Us</Link></li>
             </ul>
-          </div>
+          </FooterCol>
 
-          <div>
-            <h3>Services</h3>
+          <FooterCol title="Services">
             <ul>
               <li><Link href="/services/part-load">Part Load</Link></li>
               <li><Link href="/services/ftl">Full Truck Load</Link></li>
@@ -32,10 +40,9 @@ export function MarketingFooter() {
               <li><Link href="/services/warehousing">Warehousing</Link></li>
               <li><Link href="/services/excellence">Express Cargo</Link></li>
             </ul>
-          </div>
+          </FooterCol>
 
-          <div>
-            <h3>Quick Links</h3>
+          <FooterCol title="Quick Links">
             <ul>
               <li><Link href="/tracking">GC Tracking</Link></li>
               <li><Link href="/customer-booking">LR Booking</Link></li>
@@ -44,28 +51,34 @@ export function MarketingFooter() {
               <li><Link href="/blog">Blog</Link></li>
               <li><Link href="/network">Network</Link></li>
             </ul>
-          </div>
+          </FooterCol>
 
-          <div>
-            <h3>Contact</h3>
+          <FooterCol title="Contact" className="mkt-footer-col-contact">
             <ul className="mkt-footer-contact-list">
               <li>
                 <a href={`tel:${company.phone.replace(/\s/g, "")}`}>
-                  <Phone aria-hidden /> {company.phone}
+                  <Phone aria-hidden size={15} /> {company.phone}
                 </a>
               </li>
+              {company.phoneAlt ? (
+                <li>
+                  <a href={`tel:${company.phoneAlt.replace(/\s/g, "")}`}>
+                    <Phone aria-hidden size={15} /> {company.phoneAlt}
+                  </a>
+                </li>
+              ) : null}
               <li>
                 <a href={`mailto:${company.email}`}>
-                  <Mail aria-hidden /> {company.email}
+                  <Mail aria-hidden size={15} /> {company.email}
                 </a>
               </li>
               <li>
                 <span>
-                  <MapPin aria-hidden /> {company.address}
+                  <MapPin aria-hidden size={15} /> {company.address}
                 </span>
               </li>
             </ul>
-          </div>
+          </FooterCol>
         </div>
       </div>
 

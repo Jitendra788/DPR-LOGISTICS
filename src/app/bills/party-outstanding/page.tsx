@@ -7,6 +7,7 @@ import { DateField, InputField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { api, downloadCsv } from "@/lib/api-client";
 import { todayIso } from "@/lib/dates";
 
@@ -87,7 +88,7 @@ export default function PartyOutstandingPage() {
         crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Party Outstanding" }]}
       />
       <Flash message={message} />
-      <form onSubmit={search}>
+      <AdminForm onSubmit={search}>
         <FormCard>
           <TwoCol>
             <InputField label="Bill No" value={billNo} onChange={(e) => setBillNo(e.target.value)} />
@@ -97,7 +98,7 @@ export default function PartyOutstandingPage() {
             Search
           </Button>
         </FormCard>
-      </form>
+      </AdminForm>
       <FormCard>
         <Button type="button" variant="teal" onClick={exportExcel}>
           Export to Excel

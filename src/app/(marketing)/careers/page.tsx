@@ -17,6 +17,12 @@ export default function CareersPage() {
       title="Work Culture"
       subtitle="Join a hands-on logistics team that values reliability and customer care."
       cta={{ href: "/careers/openings", label: "Current Openings" }}
+      highlights={[
+        "Booking & fleet operations",
+        "On-the-job learning",
+        "Customer-first culture",
+        "Growth with the network",
+      ]}
     >
       <p>
         At DPR Logistics we run bookings, fleet, billing and customer support as one operation. We look for people who

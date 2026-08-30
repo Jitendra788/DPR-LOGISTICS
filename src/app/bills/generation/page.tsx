@@ -6,6 +6,7 @@ import { FormCard, TwoCol } from "@/components/ui/FormCard";
 import { InputField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { DataTable } from "@/components/ui/DataTable";
 import { api } from "@/lib/api-client";
 
@@ -26,7 +27,7 @@ export default function BillGenerationPage() {
   const [parties, setParties] = useState<Party[]>([]);
   const [stations, setStations] = useState<Station[]>([]);
   const [bills, setBills] = useState<Bill[]>([]);
-  const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  const [message, setMessage] = useState<{ type: "ok" | "err"; text: string; at?: number } | null>(null);
   const [form, setForm] = useState({
     partyName: "",
     fromDate: new Date().toISOString().slice(0, 10),
@@ -56,10 +57,17 @@ export default function BillGenerationPage() {
         method: "POST",
         body: JSON.stringify(form),
       });
-      setMessage({ type: "ok", text: `Bill ${result.bill.billNo} generated for ${result.lrCount} LR(s)` });
+      setMessage({ type: "ok", text: `Bill ${result.bill.billNo} generated for ${result.lrCount} LR(s)`, at: Date.now() });
+      setForm({
+        partyName: "",
+        fromDate: new Date().toISOString().slice(0, 10),
+        toDate: new Date().toISOString().slice(0, 10),
+        fromStation: "",
+        toStation: "",
+      });
       await loadBills();
     } catch (err) {
-      setMessage({ type: "err", text: err instanceof Error ? err.message : "Bill failed" });
+      setMessage({ type: "err", text: err instanceof Error ? err.message : "Bill failed", at: Date.now() });
     }
   }
 
@@ -71,7 +79,7 @@ export default function BillGenerationPage() {
     <>
       <PageHeader title="Bill Generation" subtitle="Prepare party bills" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Bill Generation" }]} />
       <Flash message={message} />
-      <form onSubmit={onSubmit}>
+      <AdminForm onSubmit={onSubmit}>
         <FormCard>
           <TwoCol>
             <div>
@@ -88,7 +96,7 @@ export default function BillGenerationPage() {
             <Button type="submit">Generate Bill</Button>
           </div>
         </FormCard>
-      </form>
+      </AdminForm>
       <DataTable
         rows={bills}
         columns={[

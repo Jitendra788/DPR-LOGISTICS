@@ -7,6 +7,7 @@ import { InputField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { api } from "@/lib/api-client";
 
@@ -32,7 +33,7 @@ export default function ExpenseEntryPage() {
     <>
       <PageHeader title="Expense Entry" subtitle="Roadways vehicle expenses" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Expense Entry" }]} />
       <Flash message={message} />
-      <form onSubmit={onSubmit}>
+      <AdminForm onSubmit={onSubmit}>
         <FormCard>
           <TwoCol>
             <div>
@@ -48,7 +49,7 @@ export default function ExpenseEntryPage() {
           </TwoCol>
           <Button type="submit">Save Expense</Button>
         </FormCard>
-      </form>
+      </AdminForm>
       <DataTable
         rows={rows}
         columns={[

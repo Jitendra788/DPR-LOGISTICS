@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { trackShipmentViaApi, type TrackingResult } from "@/services/trackingService";
+import { trackShipmentViaApi, type TrackingResult } from "@/services/trackingClient";
 import { ShipmentTimeline } from "@/components/marketing/ShipmentTimeline";
 import { EmptyState, ErrorState, LoadingState } from "@/components/marketing/States";
 import { ScrollReveal } from "@/components/marketing/ScrollReveal";

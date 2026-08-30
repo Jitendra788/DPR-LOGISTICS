@@ -7,6 +7,7 @@ import { SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { api, downloadCsv } from "@/lib/api-client";
 
 type Party = { name: string };
@@ -67,7 +68,7 @@ export default function BillwiseOutstandingPage() {
         crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Outstanding Report" }]}
       />
       <Flash message={message} />
-      <form onSubmit={show}>
+      <AdminForm onSubmit={show}>
         <FormCard>
           <div className="mb-3">
             <Button type="submit" variant="teal">
@@ -76,7 +77,7 @@ export default function BillwiseOutstandingPage() {
           </div>
           <SelectField label="Party Name" value={partyName} onChange={(e) => setPartyName(e.target.value)} options={parties.map((p) => p.name)} placeholder="" />
         </FormCard>
-      </form>
+      </AdminForm>
       <FormCard>
         <Button type="button" variant="teal" onClick={generateExcel}>
           Generate Excel

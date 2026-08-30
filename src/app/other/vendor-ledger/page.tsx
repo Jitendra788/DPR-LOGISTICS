@@ -7,6 +7,7 @@ import { DateField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { api, downloadCsv } from "@/lib/api-client";
 import { todayIso } from "@/lib/dates";
 
@@ -48,7 +49,7 @@ export default function VendorLedgerPage() {
     <>
       <PageHeader title="Party Ledger" subtitle="Select Date and View Ledger" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Party Ledger" }]} />
       <Flash message={message} />
-      <form onSubmit={exportExcel}>
+      <AdminForm onSubmit={exportExcel}>
         <FormCard>
           <TwoCol>
             <div>
@@ -63,7 +64,7 @@ export default function VendorLedgerPage() {
             Export to Excel
           </Button>
         </FormCard>
-      </form>
+      </AdminForm>
       {rows ? (
         <DataTable
           rows={rows}

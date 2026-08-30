@@ -39,35 +39,37 @@ body {
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .form-group > span,
 .form-label {
   display: block;
-  margin-bottom: 5px;
-  font-size: 14px;
+  margin-bottom: 4px;
+  font-size: 13px;
   font-weight: 700;
-  color: #333;
+  color: #334155;
 }
 
 .form-control {
   display: block;
   width: 100%;
-  height: 34px;
-  padding: 6px 12px;
+  height: 38px;
+  padding: 7px 12px;
   font-size: 14px;
-  line-height: 1.42857143;
-  color: #555;
+  line-height: 1.4;
+  color: #0f172a;
   background-color: #fff;
-  border: 1px solid #d2d6de;
-  border-radius: 0;
+  border: 1px solid #d8e2ec;
+  border-radius: 10px;
   box-shadow: none;
   outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .form-control:focus {
-  border-color: #3c8dbc;
+  border-color: #0f766e;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
 }
 
 select.form-control {
@@ -85,13 +87,108 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   opacity: 0.7;
 }
 
+/* Premium file upload */
+.erp-file-drop {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  padding: 10px 12px;
+  border: 1.5px dashed #99f6e4;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #f0fdfa 0%, #ffffff 100%);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+
+.erp-file-drop:hover,
+.erp-file-drop:focus-within {
+  border-color: #0f766e;
+  background: #ecfdf5;
+  box-shadow: 0 8px 20px rgba(15, 118, 110, 0.08);
+}
+
+.erp-file-drop.has-file {
+  border-style: solid;
+  border-color: #14b8a6;
+}
+
+.erp-file-input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.erp-file-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #ccfbf1;
+  color: #0f766e;
+  flex-shrink: 0;
+}
+
+.erp-file-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.erp-file-copy strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.erp-file-copy span {
+  font-size: 12px;
+  color: #64748b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.erp-file-btn {
+  flex-shrink: 0;
+  padding: 7px 12px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 6px 14px rgba(15, 118, 110, 0.25);
+}
+
+.erp-file-drop-sm {
+  min-height: 44px;
+  max-width: 280px;
+  padding: 6px 8px;
+  gap: 8px;
+}
+
+.erp-file-drop-sm .erp-file-icon {
+  display: none;
+}
+
+.erp-file-drop-sm .erp-file-btn {
+  padding: 5px 10px;
+}
+
 .box {
   position: relative;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
   background: #fff;
-  border-top: 3px solid #d2d6de;
-  border-radius: 3px;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e8eef3;
+  border-top: 3px solid #0f766e;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
 }
 
 .box-body {
@@ -101,44 +198,93 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
 
 @media (min-width: 640px) {
   .box-body {
-    padding: 15px;
+    padding: 14px 16px;
   }
 }
 
 .page-content {
-  padding: 16px;
+  padding: 12px 14px;
   max-width: 100%;
   overflow-x: hidden;
 }
 
 @media (min-width: 640px) {
   .page-content {
-    padding: 24px;
+    padding: 16px 18px;
   }
 }
 
 .btn-admin {
-  display: inline-block;
-  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
   margin-bottom: 0;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.42857143;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
   text-align: center;
   white-space: nowrap;
   vertical-align: middle;
   cursor: pointer;
   border: 1px solid transparent;
-  border-radius: 3px;
+  border-radius: 10px;
+  text-decoration: none;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease, background 0.15s ease;
+}
+
+.btn-admin-solid {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff;
+}
+
+.btn-admin-soft {
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a;
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  box-shadow: none;
+}
+
+.btn-admin-soft:hover:not(:disabled) {
+  background: #e2e8f0 !important;
+  filter: none;
+  box-shadow: none;
+}
+
+.btn-admin-muted {
+  color: #64748b !important;
+  -webkit-text-fill-color: #64748b;
+  cursor: not-allowed;
+}
+
+.btn-admin:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
+}
+
+.btn-admin-soft:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn-admin:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
 }
 
 .btn-admin-sm {
-  padding: 4px 10px;
+  padding: 5px 10px;
   margin: 0 2px 0 0;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.3;
-  border-radius: 4px;
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.08);
 }
 
 @media (max-width: 639px) {

@@ -31,6 +31,8 @@ export const navItems: NavItem[] = [
       { label: "Total Booking (MIS) Report", href: "/booking/mis-report" },
     ],
   },
+  { label: "Trip Desk", href: "/trip-desk", icon: "truck" },
+  { label: "Tracking Desk", href: "/tracking-desk", icon: "map" },
   {
     label: "LHC",
     icon: "grid",

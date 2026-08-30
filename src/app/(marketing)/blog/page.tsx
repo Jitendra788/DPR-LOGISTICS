@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Clock, Tag } from "lucide-react";
 import { blogPosts } from "@/data/marketing/blog";
+import { BlogCover } from "@/components/marketing/BlogCover";
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = createPageMetadata({
@@ -28,38 +29,45 @@ export default function BlogPage() {
           <span className="mkt-eyebrow">Blog</span>
           <h1>Logistics Insights &amp; Guides</h1>
           <p>
-            Practical tips on cargo transport, tracking, warehousing and route planning from the DPR Logistics team.
+            Practical tips on cargo transport, GC / LR tracking, warehousing and route planning from the DPR team.
           </p>
         </div>
       </section>
 
-      <section className="mkt-section">
+      <section className="mkt-section" id="blog-articles">
         <div className="mkt-container">
-          <div className="mkt-grid-3">
+          <div className="mkt-grid-3 mkt-blog-grid">
             {sorted.map((post) => (
-              <article key={post.slug} className="mkt-blog-card">
-                <div className="mkt-blog-card-meta">
-                  <span className="mkt-blog-tag">
-                    <Tag aria-hidden size={14} /> {post.category}
-                  </span>
-                  <span className="mkt-blog-read">
-                    <Clock aria-hidden size={14} /> {post.readTime}
-                  </span>
-                </div>
-                <h2>
-                  <Link href={`/blog/${post.slug}`}>{post.title}</Link>
-                </h2>
-                <p>{post.excerpt}</p>
-                <time dateTime={post.publishedAt}>
-                  {new Date(post.publishedAt).toLocaleDateString("en-IN", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </time>
-                <Link href={`/blog/${post.slug}`} className="mkt-service-link">
-                  Read article <ArrowRight aria-hidden size={16} />
+              <article key={post.slug} className="mkt-blog-card mkt-blog-card-media">
+                <Link href={`/blog/${post.slug}`} className="mkt-blog-cover-link">
+                  <BlogCover src={post.cover} alt={post.title} />
                 </Link>
+                <div className="mkt-blog-card-body">
+                  <div className="mkt-blog-card-meta">
+                    <span className="mkt-blog-tag">
+                      <Tag aria-hidden size={14} /> {post.category}
+                    </span>
+                    <span className="mkt-blog-read">
+                      <Clock aria-hidden size={14} /> {post.readTime}
+                    </span>
+                  </div>
+                  <h2>
+                    <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+                  </h2>
+                  <p>{post.excerpt}</p>
+                  <div className="mkt-blog-card-foot">
+                    <time dateTime={post.publishedAt}>
+                      {new Date(post.publishedAt).toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </time>
+                    <Link href={`/blog/${post.slug}`} className="mkt-btn mkt-btn-primary mkt-btn-sm">
+                      Read article <ArrowRight aria-hidden size={14} />
+                    </Link>
+                  </div>
+                </div>
               </article>
             ))}
           </div>

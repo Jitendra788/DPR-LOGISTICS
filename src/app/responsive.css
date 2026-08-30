@@ -11,7 +11,8 @@ body {
 }
 
 .page-content {
-  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  padding: 12px 14px;
+  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
 }
 
 .table-scroll {
@@ -132,8 +133,8 @@ body {
   }
 
   .page-content {
-    padding: 12px;
-    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    padding: 10px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   }
 
   .form-control,
@@ -263,8 +264,8 @@ body {
 
 @media (min-width: 1366px) {
   .page-content {
-    padding-left: 28px;
-    padding-right: 28px;
+    padding-left: 20px;
+    padding-right: 20px;
   }
 }
 
@@ -350,5 +351,329 @@ body {
   .erp-kpi-grid {
     grid-template-columns: 1fr !important;
   }
+}
+
+/* ── ERP header: search on own row on phones ── */
+@media (max-width: 639px) {
+  .erp-header {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 56px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    row-gap: 8px;
+  }
+
+  .erp-header-left {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .erp-header-right {
+    flex-shrink: 0;
+  }
+
+  .erp-search {
+    order: 3;
+    flex: 1 1 100%;
+    max-width: none;
+    margin: 0;
+  }
+}
+
+/* ── Page header / breadcrumbs ── */
+.erp-pagehead {
+  min-width: 0;
+}
+
+.erp-crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: 4px;
+}
+
+@media (max-width: 767px) {
+  .erp-page-title {
+    word-break: break-word;
+  }
+
+  .erp-page-sub {
+    word-break: break-word;
+  }
+}
+
+/* ── DataTable: mobile card stack ── */
+@media (max-width: 767px) {
+  .table-scroll:has(.erp-dt-stack-mobile) {
+    overflow: visible;
+  }
+
+  .erp-dt-stack-mobile {
+    min-width: 0 !important;
+  }
+
+  .erp-dt-stack-mobile thead {
+    display: none;
+  }
+
+  .erp-dt-stack-mobile tbody tr {
+    display: block;
+    margin-bottom: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 4px 10px 10px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+
+  .erp-dt-stack-mobile td {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 8px 2px;
+    border: none !important;
+    white-space: normal !important;
+    text-align: right;
+  }
+
+  .erp-dt-stack-mobile td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+    flex-shrink: 0;
+    max-width: 42%;
+    text-align: left;
+    padding-top: 2px;
+  }
+
+  .erp-dt-stack-mobile td[data-label="Actions"] {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+    border-top: 1px dashed #e2e8f0 !important;
+    margin-top: 4px;
+    padding-top: 10px;
+  }
+
+  .erp-dt-stack-mobile td[data-label="Actions"]::before {
+    max-width: none;
+    margin-bottom: 2px;
+  }
+
+  .erp-dt-stack-mobile td.erp-dt-empty {
+    display: block;
+    text-align: center;
+  }
+
+  .erp-dt-stack-mobile td.erp-dt-empty::before {
+    display: none;
+  }
+
+  .erp-dt-foot {
+    align-items: stretch;
+  }
+
+  .erp-pager {
+    overflow-x: auto;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ── Forms & boxes ── */
+.erp-form-card,
+.erp-form-card-body,
+.form-group {
+  min-width: 0;
+}
+
+@media (max-width: 767px) {
+  .box-header .btn-admin,
+  .box-body > .flex > .btn-admin {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+
+  .grid.grid-cols-2,
+  .grid.grid-cols-3 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Print / LR views ── */
+@media (max-width: 767px) {
+  .lr-print-wrap,
+  .print-page {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* ── Login + customer booking already covered; ensure no overflow ── */
+.page-content img,
+.pub-wrap img,
+.marketing-site img,
+.dpr-login-card img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ── Global project responsive hardening ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body,
+#__next,
+main {
+  min-width: 0;
+}
+
+img,
+video,
+canvas,
+svg,
+iframe {
+  max-width: 100%;
+}
+
+@media (max-width: 1023px) {
+  .erp-mid,
+  .erp-bottom,
+  .erp-dash-grid,
+  .erp-two-col,
+  .erp-form-grid-2,
+  .erp-form-grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .erp-form-card-body .grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .erp-sheet-panel {
+    width: 100% !important;
+    max-width: 100vw !important;
+    border-radius: 16px 16px 0 0;
+  }
+
+  .erp-form-card-head,
+  .erp-form-card-body {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .erp-form-card-head {
+    flex-wrap: wrap;
+  }
+
+  .td-trip-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+  }
+
+  .td-trip-tabs button {
+    flex: 0 0 auto;
+  }
+
+  .td-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .lt-main,
+  .lt-share main {
+    width: min(100%, calc(100% - 1.25rem)) !important;
+    margin: 1rem auto !important;
+  }
+
+  .lt-header,
+  .lt-share > header {
+    padding: 0.75rem 1rem;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .lt-form input,
+  .lt-form button,
+  .lt-share button {
+    font-size: 16px;
+    min-height: 44px;
+  }
+
+  .lt-map,
+  .lt-leaflet-map {
+    height: min(420px, 55vh) !important;
+    min-height: 240px;
+  }
+
+  .dpr-login-card {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .dpr-login-input,
+  .dpr-login-submit {
+    font-size: 16px;
+  }
+
+  .pub-help {
+    flex-wrap: wrap;
+  }
+
+  .pub-help a {
+    flex: 1 1 auto;
+    text-align: center;
+  }
+
+  .sim-consent,
+  .sim-consent-card,
+  .track-public {
+    max-width: 100%;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
+@media (max-width: 479px) {
+  .erp-kpi-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .erp-quick-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .page-content {
+    padding: 10px;
+  }
+
+  .box {
+    border-radius: 12px;
+  }
+}
+
+/* Leaflet / map containers always fluid */
+.leaflet-container,
+.td-map-canvas,
+.fleet-map,
+.mkt-network-map-wrap {
+  width: 100% !important;
+  max-width: 100%;
 }
 

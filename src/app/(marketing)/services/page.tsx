@@ -22,7 +22,7 @@ export const metadata: Metadata = createPageMetadata({
 export default function ServicesPage() {
   return (
     <>
-      <section className="mkt-page-hero">
+      <section className="mkt-page-hero mkt-page-hero-premium">
         <div className="mkt-container">
           <span className="mkt-eyebrow">Services</span>
           <h1>Transport & Cargo Services</h1>
@@ -40,7 +40,7 @@ export default function ServicesPage() {
               <ServiceCard key={service.id} service={service} />
             ))}
           </div>
-          <div className="mkt-highlight-grid" style={{ marginTop: "2.5rem" }}>
+          <div className="mkt-highlight-grid mkt-section-stack">
             {extraServices.map((block) => (
               <article key={block.id} className="mkt-highlight-card">
                 <h3>{block.title}</h3>

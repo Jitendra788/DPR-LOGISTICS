@@ -7,6 +7,7 @@ import { FileField, InputField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { api, formToObject } from "@/lib/api-client";
 
@@ -85,7 +86,7 @@ export default function VehicleCreationPage() {
     <>
       <PageHeader title="New Vehicle Creation" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Vehicle Creation" }]} />
       <Flash message={message} />
-      <form onSubmit={onSubmit}>
+      <AdminForm onSubmit={onSubmit}>
         <FormCard>
           <TwoCol>
             <div>
@@ -123,7 +124,7 @@ export default function VehicleCreationPage() {
           </TwoCol>
           <Button type="submit">{editId ? "Update Data" : "Save Data"}</Button>
         </FormCard>
-      </form>
+      </AdminForm>
       <DataTable
         rows={rows}
         searchKeys={["vehNo", "ownerName"]}

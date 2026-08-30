@@ -12,9 +12,11 @@ type Props<T> = {
   columns: Column<T>[];
   rows: T[];
   searchKeys?: (keyof T)[];
+  /** Stack rows as cards below 768px (default true) */
+  stackOnMobile?: boolean;
 };
 
-export function DataTable<T extends object>({ columns, rows, searchKeys }: Props<T>) {
+export function DataTable<T extends object>({ columns, rows, searchKeys, stackOnMobile = true }: Props<T>) {
   const [q, setQ] = useState("");
   const [pageSize, setPageSize] = useState(10);
   const [page, setPage] = useState(1);
@@ -72,7 +74,9 @@ export function DataTable<T extends object>({ columns, rows, searchKeys }: Props
           </label>
         </div>
         <div className="table-scroll">
-          <table className="erp-dt w-full min-w-[520px] border-collapse text-[13px] sm:min-w-[720px] sm:text-[14px]">
+          <table
+            className={`erp-dt w-full border-collapse text-[13px] sm:text-[14px] ${stackOnMobile ? "erp-dt-stack-mobile" : "min-w-[480px] sm:min-w-[640px]"}`}
+          >
             <thead>
               <tr>
                 {columns.map((c) => (
@@ -91,7 +95,9 @@ export function DataTable<T extends object>({ columns, rows, searchKeys }: Props
                 slice.map((row, i) => (
                   <tr key={i}>
                     {columns.map((c) => (
-                      <td key={c.key}>{c.render ? c.render(row) : String((row as Record<string, unknown>)[c.key] ?? "")}</td>
+                      <td key={c.key} data-label={c.header}>
+                        {c.render ? c.render(row) : String((row as Record<string, unknown>)[c.key] ?? "")}
+                      </td>
                     ))}
                   </tr>
                 ))

@@ -21,15 +21,13 @@ export function validateContact(data: ContactRequest): ContactResult | null {
   return null;
 }
 
+/** @deprecated Server APIs send email directly — kept for compatibility */
 export async function submitContact(data: ContactRequest): Promise<ContactResult> {
   const invalid = validateContact(data);
   if (invalid) return invalid;
-
-  await new Promise((r) => setTimeout(r, 700));
-  const referenceId = `CN-${Date.now().toString(36).toUpperCase()}`;
   return {
     ok: true,
-    referenceId,
+    referenceId: `CN-${Date.now().toString(36).toUpperCase()}`,
     message: "Message received. Our support team will respond within one business day.",
   };
 }

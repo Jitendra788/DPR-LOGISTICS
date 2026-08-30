@@ -29,15 +29,13 @@ export function validateQuote(data: QuoteRequest): QuoteResult | null {
   return null;
 }
 
+/** @deprecated Server APIs send email directly — kept for compatibility */
 export async function submitQuote(data: QuoteRequest): Promise<QuoteResult> {
   const invalid = validateQuote(data);
   if (invalid) return invalid;
-
-  await new Promise((r) => setTimeout(r, 800));
-  const referenceId = `QT-${Date.now().toString(36).toUpperCase()}`;
   return {
     ok: true,
-    referenceId,
+    referenceId: `QT-${Date.now().toString(36).toUpperCase()}`,
     message: "Thank you! Our team will share an estimated quote within 2 business hours.",
   };
 }

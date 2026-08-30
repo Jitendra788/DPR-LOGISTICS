@@ -388,3 +388,68 @@ model PodDocument {
   mimeType   String   @default("application/octet-stream")
   createdAt  DateTime @default(now())
 }
+
+/** Phone-based trip tracking desk: Pending → InTransit → Completed */
+model TripDesk {
+  id                  Int      @id @default(autoincrement())
+  tripNo              String   @default("")
+  driverPhone         String
+  driverName          String   @default("")
+  vehNo               String   @default("")
+  fromStation         String   @default("")
+  toStation           String   @default("")
+  lrNos               String   @default("")
+  status              String   @default("Pending")
+  remarks             String   @default("")
+  startedAt           String   @default("")
+  completedAt         String   @default("")
+  shareToken          String   @default("")
+  customerTrackToken  String   @default("")
+  trackingMode        String   @default("phone")
+  deviceImei          String   @default("")
+  simMsisdn           String   @default("")
+  simConsentToken     String   @default("")
+  simConsentStatus    String   @default("")
+  simConsentAt        String   @default("")
+  simLastPollAt       String   @default("")
+  simLastPollError    String   @default("")
+  destLat             Float    @default(0)
+  destLng             Float    @default(0)
+  etaMinutes          Int      @default(0)
+  distanceRemainingKm Float    @default(0)
+  lastLat             Float    @default(0)
+  lastLng             Float    @default(0)
+  lastLocationAt      String   @default("")
+  createdAt           DateTime @default(now())
+  locationLogs        TripLocationLog[]
+  alerts              TrackingAlert[]
+}
+
+model TripLocationLog {
+  id         Int      @id @default(autoincrement())
+  tripId     Int
+  lat        Float
+  lng        Float
+  speed      Float    @default(0)
+  heading    Float    @default(0)
+  accuracy   Float    @default(0)
+  source     String   @default("phone")
+  recordedAt String   @default("")
+  trip       TripDesk @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@index([tripId, recordedAt])
+}
+
+model TrackingAlert {
+  id             Int      @id @default(autoincrement())
+  tripId         Int
+  type           String
+  message        String
+  severity       String   @default("medium")
+  channel        String   @default("erp")
+  triggeredAt    String   @default("")
+  acknowledgedAt String   @default("")
+  trip           TripDesk @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@index([tripId, acknowledgedAt])
+}

@@ -48,6 +48,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     isMarketingRoute(pathname) ||
     pathname === "/login" ||
     pathname.startsWith("/customer-booking") ||
+    pathname.startsWith("/live-track") ||
+    pathname.startsWith("/track/") ||
+    pathname.startsWith("/sim-consent/") ||
     pathname.startsWith("/booking/lr/print") ||
     pathname.startsWith("/lhc/contract/print") ||
     pathname.startsWith("/bills/print") ||

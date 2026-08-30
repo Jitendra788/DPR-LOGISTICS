@@ -7,6 +7,7 @@ import { InputField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { api } from "@/lib/api-client";
 
@@ -37,7 +38,7 @@ export default function TripSheetPage() {
     <>
       <PageHeader title="Trip Sheet" subtitle="DPR Roadways trip entry" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Trip Sheet" }]} />
       <Flash message={message} />
-      <form onSubmit={onSubmit}>
+      <AdminForm onSubmit={onSubmit}>
         <FormCard>
           <TwoCol>
             <div>
@@ -53,7 +54,7 @@ export default function TripSheetPage() {
           </TwoCol>
           <Button type="submit">Save Trip Sheet</Button>
         </FormCard>
-      </form>
+      </AdminForm>
       <DataTable
         rows={rows}
         columns={[

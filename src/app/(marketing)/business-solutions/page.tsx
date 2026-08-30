@@ -14,7 +14,7 @@ export const metadata: Metadata = createPageMetadata({
 export default function BusinessSolutionsPage() {
   return (
     <>
-      <section className="mkt-page-hero">
+      <section className="mkt-page-hero mkt-page-hero-premium">
         <div className="mkt-container">
           <span className="mkt-eyebrow">Business Solutions</span>
           <h1>Logistics programs built for scale</h1>

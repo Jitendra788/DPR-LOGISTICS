@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { MarketingFooter } from "@/components/marketing/Footer";
+import { GstinBar } from "@/components/marketing/GstinBar";
 import { MarketingHeader } from "@/components/marketing/Header";
 import { GoogleAnalytics } from "@/components/marketing/GoogleAnalytics";
 import { JsonLd } from "@/components/marketing/JsonLd";
@@ -72,6 +73,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       <JsonLd data={[organizationJsonLd(), localBusinessJsonLd(), websiteJsonLd()]} />
       <MarketingHeader />
       <main>{children}</main>
+      <GstinBar />
       <MarketingFooter />
     </div>
   );

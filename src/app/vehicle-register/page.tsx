@@ -7,6 +7,7 @@ import { DateField, InputField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { api } from "@/lib/api-client";
 import { todayIso } from "@/lib/dates";
@@ -71,7 +72,7 @@ export default function VehicleRegisterPage() {
     <>
       <PageHeader title="New Vehicle Creation" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Self Vehicle Creation" }]} />
       <Flash message={message} />
-      <form onSubmit={onSubmit}>
+      <AdminForm onSubmit={onSubmit}>
         <FormCard>
           <TwoCol>
             <div>
@@ -99,7 +100,7 @@ export default function VehicleRegisterPage() {
             Save Data
           </Button>
         </FormCard>
-      </form>
+      </AdminForm>
       <DataTable
         rows={rows}
         columns={[

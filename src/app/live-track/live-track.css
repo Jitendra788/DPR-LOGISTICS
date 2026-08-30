@@ -1,0 +1,209 @@
+/* Public live vehicle tracking */
+
+.lt-page,
+.lt-share {
+  min-height: 100vh;
+  background: linear-gradient(165deg, #0b1f33 0%, #132847 45%, #1e3a5f 100%);
+  color: #f8fafc;
+  font-family: Manrope, "Segoe UI", sans-serif;
+}
+
+.lt-header,
+.lt-share > header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lt-brand,
+.lt-share > header a {
+  color: #f59e0b;
+  font-weight: 800;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+}
+
+.lt-main {
+  width: min(720px, calc(100% - 2rem));
+  margin: 2rem auto;
+}
+
+.lt-main h1,
+.lt-share main h1 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+}
+
+.lt-lead {
+  color: rgba(226, 232, 240, 0.85);
+  margin: 0 0 1.25rem;
+  line-height: 1.55;
+}
+
+.lt-form {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: 1fr;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 520px) {
+  .lt-form {
+    grid-template-columns: 1fr auto;
+  }
+}
+
+.lt-form input {
+  min-height: 48px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(4, 18, 37, 0.45);
+  color: #fff;
+  padding: 0 1rem;
+  font: inherit;
+}
+
+.lt-form button {
+  min-height: 48px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  color: #0b1f33;
+  font-weight: 800;
+  padding: 0 1.25rem;
+  cursor: pointer;
+}
+
+.lt-error {
+  color: #fecaca;
+  background: rgba(127, 29, 29, 0.35);
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+}
+
+.lt-card {
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.lt-meta p {
+  margin: 0.25rem 0;
+  font-size: 0.95rem;
+}
+
+.lt-map {
+  width: 100%;
+  height: min(420px, 55vh);
+  border: 0;
+  border-radius: 12px;
+  margin-top: 0.85rem;
+  background: #0b1f33;
+}
+
+.lt-map-empty {
+  margin-top: 0.85rem;
+  padding: 2rem 1rem;
+  text-align: center;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.25);
+  color: rgba(226, 232, 240, 0.8);
+}
+
+.lt-maps-link {
+  display: inline-block;
+  margin-top: 0.85rem;
+  color: #fbbf24;
+  font-weight: 700;
+}
+
+.lt-share {
+  padding: 0 0 2rem;
+}
+
+.lt-share main {
+  width: min(480px, calc(100% - 2rem));
+  margin: 1.5rem auto 0;
+}
+
+.lt-share .err {
+  color: #fecaca;
+  background: rgba(127, 29, 29, 0.4);
+  padding: 0.75rem;
+  border-radius: 10px;
+}
+
+.lt-share .ok {
+  color: #bbf7d0;
+}
+
+.lt-share button {
+  width: 100%;
+  min-height: 52px;
+  margin: 1rem 0;
+  border: none;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.lt-share button.start {
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  color: #0b1f33;
+}
+
+.lt-share button.stop {
+  background: #dc2626;
+  color: #fff;
+}
+
+.lt-share .hint,
+.lt-share .meta {
+  color: rgba(226, 232, 240, 0.8);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.lt-leaflet-map {
+  z-index: 0;
+}
+
+.lt-leaflet-truck {
+  background: transparent !important;
+  border: none !important;
+}
+
+@media (max-width: 639px) {
+  .lt-main {
+    width: calc(100% - 1.25rem);
+    margin: 1rem auto;
+  }
+
+  .lt-share main {
+    width: calc(100% - 1.25rem);
+  }
+
+  .lt-form {
+    grid-template-columns: 1fr;
+  }
+
+  .lt-form button,
+  .lt-share button {
+    width: 100%;
+  }
+
+  .lt-map {
+    height: min(360px, 50vh);
+  }
+
+  .lt-header,
+  .lt-share > header {
+    padding: 0.75rem 1rem;
+  }
+}

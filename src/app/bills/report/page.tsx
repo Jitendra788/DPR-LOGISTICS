@@ -7,6 +7,7 @@ import { InputField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { api, downloadCsv } from "@/lib/api-client";
 
 type Party = { name: string };
@@ -55,7 +56,7 @@ export default function BillReportPage() {
     <>
       <PageHeader title="Bill Report" subtitle="Select date and view bills" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Bill Report" }]} />
       <Flash message={message} />
-      <form onSubmit={showReport}>
+      <AdminForm onSubmit={showReport}>
         <FormCard>
           <TwoCol>
             <div>
@@ -68,7 +69,7 @@ export default function BillReportPage() {
             </div>
           </TwoCol>
         </FormCard>
-      </form>
+      </AdminForm>
       <FormCard>
         <Button type="button" onClick={() => downloadCsv("bill-report.csv", rows as unknown as Record<string, unknown>[])} disabled={!rows.length}>
           Export to Excel

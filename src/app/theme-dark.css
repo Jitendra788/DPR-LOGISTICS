@@ -180,6 +180,30 @@
   border-color: #2dd4bf;
 }
 
+[data-theme="dark"] .erp-file-drop {
+  background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+  border-color: #334155;
+}
+
+[data-theme="dark"] .erp-file-drop:hover,
+[data-theme="dark"] .erp-file-drop:focus-within {
+  border-color: #2dd4bf;
+  background: #0f172a;
+}
+
+[data-theme="dark"] .erp-file-icon {
+  background: #134e4a;
+  color: #5eead4;
+}
+
+[data-theme="dark"] .erp-file-copy strong {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .erp-file-copy span {
+  color: #94a3b8;
+}
+
 [data-theme="dark"] .erp-dt th,
 [data-theme="dark"] .erp-dt td {
   color: #e5e7eb;
@@ -266,4 +290,70 @@
 
 [data-theme="dark"] .s2-opt.is-selected:not(.is-active) {
   background: #1e293b;
+}
+
+[data-theme="dark"] .td-stat,
+[data-theme="dark"] .td-panel,
+[data-theme="dark"] .td-form-section,
+[data-theme="dark"] .td-table-wrap,
+[data-theme="dark"] .td-trip-card,
+[data-theme="dark"] .td-detail-item {
+  background: #111827;
+  border-color: #1f2937;
+}
+
+[data-theme="dark"] .td-stat-value,
+[data-theme="dark"] .td-panel-head h3,
+[data-theme="dark"] .td-detail-item strong,
+[data-theme="dark"] .td-trip-card strong {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .td-toolbar,
+[data-theme="dark"] .td-form-section-head {
+  background: #0f172a;
+  border-color: #1f2937;
+}
+
+[data-theme="dark"] .td-tool-btn {
+  background: #111827;
+  border-color: #334155;
+  color: #e5e7eb;
+}
+
+[data-theme="dark"] .td-tool-btn:hover:not(:disabled) {
+  background: #1f2937;
+}
+
+[data-theme="dark"] .td-trip-tabs button {
+  background: #111827;
+  border-color: #334155;
+  color: #e5e7eb;
+}
+
+[data-theme="dark"] .td-trip-tabs button.is-active {
+  background: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+  border-color: #14b8a6;
+}
+
+[data-theme="dark"] .td-map-empty {
+  background: #0f172a;
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .erp-dt-stack-mobile tbody tr {
+  background: #111827;
+  border-color: #1f2937;
+}
+
+[data-theme="dark"] .erp-flash-toast.is-ok {
+  background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
+  color: #d1fae5;
+  border-color: #10b981;
+}
+
+[data-theme="dark"] .erp-flash-toast.is-err {
+  background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+  color: #fecaca;
+  border-color: #f87171;
 }

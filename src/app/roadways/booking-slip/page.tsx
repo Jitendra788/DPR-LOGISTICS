@@ -7,6 +7,7 @@ import { DateField, InputField, ManualNumberField, SelectField } from "@/compone
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { api } from "@/lib/api-client";
 import { isoToDisplay, todayIso } from "@/lib/dates";
@@ -140,7 +141,7 @@ export default function BookingSlipPage() {
         crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Booking Slip" }]}
       />
       <Flash message={message} />
-      <form onSubmit={onSubmit}>
+      <AdminForm onSubmit={onSubmit}>
         <FormCard>
           <TwoCol>
             <div>
@@ -182,7 +183,7 @@ export default function BookingSlipPage() {
             </Button>
           </div>
         </FormCard>
-      </form>
+      </AdminForm>
 
       <div ref={tableRef} className="mt-4">
         <DataTable

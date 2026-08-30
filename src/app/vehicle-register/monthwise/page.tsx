@@ -7,6 +7,7 @@ import { DateField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { api, downloadCsv } from "@/lib/api-client";
 import { todayIso } from "@/lib/dates";
 
@@ -56,7 +57,7 @@ export default function MonthwiseReportPage() {
         crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Monthwise Margin Report" }]}
       />
       <Flash message={message} />
-      <form onSubmit={show}>
+      <AdminForm onSubmit={show}>
         <FormCard>
           <TwoCol>
             <div>
@@ -74,7 +75,7 @@ export default function MonthwiseReportPage() {
             </div>
           </TwoCol>
         </FormCard>
-      </form>
+      </AdminForm>
       <FormCard>
         <Button
           type="button"

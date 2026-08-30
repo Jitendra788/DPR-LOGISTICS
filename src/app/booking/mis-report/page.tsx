@@ -7,6 +7,7 @@ import { InputField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { api, downloadCsv } from "@/lib/api-client";
 
 type Party = { name: string };
@@ -81,7 +82,7 @@ export default function BookingMisReportPage() {
     <>
       <PageHeader title="Booking MIS Report" subtitle="Select Date and View Report" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Booking MIS Report" }]} />
       <Flash message={message} />
-      <form onSubmit={loadReport}>
+      <AdminForm onSubmit={loadReport}>
         <FormCard>
           <TwoCol>
             <div>
@@ -96,7 +97,7 @@ export default function BookingMisReportPage() {
             </div>
           </TwoCol>
         </FormCard>
-      </form>
+      </AdminForm>
       <FormCard>
         <Button type="button" onClick={exportExcel} disabled={!rows.length}>
           Export to Excel

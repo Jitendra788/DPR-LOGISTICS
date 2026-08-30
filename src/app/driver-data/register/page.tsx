@@ -7,6 +7,7 @@ import { InputField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { api, formToObject } from "@/lib/api-client";
 
@@ -32,7 +33,7 @@ export default function DriverRegisterPage() {
     <>
       <PageHeader title="Driver Register" subtitle="Daily driver attendance / trip register" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Driver Register" }]} />
       <Flash message={message} />
-      <form onSubmit={onSubmit}>
+      <AdminForm onSubmit={onSubmit}>
         <FormCard>
           <TwoCol>
             <div>
@@ -48,7 +49,7 @@ export default function DriverRegisterPage() {
           </TwoCol>
           <Button type="submit">Save Data</Button>
         </FormCard>
-      </form>
+      </AdminForm>
       <DataTable
         rows={rows}
         columns={[

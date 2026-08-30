@@ -182,12 +182,6 @@ export default function CustomerBookingPage() {
           </div>
         </div>
 
-        {message ? (
-          <div className={`pub-flash ${message.type === "ok" ? "is-ok" : "is-err"}`} role="status">
-            {message.text}
-          </div>
-        ) : null}
-
         <form onSubmit={onSubmit}>
           <section className="pub-card">
             <h2>Shipment details</h2>
@@ -245,6 +239,11 @@ export default function CustomerBookingPage() {
           <button type="submit" className="pub-submit" disabled={saving}>
             {saving ? "Saving…" : "Save & Print LR"}
           </button>
+          {message ? (
+            <div className={`pub-flash ${message.type === "ok" ? "is-ok" : "is-err"}`} role="status">
+              {message.text}
+            </div>
+          ) : null}
         </form>
 
         <footer className="pub-foot">

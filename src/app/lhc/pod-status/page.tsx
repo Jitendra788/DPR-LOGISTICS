@@ -8,6 +8,7 @@ import { DateField, InputField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { api } from "@/lib/api-client";
 import { todayIso } from "@/lib/dates";
 
@@ -35,6 +36,7 @@ function SelectDocCell({ lrNo, onMessage }: { lrNo: string; onMessage: (type: "o
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  const [fileName, setFileName] = useState("");
 
   async function upload() {
     const file = inputRef.current?.files?.[0];
@@ -51,6 +53,7 @@ function SelectDocCell({ lrNo, onMessage }: { lrNo: string; onMessage: (type: "o
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) throw new Error(data.error || "Upload failed");
       if (inputRef.current) inputRef.current.value = "";
+      setFileName("");
       onMessage("ok", `Document uploaded for ${lrNo}`);
     } catch (err) {
       onMessage("err", err instanceof Error ? err.message : "Upload failed");
@@ -61,11 +64,28 @@ function SelectDocCell({ lrNo, onMessage }: { lrNo: string; onMessage: (type: "o
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <input ref={inputRef} type="file" className="max-w-[220px] text-[13px]" />
+      <label className={`erp-file-drop erp-file-drop-sm${fileName ? " has-file" : ""}`}>
+        <input
+          ref={inputRef}
+          type="file"
+          className="erp-file-input"
+          onChange={(e) => setFileName(e.target.files?.[0]?.name ?? "")}
+        />
+        <span className="erp-file-copy">
+          <strong>{fileName ? "Selected" : "Choose file"}</strong>
+          <span>{fileName || "No file chosen"}</span>
+        </span>
+        <span className="erp-file-btn">Browse</span>
+      </label>
       <Button type="button" size="sm" disabled={busy} onClick={upload}>
         {busy ? "Uploading..." : "Upload"}
       </Button>
-      <Button type="button" size="sm" variant="teal" onClick={() => router.push(`/lhc/pod-status/docs?lrNo=${encodeURIComponent(lrNo)}`)}>
+      <Button
+        type="button"
+        size="sm"
+        variant="teal"
+        onClick={() => router.push(`/lhc/pod-status/docs?lrNo=${encodeURIComponent(lrNo)}`)}
+      >
         View Documents
       </Button>
     </div>
@@ -114,7 +134,7 @@ export default function PodStatusPage() {
         crumbs={[{ label: "Home", href: "/dashboard" }, { label: "POD Documents" }]}
       />
       <Flash message={message} />
-      <form onSubmit={showAll}>
+      <AdminForm onSubmit={showAll}>
         <FormCard>
           <TwoCol>
             <div>
@@ -140,7 +160,7 @@ export default function PodStatusPage() {
             </div>
           </TwoCol>
         </FormCard>
-      </form>
+      </AdminForm>
       {rows ? (
         <DataTable
           rows={rows.map((r, i) => ({ ...r, srNo: i + 1 }))}

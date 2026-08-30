@@ -82,15 +82,22 @@ export function MarketingHeader() {
         </nav>
 
         <div className="mkt-header-cta">
-          <a href={`tel:${company.phone.replace(/\s/g, "")}`} className="mkt-header-phone">
+          <div className="mkt-header-phone">
             <span className="mkt-header-phone-icon">
               <Phone aria-hidden />
             </span>
             <span className="mkt-header-phone-text">
               <span className="mkt-header-phone-label">Talk To Us</span>
-              <span className="mkt-header-phone-num">{company.phone}</span>
+              <a href={`tel:${company.phone.replace(/\s/g, "")}`} className="mkt-header-phone-num">
+                {company.phone}
+              </a>
+              {company.phoneAlt ? (
+                <a href={`tel:${company.phoneAlt.replace(/\s/g, "")}`} className="mkt-header-phone-num mkt-header-phone-alt">
+                  {company.phoneAlt}
+                </a>
+              ) : null}
             </span>
-          </a>
+          </div>
           <Link href={TRACKING_HREF} className="mkt-header-track-btn">
             GC Tracking
           </Link>
@@ -138,6 +145,11 @@ export function MarketingHeader() {
             <a href={`tel:${company.phone.replace(/\s/g, "")}`} className="mkt-mobile-phone">
               <Phone aria-hidden /> Talk to us — {company.phone}
             </a>
+            {company.phoneAlt ? (
+              <a href={`tel:${company.phoneAlt.replace(/\s/g, "")}`} className="mkt-mobile-phone">
+                <Phone aria-hidden /> {company.phoneAlt}
+              </a>
+            ) : null}
           </nav>
         </div>
       ) : null}

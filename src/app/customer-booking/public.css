@@ -156,11 +156,12 @@
 }
 
 .pub-flash {
-  margin-bottom: 16px;
+  margin-top: 12px;
+  margin-bottom: 0;
   padding: 12px 14px;
   border-radius: 12px;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 700;
 }
 
 .pub-flash.is-ok {
@@ -208,6 +209,46 @@
 @media (min-width: 768px) {
   .pub-grid {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 639px) {
+  .pub-top {
+    min-height: 56px;
+    padding: 0 12px;
+  }
+
+  .pub-brand-logo {
+    max-height: 40px;
+  }
+
+  .pub-wrap {
+    padding: 16px 12px 28px;
+  }
+
+  .pub-head h1 {
+    font-size: 1.4rem;
+  }
+
+  .pub-field input,
+  .pub-field select {
+    font-size: 16px;
+    min-height: 44px;
+  }
+
+  .pub-submit {
+    width: 100%;
+  }
+
+  .pub-help {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pub-help a {
+    flex: 1 1 calc(50% - 4px);
+    text-align: center;
   }
 }
 

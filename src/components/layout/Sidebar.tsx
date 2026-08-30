@@ -13,6 +13,7 @@ import {
   FileText,
   FolderPlus,
   LayoutDashboard,
+  MapPin,
   Truck,
   UserRound,
   Warehouse,
@@ -30,6 +31,7 @@ const icons: Record<string, ComponentType<{ className?: string }>> = {
   "plus-square": FolderPlus,
   user: UserRound,
   truck: Truck,
+  map: MapPin,
   car: Car,
 };
 

@@ -7,6 +7,7 @@ import { InputField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { api } from "@/lib/api-client";
 
 type Vehicle = { vehNo: string };
@@ -69,7 +70,7 @@ export default function LhcPaymentModifyPage() {
     <>
       <PageHeader title="LHC Payment Modify" subtitle="Select and fill data for the payment" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "LHC Payment" }]} />
       <Flash message={message} />
-      <form onSubmit={showReport}>
+      <AdminForm onSubmit={showReport}>
         <FormCard>
           <TwoCol>
             <div>
@@ -83,7 +84,7 @@ export default function LhcPaymentModifyPage() {
             </div>
           </TwoCol>
         </FormCard>
-      </form>
+      </AdminForm>
       <DataTable
         rows={rows}
         columns={[

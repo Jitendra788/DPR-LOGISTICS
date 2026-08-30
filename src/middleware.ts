@@ -11,7 +11,11 @@ export function middleware(req: Request) {
     pathname === "/sitemap.xml" ||
     pathname.endsWith(".html") ||
     pathname.startsWith("/customer-booking") ||
+    pathname.startsWith("/live-track") ||
+    pathname.startsWith("/track/") ||
+    pathname.startsWith("/sim-consent/") ||
     pathname.startsWith("/api/public/") ||
+    pathname.startsWith("/api/tracking/ingest") ||
     pathname.startsWith("/api/auth/login") ||
     pathname.startsWith("/_next") ||
     pathname === "/favicon.ico" ||

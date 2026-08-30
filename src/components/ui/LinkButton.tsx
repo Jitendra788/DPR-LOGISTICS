@@ -4,10 +4,10 @@ import type { ReactNode } from "react";
 type Variant = "primary" | "teal" | "outline" | "white";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-[#00a65a] text-white hover:bg-[#008d4c] border border-[#008d4c]",
-  teal: "bg-[#00695c] text-white hover:bg-[#004d40] border border-[#004d40]",
-  outline: "bg-white text-[#444] hover:bg-[#f4f4f4] border border-[#d2d6de]",
-  white: "bg-white/20 text-white hover:bg-white/30 border border-white/40",
+  primary: "btn-admin-solid bg-gradient-to-br from-[#059669] to-[#10b981] border border-[#047857]",
+  teal: "btn-admin-solid bg-gradient-to-br from-[#0f766e] to-[#14b8a6] border border-[#0d9488]",
+  outline: "btn-admin-soft",
+  white: "btn-admin-solid bg-white/20 hover:bg-white/30 border border-white/40 shadow-none",
 };
 
 type Props = {
@@ -19,7 +19,7 @@ type Props = {
 
 export function LinkButton({ href, variant = "primary", className = "", children }: Props) {
   return (
-    <Link href={href} className={`btn-admin inline-block no-underline ${variants[variant]} ${className}`}>
+    <Link href={href} className={`btn-admin no-underline ${variants[variant]} ${className}`}>
       {children}
     </Link>
   );

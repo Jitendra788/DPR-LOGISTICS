@@ -22,6 +22,7 @@ export const resourceMap = {
   "driver-vouchers": prisma.driverVoucher,
   slips: prisma.bookingSlip,
   tyres: prisma.tyreStatus,
+  "trip-desk": prisma.tripDesk,
 } as const;
 
 export type ResourceKey = keyof typeof resourceMap;
@@ -77,9 +78,14 @@ const FLOAT_FIELDS = new Set([
   "tdsAmt",
   "paidAmt",
   "otherDed",
+  "lastLat",
+  "lastLng",
+  "destLat",
+  "destLng",
+  "distanceRemainingKm",
 ]);
 
-const INT_FIELDS = new Set(["lrCount"]);
+const INT_FIELDS = new Set(["lrCount", "etaMinutes"]);
 const BOOL_FIELDS = new Set(["billed", "paid"]);
 const SKIP_FIELDS = new Set(["id", "createdAt", "sr", "srNo"]);
 const NUMERIC_GST_RESOURCES = new Set<ResourceKey>(["bookings"]);

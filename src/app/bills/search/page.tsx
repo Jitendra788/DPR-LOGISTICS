@@ -7,6 +7,7 @@ import { FormCard } from "@/components/ui/FormCard";
 import { FieldWrap } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { api } from "@/lib/api-client";
 
 type Bill = { billNo: string };
@@ -39,7 +40,7 @@ export default function SearchBillStatusPage() {
         crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Search Bill" }]}
       />
       <Flash message={message} />
-      <form onSubmit={search}>
+      <AdminForm onSubmit={search}>
         <FormCard>
           <div className="flex w-full max-w-3xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
             <FieldWrap label="Enter Bill No for Search" className="mb-0 min-w-0 w-full flex-1 sm:min-w-[280px]">
@@ -50,7 +51,7 @@ export default function SearchBillStatusPage() {
             </Button>
           </div>
         </FormCard>
-      </form>
+      </AdminForm>
     </>
   );
 }

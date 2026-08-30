@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" role="img" aria-label="Epic Yarns">
+  <rect width="320" height="140" fill="#fff"/>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#9aa3ad"/>
+      <stop offset="100%" stop-color="#d4a017"/>
+    </linearGradient>
+  </defs>
+  <path d="M120 30 A40 40 0 1 0 120 100" fill="none" stroke="url(#g)" stroke-width="6" stroke-linecap="round"/>
+  <path d="M145 42 h30 M140 52 h40 M135 62 h50 M140 72 h40 M145 82 h30 M150 92 h20" stroke="url(#g)" stroke-width="5" stroke-linecap="round"/>
+  <text x="160" y="118" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="18" fill="#111" font-weight="800" letter-spacing="1">EPIC YARNS</text>
+  <text x="160" y="132" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#444">Private Limited</text>
+</svg>

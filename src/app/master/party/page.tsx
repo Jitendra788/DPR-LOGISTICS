@@ -7,6 +7,7 @@ import { FileField, InputField, SelectField, TextAreaField } from "@/components/
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { formToObject } from "@/lib/api-client";
 import { api } from "@/lib/api-client";
@@ -24,10 +25,12 @@ type Party = {
   pan: string;
 };
 
+const emptyForm = (): Partial<Party> => ({ partyType: "Consigner/Consignee", gst: "" });
+
 export default function PartyCreationPage() {
-  const { rows, message, create, update, remove, setMessage } = useCrud<Party>("parties");
+  const { rows, message, create, update, remove, setMessage, saving } = useCrud<Party>("parties");
   const [editId, setEditId] = useState<number | null>(null);
-  const [form, setForm] = useState<Partial<Party>>({ partyType: "Consigner/Consignee", gst: "" });
+  const [form, setForm] = useState<Partial<Party>>(emptyForm());
   const [nextSr, setNextSr] = useState(1);
 
   useEffect(() => {
@@ -55,13 +58,45 @@ export default function PartyCreationPage() {
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const raw = { ...form, ...formToObject(e.currentTarget) };
+    if (saving) return;
+
+    const formEl = e.currentTarget;
+    const raw = { ...form, ...formToObject(formEl) };
     const body = { ...raw, gst: String(raw.gst ?? "").trim() };
-    const saved = editId ? await update(editId, body) : await create(body);
-    if (saved) {
-      setEditId(null);
-      e.currentTarget.reset();
-      setForm({ partyType: "Consigner/Consignee", gst: "" });
+    const name = String(body.name ?? "").trim();
+    if (!name) {
+      setMessage({ type: "err", text: "Party name is required" });
+      return;
+    }
+
+    if (editId) {
+      const saved = await update(editId, body);
+      if (saved) {
+        setEditId(null);
+        setForm(emptyForm());
+        formEl.reset();
+      }
+      return;
+    }
+
+    // Clear immediately so a second click cannot re-post the same filled form
+    setForm(emptyForm());
+    formEl.reset();
+
+    const saved = await create(body);
+    if (!saved) {
+      // Restore so user can fix and retry on real errors
+      setForm({
+        name: String(body.name ?? ""),
+        address: String(body.address ?? ""),
+        contact: String(body.contact ?? ""),
+        gst: String(body.gst ?? ""),
+        opBalance: String(body.opBalance ?? ""),
+        opDate: String(body.opDate ?? ""),
+        partyType: String(body.partyType ?? "Consigner/Consignee"),
+        partyCode: String(body.partyCode ?? ""),
+        pan: String(body.pan ?? ""),
+      });
     }
   }
 
@@ -73,7 +108,7 @@ export default function PartyCreationPage() {
         crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Supplier Party Creation" }]}
       />
       <Flash message={message} />
-      <form onSubmit={onSubmit}>
+      <AdminForm onSubmit={onSubmit}>
         <FormCard>
           <TwoCol>
             <div>
@@ -99,15 +134,25 @@ export default function PartyCreationPage() {
             </div>
           </TwoCol>
           <div className="flex flex-wrap gap-2">
-            <Button type="submit">{editId ? "Update Data" : "Save Data"}</Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? "Saving…" : editId ? "Update Data" : "Save Data"}
+            </Button>
             {editId ? (
-              <Button type="button" variant="muted" onClick={() => { setEditId(null); setForm({ partyType: "Consigner/Consignee", gst: "" }); }}>
+              <Button
+                type="button"
+                variant="secondary"
+                disabled={saving}
+                onClick={() => {
+                  setEditId(null);
+                  setForm(emptyForm());
+                }}
+              >
                 Cancel
               </Button>
             ) : null}
           </div>
         </FormCard>
-      </form>
+      </AdminForm>
       <DataTable
         rows={rows}
         searchKeys={["name", "gst", "partyCode"]}

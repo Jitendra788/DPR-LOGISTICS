@@ -6,6 +6,7 @@ import { FormCard, TwoCol } from "@/components/ui/FormCard";
 import { DateField, FieldWrap, InputField, ManualNumberField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { api, formToObject } from "@/lib/api-client";
 import { todayIso } from "@/lib/dates";
@@ -224,7 +225,7 @@ export default function RoadwaysLrPage() {
         crumbs={[{ label: "Home", href: "/dashboard" }, { label: "LR Booking" }]}
       />
       <Flash message={message} />
-      <form onSubmit={onSubmit}>
+      <AdminForm onSubmit={onSubmit}>
         <FormCard>
           <TwoCol>
             <div>
@@ -322,7 +323,7 @@ export default function RoadwaysLrPage() {
             </div>
           </div>
         </FormCard>
-      </form>
+      </AdminForm>
     </>
   );
 }

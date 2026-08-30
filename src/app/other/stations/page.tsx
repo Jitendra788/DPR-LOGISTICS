@@ -7,6 +7,7 @@ import { InputField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
+import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { formToObject } from "@/lib/api-client";
 
@@ -32,7 +33,7 @@ export default function StationMasterPage() {
     <>
       <PageHeader title="Station Master" subtitle="Add source and destination stations" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Station Master" }]} />
       <Flash message={message} />
-      <form onSubmit={onSubmit}>
+      <AdminForm onSubmit={onSubmit}>
         <FormCard>
           <TwoCol>
             <InputField label="Station Name" name="name" value={form.name ?? ""} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
@@ -40,7 +41,7 @@ export default function StationMasterPage() {
           </TwoCol>
           <Button type="submit">{editId ? "Update" : "Save Data"}</Button>
         </FormCard>
-      </form>
+      </AdminForm>
       <DataTable
         rows={rows}
         columns={[
