@@ -28,10 +28,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     service?.seoDescription ??
     (extra ? `${extra.title} by DPR Logistics — ${extra.points[0]}` : "Logistics service by DPR Logistics.");
   return createPageMetadata({
-    title,
+    title: `${title} | Transport Service Kolhapur`,
     description,
     path: `/services/${slug}`,
-    keywords: [title, "DPR Logistics", "cargo transport India", "logistics Kolhapur"],
+    keywords: [
+      title,
+      `${title} Kolhapur`,
+      `${title} Maharashtra`,
+      "transport company Kolhapur",
+      "part load FTL booking",
+    ],
   });
 }
 

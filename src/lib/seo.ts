@@ -8,35 +8,73 @@ export const SITE_NAME = company.name;
 
 export const DEFAULT_OG_IMAGE = "/dpr-logo-header.png";
 
+/** High-intent phrases people type on Google for Indian cargo / transport. */
 export const SEO_KEYWORDS = [
+  // Brand
   "DPR Logistics",
-  "dprlogistics.in",
   "DPR Logistics Kolhapur",
-  "logistics company India",
-  "cargo transport India",
+  "DPR Logistics Kagal",
+  "dprlogistics.in",
+  "DPR transport company",
+  // Local intent
+  "transport company in Kolhapur",
   "transport company Kolhapur",
+  "cargo transport Kolhapur",
+  "goods transport Kolhapur",
+  "logistics company Kolhapur",
+  "truck transport Kolhapur",
+  "part load transport Kolhapur",
+  "FTL transport Kolhapur",
   "Kagal MIDC transport",
+  "Kagal transport company",
+  "Maharashtra transport company",
+  // Services
   "part load transport",
-  "part load cargo Maharashtra",
+  "part load booking",
   "full truck load FTL",
   "FTL transport India",
+  "truck booking India",
+  "cargo booking online",
+  "goods transport service",
   "trailer transport India",
   "container transport India",
-  "warehousing logistics",
-  "GC tracking",
-  "LR tracking",
+  "ODC cargo transport",
+  "warehousing Kolhapur",
+  "warehousing logistics Maharashtra",
+  "fleet owners transport contractors",
+  // Tracking
+  "GC tracking online",
+  "LR tracking online",
   "lorry receipt tracking",
-  "docket tracking online",
-  "shipment tracking India",
-  "track consignment online",
-  "pan India logistics",
+  "docket tracking",
+  "consignment tracking India",
+  "track shipment online India",
+  "cargo tracking number",
+  // Routes people search
   "Kolhapur to Pune transport",
-  "Maharashtra Gujarat transport",
+  "Kolhapur to Mumbai cargo",
+  "Kolhapur to Bangalore transport",
+  "Kolhapur to Ahmedabad transport",
+  "Kolhapur to Surat transport",
+  "Kolhapur to Delhi transport",
+  "Maharashtra to Gujarat transport",
+  "pan India logistics",
   "B2B logistics India",
-  "freight transport company",
-  "GST logistics billing",
+  "freight forwarder Kolhapur",
+  "GST transport billing",
   "POD proof of delivery",
 ] as const;
+
+export function mergeSeoKeywords(...extra: Array<string | readonly string[] | undefined>): string[] {
+  const set = new Set<string>();
+  for (const item of SEO_KEYWORDS) set.add(item);
+  for (const group of extra) {
+    if (!group) continue;
+    if (typeof group === "string") set.add(group);
+    else for (const k of group) if (k) set.add(k);
+  }
+  return [...set];
+}
 
 type PageMetaOptions = {
   title: string;
@@ -67,7 +105,7 @@ export function createPageMetadata({
   return {
     title,
     description,
-    keywords: keywords ?? [...SEO_KEYWORDS],
+    keywords: mergeSeoKeywords(keywords),
     alternates: { canonical: url },
     openGraph: {
       title: fullTitle,
@@ -124,10 +162,25 @@ export function organizationJsonLd() {
     "@type": "Organization",
     name: company.name,
     legalName: company.name,
-    alternateName: ["DPR", "DPR Logistics Kolhapur", "dprlogistics.in", "DPR Logistics SP Group"],
+    alternateName: [
+      "DPR",
+      "DPR Logistics Kolhapur",
+      "DPR Logistics Kagal",
+      "dprlogistics.in",
+      "DPR Logistics SP Group",
+      "DPR Transport Kolhapur",
+    ],
     url: SITE_URL,
     logo: absoluteUrl(DEFAULT_OG_IMAGE),
     description: company.description,
+    knowsAbout: [
+      "Part load transport",
+      "Full truck load FTL",
+      "Trailer and container transport",
+      "Warehousing and distribution",
+      "GC LR consignment tracking",
+      "GST logistics billing",
+    ],
     email: company.email,
     telephone: company.phone,
     foundingDate: String(company.foundedYear),
@@ -193,10 +246,34 @@ export function localBusinessJsonLd() {
       opens: "09:00",
       closes: "19:00",
     },
-    areaServed: {
-      "@type": "Country",
-      name: "India",
-    },
+    areaServed: [
+      { "@type": "Country", name: "India" },
+      { "@type": "State", name: "Maharashtra" },
+      { "@type": "State", name: "Gujarat" },
+      { "@type": "City", name: "Kolhapur" },
+      { "@type": "City", name: "Pune" },
+      { "@type": "City", name: "Mumbai" },
+      { "@type": "City", name: "Bangalore" },
+      { "@type": "City", name: "Ahmedabad" },
+      { "@type": "City", name: "Surat" },
+      { "@type": "City", name: "Delhi" },
+      { "@type": "City", name: "Hyderabad" },
+      { "@type": "City", name: "Chennai" },
+    ],
+    serviceType: [
+      "Part load cargo transport",
+      "Full truck load FTL",
+      "Trailer transport",
+      "Container transport",
+      "Warehousing",
+      "Shipment tracking",
+    ],
+    knowsAbout: [
+      "transport company Kolhapur",
+      "part load booking",
+      "GC LR tracking",
+      "Kagal MIDC logistics",
+    ],
     priceRange: "$$",
   };
 }

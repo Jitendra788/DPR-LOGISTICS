@@ -6,7 +6,7 @@ import { GoogleAnalytics } from "@/components/marketing/GoogleAnalytics";
 import { JsonLd } from "@/components/marketing/JsonLd";
 import { company } from "@/data/marketing/company";
 import { BRAND_LOGO } from "@/lib/brand";
-import { localBusinessJsonLd, organizationJsonLd, SITE_URL, websiteJsonLd } from "@/lib/seo";
+import { localBusinessJsonLd, organizationJsonLd, SITE_URL, websiteJsonLd, SEO_KEYWORDS } from "@/lib/seo";
 import "./marketing.css";
 import "./marketing-premium.css";
 import "./marketing-advanced.css";
@@ -15,30 +15,17 @@ import "./marketing-responsive.css";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${company.name} | ${company.seo.homeTitle}`,
+    default: `${company.seo.homeTitle} | ${company.name}`,
     template: `%s | ${company.name}`,
   },
   description: company.seo.homeDescription,
-  keywords: [
-    "DPR Logistics",
-    "dprlogistics.in",
-    "DPR Logistics Kolhapur",
-    "logistics company Kolhapur",
-    "Kagal MIDC transport",
-    "cargo transport India",
-    "part load transport Maharashtra",
-    "FTL transport India",
-    "trailer container logistics",
-    "GC LR tracking",
-    "lorry receipt tracking",
-    "warehousing Kolhapur",
-  ],
+  keywords: [...SEO_KEYWORDS],
   authors: [{ name: company.name }],
   creator: company.name,
   publisher: company.name,
   formatDetection: { telephone: true, email: true },
   openGraph: {
-    title: `${company.name} | Logistics & Cargo Transport India`,
+    title: `${company.name} | Transport Company Kolhapur — Part Load, FTL & Tracking`,
     description: company.seo.homeDescription,
     type: "website",
     locale: "en_IN",
@@ -48,7 +35,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: `${company.name} | Logistics & Cargo Transport India`,
+    title: `${company.name} | Transport Company Kolhapur — Part Load, FTL & Tracking`,
     description: company.seo.homeDescription,
     images: ["/dpr-logo-header.png"],
   },

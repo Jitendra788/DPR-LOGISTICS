@@ -7,9 +7,9 @@ import "./theme-dark.css";
 import "./responsive.css";
 
 export const metadata: Metadata = {
-  title: "DPR Logistics | Transport & Logistics India",
+  title: "DPR Logistics | Transport Company Kolhapur — Part Load & FTL",
   description:
-    "DPR Logistics — pan-India cargo transport, part load, FTL, tracking and warehousing from Kolhapur, Maharashtra.",
+    "DPR Logistics — transport company in Kolhapur. Part load, FTL, trailer, warehousing and online GC/LR tracking across India. Call +91 93562 59949.",
   icons: {
     icon: [
       { url: BRAND_LOGO, type: "image/jpeg" },

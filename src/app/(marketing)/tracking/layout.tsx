@@ -4,20 +4,20 @@ import { faqs } from "@/data/marketing/statistics";
 import { createPageMetadata, faqJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = createPageMetadata({
-  title: "Track Shipment — GC / LR Tracking",
+  title: "Track GC / LR Online | Shipment & Consignment Status",
   description:
-    "Track DPR Logistics GC / LR online. Enter the exact docket number for limited status, then verify with consignee or consignor mobile last 4 digits for full details, vehicle and GPS. Or open the WhatsApp / SMS secret track link.",
+    "Track DPR Logistics GC, LR or docket online. Enter exact consignment number for status, verify with mobile last 4 digits for full details, vehicle & GPS — or open WhatsApp track link.",
   path: "/tracking",
   keywords: [
-    "GC tracking",
-    "LR tracking",
-    "lorry receipt tracking",
-    "docket tracking online",
-    "shipment tracking DPR Logistics",
-    "track consignment Kolhapur",
-    "GC LR status online",
-    "WhatsApp shipment tracking link",
-    "cargo tracking Maharashtra",
+    "track GC online",
+    "track LR online",
+    "track my consignment",
+    "track my shipment India",
+    "lorry receipt status",
+    "goods consignment tracking",
+    "docket number tracking",
+    "DPR Logistics tracking",
+    "cargo tracking Kolhapur",
   ],
 });
 

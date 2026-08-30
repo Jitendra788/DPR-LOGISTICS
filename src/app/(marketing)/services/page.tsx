@@ -7,17 +7,18 @@ import { MarketingButton } from "@/components/marketing/Button";
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = createPageMetadata({
-  title: "Transport Services",
+  title: "Part Load, FTL, Trailer & Warehousing Services",
   description:
-    "DPR Logistics transport services — part load, full truck load (FTL), trailers, containers, warehousing and value-added logistics across India. Book pickup online.",
+    "DPR Logistics services in Kolhapur — part load booking, full truck load (FTL), trailer, container, ODC cargo and warehousing across Maharashtra, Gujarat and pan-India. Request pickup online.",
   path: "/services",
   keywords: [
-    "part load transport India",
-    "FTL transport services",
-    "trailer container transport",
-    "warehousing logistics Maharashtra",
-    "ODC project cargo India",
-    "DPR Logistics services Kolhapur",
+    "part load service Kolhapur",
+    "FTL service Maharashtra",
+    "trailer booking India",
+    "container cargo transport",
+    "ODC project cargo",
+    "warehouse for rent Kolhapur",
+    "goods transport services India",
   ],
 });
 

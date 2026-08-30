@@ -5,21 +5,17 @@ import { JsonLd } from "@/components/marketing/JsonLd";
 import { createPageMetadata, faqJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = createPageMetadata({
-  title: "FAQs — Tracking, Booking, GST Billing & Customer Care",
+  title: "FAQ | Track LR, Part Load Booking & GST Billing",
   description:
-    "DPR Logistics FAQs: how to track GC / LR online, mobile last 4 digit verification, WhatsApp secret track link, part load & FTL pickup, GST billing, POD and customer care in Kolhapur.",
+    "DPR Logistics FAQ — how to track GC/LR online, mobile last-4 verify, WhatsApp track link, part load & FTL booking, GST invoice, POD and customer care in Kolhapur.",
   path: "/contact/faq",
   keywords: [
-    "DPR Logistics FAQ",
-    "GC LR tracking FAQ",
-    "how to track shipment India",
-    "part load FTL booking FAQ",
-    "GST logistics billing Kolhapur",
-    "POD proof of delivery",
-    "DPR Logistics customer care",
-    "WhatsApp shipment tracking link",
-    "lorry receipt tracking",
-    "Kagal MIDC transport company FAQ",
+    "how to track LR online",
+    "how to track GC number",
+    "part load booking FAQ",
+    "transport GST billing FAQ",
+    "POD delivery proof FAQ",
+    "DPR Logistics helpline FAQ",
   ],
 });
 

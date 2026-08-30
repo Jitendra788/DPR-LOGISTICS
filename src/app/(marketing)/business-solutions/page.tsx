@@ -6,9 +6,16 @@ import { MarketingButton } from "@/components/marketing/Button";
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = createPageMetadata({
-  title: "Business Solutions",
-  description: `B2B, e-commerce, retail, industrial and bulk logistics solutions from ${company.name}. Contract transport, warehousing and distribution programmes for enterprise shippers.`,
+  title: "B2B Logistics Solutions | Contract Transport & Warehousing",
+  description: `B2B, e-commerce, retail and industrial logistics from ${company.name} Kolhapur — contract FTL, part load programmes, warehousing and distribution for enterprise shippers across India.`,
   path: "/business-solutions",
+  keywords: [
+    "B2B logistics India",
+    "contract transport company",
+    "e-commerce logistics Maharashtra",
+    "industrial cargo logistics",
+    "enterprise warehousing India",
+  ],
 });
 
 export default function BusinessSolutionsPage() {

@@ -5,16 +5,16 @@ import { QuoteForm } from "@/components/marketing/QuoteForm";
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = createPageMetadata({
-  title: "Pickup Request",
-  description: `Request a cargo pickup from ${company.name}. Share route, weight and dimensions for part load, FTL, trailer or container booking across India.`,
+  title: "Book Cargo Pickup | Part Load & FTL Quote",
+  description: `Book cargo pickup with ${company.name} Kolhapur. Get part load / FTL quote — share route, weight and package details. Call ${company.phone} or submit online pickup request.`,
   path: "/quote",
   keywords: [
-    "pickup request",
-    "cargo booking Kolhapur",
-    "part load pickup",
-    "FTL booking India",
-    "DPR Logistics quote",
-    "Kagal MIDC cargo pickup",
+    "book part load online",
+    "book FTL truck",
+    "cargo pickup request",
+    "transport quote Kolhapur",
+    "truck booking Kolhapur",
+    "goods booking online India",
   ],
 });
 

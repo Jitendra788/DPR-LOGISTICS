@@ -5,15 +5,18 @@ import { transportRoutes } from "@/data/marketing/routes";
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = createPageMetadata({
-  title: "Popular Transport Routes",
+  title: "Cargo Routes | Kolhapur to Pune, Mumbai, Bangalore & More",
   description:
-    "DPR Logistics popular cargo routes — Kolhapur to Pune, Mumbai, Ahmedabad, Surat, Bangalore, Delhi and more. Part load, FTL and online tracking on every lane.",
+    "Popular DPR Logistics cargo routes from Kolhapur — Pune, Mumbai, Ahmedabad, Surat, Bangalore, Delhi, Hyderabad, Chennai. Part load & FTL with online GC/LR tracking.",
   path: "/routes",
   keywords: [
-    "Kolhapur to Pune transport",
-    "Kolhapur to Mumbai cargo",
-    "Maharashtra Gujarat transport routes",
-    "part load routes India",
+    "Kolhapur to Pune part load",
+    "Kolhapur to Mumbai transport rate",
+    "Kolhapur to Bangalore cargo",
+    "Kolhapur to Ahmedabad FTL",
+    "Kolhapur to Surat transport",
+    "Kolhapur to Delhi goods transport",
+    "Maharashtra Gujarat cargo route",
   ],
 });
 

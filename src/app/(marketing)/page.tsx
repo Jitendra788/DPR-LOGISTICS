@@ -20,18 +20,11 @@ export const metadata = createPageMetadata({
   description: company.seo.homeDescription,
   path: "/",
   keywords: [
-    "DPR Logistics",
-    "DPR",
-    "dprlogistics.in",
-    "DPR Logistics Kolhapur",
-    "logistics company India",
-    "cargo transport Kolhapur",
-    "Kagal MIDC logistics",
-    "part load FTL transport",
-    "GC LR tracking online",
-    "lorry receipt tracking",
-    "pan India logistics partner",
-    "warehousing Maharashtra",
+    "best transport company Kolhapur",
+    "cheap part load Kolhapur",
+    "goods carrier Kolhapur",
+    "truck hire Kolhapur",
+    "parcel cargo transport Maharashtra",
   ],
 });
 

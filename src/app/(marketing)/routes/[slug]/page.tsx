@@ -18,14 +18,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const route = getTransportRoute(slug);
   if (!route) return { title: "Route" };
   return createPageMetadata({
-    title: route.title,
+    title: `${route.title} | Part Load & FTL`,
     description: route.seoDescription,
     path: `/routes/${slug}`,
     keywords: [
       route.title,
       `${route.from} to ${route.to} transport`,
-      "part load FTL cargo",
-      "DPR Logistics",
+      `${route.from} to ${route.to} part load`,
+      `${route.from} to ${route.to} FTL`,
+      `${route.from} to ${route.to} cargo`,
+      "goods transport booking",
     ],
   });
 }

@@ -2,15 +2,16 @@ import type { Metadata } from "next";
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = createPageMetadata({
-  title: "Network & Branches",
+  title: "Network & Branches | Pan-India Cargo Coverage",
   description:
-    "DPR Logistics pan-India network — branches and regular lanes from Kolhapur across Maharashtra, Gujarat, Delhi NCR, Bangalore, Hyderabad, Chennai and major metros.",
+    "DPR Logistics network from Kolhapur / Kagal MIDC — regular lanes across Maharashtra, Gujarat, Delhi NCR, Bangalore, Hyderabad, Chennai and major industrial metros.",
   path: "/network",
   keywords: [
     "DPR Logistics branches",
-    "logistics network India",
-    "Kolhapur transport network",
-    "Maharashtra Gujarat transport lanes",
+    "transport network Maharashtra",
+    "pan India cargo network",
+    "Kolhapur logistics hubs",
+    "Gujarat Maharashtra transport network",
   ],
 });
 

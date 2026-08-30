@@ -5,15 +5,16 @@ import { ContactForm } from "@/components/marketing/ContactForm";
 import { createPageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = createPageMetadata({
-  title: "Contact Us",
-  description: `Contact ${company.name} for cargo booking, FTL/part load enquiries, tracking support and business partnerships. Call ${company.phone} or visit Kolhapur head office.`,
+  title: "Contact Transport Company Kolhapur | Booking & Care",
+  description: `Call ${company.name} Kolhapur for part load / FTL booking, GC tracking help and business enquiries. Phone ${company.phone}, WhatsApp, email ${company.email}. Office: Kagal MIDC.`,
   path: "/contact",
   keywords: [
-    "DPR Logistics contact",
-    "cargo booking Kolhapur",
-    "logistics customer care Maharashtra",
+    "DPR Logistics phone number",
+    "transport company Kolhapur contact",
+    "cargo booking helpline",
+    "logistics customer care Kolhapur",
     "Kagal MIDC transport office",
-    "DPR Logistics phone WhatsApp",
+    "WhatsApp transport booking",
   ],
 });
 
