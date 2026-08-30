@@ -117,19 +117,48 @@ Office address sahi hona chahiye — verification ke bina full ranking nahi milt
 
 ### 3) Profile complete karo (100% fill)
 
-Fill these fields carefully:
+Fill these fields carefully.
+
+#### Business description — copy & paste (ready)
+
+Google Business Profile → **Edit profile** → **Business information** → **From the business** / Description.
+
+**Short (optional / about snippet):**
+
+```text
+DPR Logistics — transport company in Kolhapur (Kagal MIDC). Part load, FTL, trailer, container & warehousing with online GC/LR tracking. Call +91 93562 59949.
+```
+
+**Full business description (paste this — under Google’s 750-character limit):**
+
+```text
+DPR Logistics is a cargo transport company from Kagal MIDC, Kolhapur, Maharashtra. We offer pan-India part load, full truck load (FTL), trailer, container and warehousing for manufacturers, traders and distributors.
+
+Book pickup by phone or online, get GST billing with LR copies, and track GC/LR on dprlogistics.in. Lanes cover Maharashtra, Gujarat, Pune, Mumbai, Bangalore, Ahmedabad, Surat, Delhi, Hyderabad and Chennai.
+
+Office: Shree Mahalaxmi Petrol Pump, 5 Star MIDC Road, Kagal, Kolhapur 416216. Mon–Sat 9 AM–7 PM. Call +91 93562 59949 / +91 93716 62142. Email dprlogistics2142@gmail.com. GSTIN 27BNLPK2073C1Z5.
+```
+
+**Services to add (one by one):**
+
+- Part load transport  
+- Full truck load (FTL)  
+- Trailer transport  
+- Container transport  
+- Warehousing & distribution  
+- GC / LR online tracking  
+- Cargo pickup booking  
+- POD / proof of delivery support  
+
+Same text is also stored in code: `company.googleBusiness` in `src/data/marketing/company.ts`.
 
 | Field | Suggested text |
 |---|---|
-| **Short description** | DPR Logistics — Kolhapur (Kagal MIDC) se pan-India part load, FTL, trailer, container aur warehousing. Online GC/LR tracking. |
-| **Long description** | DPR Logistics is a cargo transport and logistics company from Kagal MIDC, Kolhapur. We offer part load, full truck load (FTL), trailers, containers and warehousing with online GC/LR tracking, GST billing and dedicated booking desk. Call +91 93562 59949. |
-| **Services** | Part load transport, FTL / full truck load, Trailer transport, Container transport, Warehousing, Consignment tracking, Pickup booking |
-| **Attributes** | Women-led / appointment required — jo true ho |
+| **Attributes** | Only mark what is true for your office |
 | **Photos** | Office board, trucks, warehouse, staff, GST board, visiting card (min 10 photos) |
 | **Logo** | DPR logo (site wala) |
 | **Cover** | Truck / warehouse photo |
 | **Booking / Appointment link** | `https://www.dprlogistics.in/quote` |
-| **Menu / Products** (optional) | Part load, FTL, Tracking |
 
 ### 4) Posts & reviews (ranking boost)
 
