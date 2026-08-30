@@ -8,9 +8,10 @@ export const company = {
   /** Ready text for Google Business Profile (Maps). Short ≈ 200 chars; long within 750-char GBP limit. */
   googleBusiness: {
     shortDescription:
-      "DPR Logistics — transport company in Kolhapur (Kagal MIDC). Part load, FTL, trailer, container & warehousing with online GC/LR tracking. Call +91 93562 59949.",
+      "DPR Logistics is a cargo transport company in Kolhapur (Kagal MIDC) offering part load, FTL, trailer, container and warehousing with online GC and LR tracking.",
+    /** Google Business Profile description — no phone, email, URL, GSTIN or address (those are separate fields). */
     description:
-      "DPR Logistics is a cargo transport company from Kagal MIDC, Kolhapur, Maharashtra. We offer pan-India part load, full truck load (FTL), trailer, container and warehousing for manufacturers, traders and distributors.\n\nBook pickup by phone or online, get GST billing with LR copies, and track GC/LR on dprlogistics.in. Lanes cover Maharashtra, Gujarat, Pune, Mumbai, Bangalore, Ahmedabad, Surat, Delhi, Hyderabad and Chennai.\n\nOffice: Shree Mahalaxmi Petrol Pump, 5 Star MIDC Road, Kagal, Kolhapur 416216. Mon–Sat 9 AM–7 PM. Call +91 93562 59949 / +91 93716 62142. Email dprlogistics2142@gmail.com. GSTIN 27BNLPK2073C1Z5.",
+      "DPR Logistics is a cargo transport and logistics company from Kagal MIDC, Kolhapur, Maharashtra. We move goods across India with part load, full truck load (FTL), trailer, container and warehousing services for manufacturers, traders and distributors.\n\nCustomers can book pickup, receive GST-compliant billing with lorry receipts, and track consignments using GC or LR numbers. We run regular lanes across Maharashtra and Gujarat, and to Pune, Mumbai, Bangalore, Ahmedabad, Surat, Delhi, Hyderabad and Chennai.\n\nOur focus is reliable transit, careful cargo handling and clear status updates from booking to delivery.",
     services: [
       "Part load transport",
       "Full truck load (FTL)",

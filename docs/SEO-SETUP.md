@@ -123,20 +123,22 @@ Fill these fields carefully.
 
 Google Business Profile → **Edit profile** → **Business information** → **From the business** / Description.
 
+> **Important:** Description me **phone, email, website, GSTIN, address, “Call …”** mat likho. Google inko alag fields me leta hai — warna **Invalid value** error aata hai.
+
 **Short (optional / about snippet):**
 
 ```text
-DPR Logistics — transport company in Kolhapur (Kagal MIDC). Part load, FTL, trailer, container & warehousing with online GC/LR tracking. Call +91 93562 59949.
+DPR Logistics is a cargo transport company in Kolhapur (Kagal MIDC) offering part load, FTL, trailer, container and warehousing with online GC and LR tracking.
 ```
 
-**Full business description (paste this — under Google’s 750-character limit):**
+**Full business description (paste this — Google-safe, under 750 characters):**
 
 ```text
-DPR Logistics is a cargo transport company from Kagal MIDC, Kolhapur, Maharashtra. We offer pan-India part load, full truck load (FTL), trailer, container and warehousing for manufacturers, traders and distributors.
+DPR Logistics is a cargo transport and logistics company from Kagal MIDC, Kolhapur, Maharashtra. We move goods across India with part load, full truck load (FTL), trailer, container and warehousing services for manufacturers, traders and distributors.
 
-Book pickup by phone or online, get GST billing with LR copies, and track GC/LR on dprlogistics.in. Lanes cover Maharashtra, Gujarat, Pune, Mumbai, Bangalore, Ahmedabad, Surat, Delhi, Hyderabad and Chennai.
+Customers can book pickup, receive GST-compliant billing with lorry receipts, and track consignments using GC or LR numbers. We run regular lanes across Maharashtra and Gujarat, and to Pune, Mumbai, Bangalore, Ahmedabad, Surat, Delhi, Hyderabad and Chennai.
 
-Office: Shree Mahalaxmi Petrol Pump, 5 Star MIDC Road, Kagal, Kolhapur 416216. Mon–Sat 9 AM–7 PM. Call +91 93562 59949 / +91 93716 62142. Email dprlogistics2142@gmail.com. GSTIN 27BNLPK2073C1Z5.
+Our focus is reliable transit, careful cargo handling and clear status updates from booking to delivery.
 ```
 
 **Services to add (one by one):**
