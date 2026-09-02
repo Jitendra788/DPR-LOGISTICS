@@ -182,12 +182,17 @@ export function MoneyReceiptSearch({
       drafts[row.billNo] ?? {
         tdsPct: 0,
         tdsAmt: 0,
-        paidAmt: row.outstanding,
+        paidAmt: 0,
         otherDed: 0,
-        balance: row.outstanding,
+        balance: 0,
         narration: "",
       }
     );
+  }
+
+  function calcBalance(row: BillRow, draft: Pick<RowDraft, "paidAmt" | "otherDed" | "tdsAmt">) {
+    if (!draft.paidAmt && !draft.otherDed && !draft.tdsAmt) return 0;
+    return Number(Math.max(0, row.outstanding - draft.paidAmt - draft.otherDed - draft.tdsAmt).toFixed(2));
   }
 
   function updateDraft(billNo: string, patch: Partial<RowDraft>, row: BillRow) {
@@ -195,20 +200,20 @@ export function MoneyReceiptSearch({
       const cur = prev[billNo] ?? {
         tdsPct: 0,
         tdsAmt: 0,
-        paidAmt: row.outstanding,
+        paidAmt: 0,
         otherDed: 0,
-        balance: row.outstanding,
+        balance: 0,
         narration: "",
       };
       const next = { ...cur, ...patch };
       if ("tdsPct" in patch || "paidAmt" in patch || "otherDed" in patch) {
         if (next.tdsPct > 0) {
           next.tdsAmt = Number(((row.beforeTax * next.tdsPct) / 100).toFixed(2));
+        } else if ("tdsPct" in patch) {
+          next.tdsAmt = 0;
         }
       }
-      next.balance = Number(
-        Math.max(0, row.outstanding - next.paidAmt - next.otherDed - next.tdsAmt).toFixed(2),
-      );
+      next.balance = calcBalance(row, next);
       return { ...prev, [billNo]: next };
     });
   }
@@ -232,9 +237,9 @@ export function MoneyReceiptSearch({
         nextDrafts[row.billNo] = {
           tdsPct: 0,
           tdsAmt: 0,
-          paidAmt: row.outstanding,
+          paidAmt: 0,
           otherDed: 0,
-          balance: row.outstanding,
+          balance: 0,
           narration: "",
         };
       });
