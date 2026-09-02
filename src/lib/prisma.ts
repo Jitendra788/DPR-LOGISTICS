@@ -1,20 +1,8 @@
 import { PrismaClient } from "@prisma/client";
+import { pickDatabaseUrl } from "./database-url";
 
-function resolveDatabaseUrl() {
-  const url =
-    process.env.DATABASE_URL ??
-    process.env.POSTGRES_PRISMA_URL ??
-    process.env.POSTGRES_URL ??
-    "";
-
-  if (url) return url;
-  if (process.env.VERCEL) return "";
-  return "file:./dev.db";
-}
-
-/** False on Vercel when Postgres env vars are missing. */
 export function isDatabaseConfigured() {
-  return Boolean(resolveDatabaseUrl());
+  return Boolean(pickDatabaseUrl());
 }
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
@@ -22,7 +10,7 @@ const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
-    datasourceUrl: resolveDatabaseUrl(),
+    datasourceUrl: pickDatabaseUrl(),
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
   });
 

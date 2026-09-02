@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error:
-            "Database not configured on Vercel. Connect Postgres in Project → Storage, then redeploy.",
+            "Database not connected. In Vercel: Storage → open dpr-logistics-db → Connect Project → then Deployments → Redeploy.",
         },
         { status: 503 },
       );
