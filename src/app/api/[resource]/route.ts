@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getModel, isResource, sanitize } from "@/lib/resources";
+import { apiError } from "@/lib/handle-api-error";
 import { prisma } from "@/lib/prisma";
 import { attachBookingTrackToken, stripBookingTrackToken } from "@/services/trackingService";
 
@@ -10,8 +11,12 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
   if (!isResource(resource)) {
     return NextResponse.json({ error: "Unknown resource" }, { status: 404 });
   }
-  const rows = await getModel(resource).findMany({ orderBy: { id: "desc" } });
-  return NextResponse.json(rows);
+  try {
+    const rows = await getModel(resource).findMany({ orderBy: { id: "desc" } });
+    return NextResponse.json(rows);
+  } catch (err) {
+    return apiError(err, `GET /api/${resource} failed`);
+  }
 }
 
 export async function POST(req: NextRequest, ctx: Ctx) {

@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
     return res;
   } catch (err) {
     console.error("Login failed", err);
-    return NextResponse.json({ error: "Login failed. Please try again." }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Login failed";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

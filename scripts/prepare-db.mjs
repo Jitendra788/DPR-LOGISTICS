@@ -3,6 +3,13 @@ import { resolveDbEnv } from "./resolve-db-env.mjs";
 import { applySchema } from "./select-schema.mjs";
 
 const env = resolveDbEnv();
+
+if (!env.DATABASE_URL && process.env.VERCEL) {
+  console.warn("Vercel build: POSTGRES_PRISMA_URL / DATABASE_URL not set — skipping database setup.");
+  console.log("Database ready (skipped).");
+  process.exit(0);
+}
+
 if (!env.DATABASE_URL) {
   env.DATABASE_URL = "file:./dev.db";
 }
