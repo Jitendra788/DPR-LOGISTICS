@@ -10,6 +10,7 @@ import { Flash } from "@/components/ui/Flash";
 import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { api, formToObject } from "@/lib/api-client";
+import { lrNoEquals } from "@/lib/lr-no";
 
 type Party = { id: number; name: string };
 type Booking = {
@@ -95,7 +96,7 @@ function LrBookingInner() {
     const q = searchParams.get("lrNo");
     if (!q || !rows.length) return;
     setSearchLr(q);
-    const found = rows.find((r) => r.lrNo.toLowerCase() === q.toLowerCase());
+    const found = rows.find((r) => lrNoEquals(r.lrNo, q));
     if (found) load(found);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, rows]);
@@ -122,7 +123,7 @@ function LrBookingInner() {
   }
 
   function search() {
-    const found = rows.find((r) => r.lrNo.toLowerCase() === searchLr.trim().toLowerCase());
+    const found = rows.find((r) => lrNoEquals(r.lrNo, searchLr.trim()));
     if (!found) {
       setMessage({ type: "err", text: "LR not found" });
       return;

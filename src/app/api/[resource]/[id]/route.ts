@@ -14,14 +14,29 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
 }
 
 export async function PUT(req: NextRequest, ctx: Ctx) {
-  const { resource, id } = await ctx.params;
+  const { resource, id: idParam } = await ctx.params;
   if (!isResource(resource)) {
     return NextResponse.json({ error: "Unknown resource" }, { status: 404 });
   }
+
+  const id = Number(idParam);
+  if (!Number.isFinite(id) || id <= 0) {
+    return NextResponse.json({ error: "Invalid record id" }, { status: 400 });
+  }
+
   const body = (await req.json()) as Record<string, unknown>;
   try {
-    const updated = await getModel(resource).update({
-      where: { id: Number(id) },
+    const model = getModel(resource);
+    const existing = await model.findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json(
+        { error: "Record not found. Refresh the page and try again." },
+        { status: 404 },
+      );
+    }
+
+    const updated = await model.update({
+      where: { id },
       data: sanitize(body, resource),
     });
     return NextResponse.json(updated);

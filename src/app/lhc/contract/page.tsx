@@ -10,7 +10,7 @@ import { Flash } from "@/components/ui/Flash";
 import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { api } from "@/lib/api-client";
-import { stripLrPrefix } from "@/lib/lr-no";
+import { lrNoEquals, stripLrPrefix } from "@/lib/lr-no";
 
 type Vendor = { name: string; type: string };
 type Vehicle = {
@@ -111,7 +111,9 @@ export default function LorryHireContractPage() {
 
   const brokers = vendors.filter((v) => v.type === "Broker").map((v) => v.name);
   const fuelVendors = vendors.filter((v) => v.type === "Fuel" || v.type === "Other").map((v) => v.name);
-  const pendingLrs = bookings.filter((b) => !b.lhcNo || (editId && form.lrNos?.includes(b.lrNo)));
+  const pendingLrs = bookings.filter(
+    (b) => !b.lhcNo || (editId && selectedLrs.some((lr) => lrNoEquals(lr, b.lrNo))),
+  );
 
   const totalAdvance = useMemo(() => (form.transfer || 0) + (form.cash || 0) + (form.fuel || 0), [form]);
   const balance = (form.lorryFreight || 0) - totalAdvance;
@@ -163,18 +165,14 @@ export default function LorryHireContractPage() {
     const saved = editId ? await update(editId, body) : await create(body);
     if (!saved) return;
 
-    // Link selected LRs to this LHC
-    await Promise.all(
-      selectedLrs.map(async (lrNo) => {
-        const booking = bookings.find((b) => b.lrNo === lrNo);
-        if (booking) {
-          await api(`/api/bookings/${booking.id}`, {
-            method: "PUT",
-            body: JSON.stringify({ ...booking, lhcNo: saved.challanNo }),
-          });
-        }
+    await api("/api/bookings/link-lhc", {
+      method: "POST",
+      body: JSON.stringify({
+        lrNos: selectedLrs,
+        lhcNo: saved.challanNo,
+        previousLhcNo: editId ? form.challanNo : "",
       }),
-    );
+    });
 
     setEditId(null);
     setSelectedLrs([]);
@@ -194,17 +192,12 @@ export default function LorryHireContractPage() {
 
   async function deleteChallan() {
     if (!editId || !form.challanNo) return;
-    const linked = bookings.filter((b) => b.lhcNo === form.challanNo);
     const ok = await remove(editId);
     if (!ok) return;
-    await Promise.all(
-      linked.map((b) =>
-        api(`/api/bookings/${b.id}`, {
-          method: "PUT",
-          body: JSON.stringify({ ...b, lhcNo: "" }),
-        }),
-      ),
-    );
+    await api("/api/bookings/link-lhc", {
+      method: "DELETE",
+      body: JSON.stringify({ lhcNo: form.challanNo }),
+    });
     setEditId(null);
     setBookings(await api<Booking[]>("/api/bookings"));
   }
