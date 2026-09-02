@@ -23,6 +23,9 @@ export const resourceMap = {
   slips: prisma.bookingSlip,
   tyres: prisma.tyreStatus,
   "trip-desk": prisma.tripDesk,
+  "blog-posts": prisma.blogPost,
+  "marketing-media": prisma.marketingMedia,
+  "web-inquiries": prisma.webInquiry,
 } as const;
 
 export type ResourceKey = keyof typeof resourceMap;
@@ -85,8 +88,8 @@ const FLOAT_FIELDS = new Set([
   "distanceRemainingKm",
 ]);
 
-const INT_FIELDS = new Set(["lrCount", "etaMinutes"]);
-const BOOL_FIELDS = new Set(["billed", "paid"]);
+const INT_FIELDS = new Set(["lrCount", "etaMinutes", "sortOrder"]);
+const BOOL_FIELDS = new Set(["billed", "paid", "published"]);
 const SKIP_FIELDS = new Set(["id", "createdAt", "sr", "srNo"]);
 const NUMERIC_GST_RESOURCES = new Set<ResourceKey>(["bookings"]);
 

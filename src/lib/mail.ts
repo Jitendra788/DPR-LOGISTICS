@@ -12,7 +12,8 @@ function mailConfig() {
   const host = process.env.SMTP_HOST || "smtp.gmail.com";
   const port = Number(process.env.SMTP_PORT || 587);
   const user = process.env.SMTP_USER || process.env.MAIL_USER || "";
-  const pass = process.env.SMTP_PASS || process.env.MAIL_PASS || "";
+  const rawPass = process.env.SMTP_PASS || process.env.MAIL_PASS || "";
+  const pass = rawPass.replace(/\s/g, "");
   const to = process.env.MAIL_TO || company.email;
   const from = process.env.MAIL_FROM || `DPR Logistics <${user || company.email}>`;
   return { host, port, user, pass, to, from };
@@ -37,6 +38,11 @@ export async function sendMail(payload: MailPayload) {
     port,
     secure: port === 465,
     auth: { user, pass },
+    ...(host.includes("gmail")
+      ? {
+          tls: { minVersion: "TLSv1.2" as const },
+        }
+      : {}),
   });
 
   await transporter.sendMail({

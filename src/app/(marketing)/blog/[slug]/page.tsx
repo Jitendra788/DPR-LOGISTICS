@@ -1,22 +1,25 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { blogPosts, getBlogPost } from "@/data/marketing/blog";
 import { company } from "@/data/marketing/company";
 import { BlogCover } from "@/components/marketing/BlogCover";
 import { JsonLd } from "@/components/marketing/JsonLd";
 import { MarketingButton } from "@/components/marketing/Button";
 import { absoluteUrl, articleJsonLd, createPageMetadata } from "@/lib/seo";
+import { getPostBySlug, getPublishedSlugs } from "@/services/blogService";
 
 type Props = { params: Promise<{ slug: string }> };
 
-export function generateStaticParams() {
-  return blogPosts.map((p) => ({ slug: p.slug }));
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const slugs = await getPublishedSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = getBlogPost(slug);
+  const post = await getPostBySlug(slug);
   if (!post) return { title: "Article" };
   return createPageMetadata({
     title: post.title,
@@ -28,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = getBlogPost(slug);
+  const post = await getPostBySlug(slug);
   if (!post) notFound();
 
   const url = absoluteUrl(`/blog/${slug}`);

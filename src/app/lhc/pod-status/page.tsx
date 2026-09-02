@@ -64,18 +64,15 @@ function SelectDocCell({ lrNo, onMessage }: { lrNo: string; onMessage: (type: "o
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <label className={`erp-file-drop erp-file-drop-sm${fileName ? " has-file" : ""}`}>
+      <label className={`erp-choose-file erp-choose-file-inline${fileName ? " has-file" : ""}${busy ? " is-disabled" : ""}`}>
         <input
           ref={inputRef}
           type="file"
           className="erp-file-input"
           onChange={(e) => setFileName(e.target.files?.[0]?.name ?? "")}
         />
-        <span className="erp-file-copy">
-          <strong>{fileName ? "Selected" : "Choose file"}</strong>
-          <span>{fileName || "No file chosen"}</span>
-        </span>
-        <span className="erp-file-btn">Browse</span>
+        <span className="erp-choose-file-btn">Choose file</span>
+        <span className="erp-choose-file-name">{fileName || "No file chosen"}</span>
       </label>
       <Button type="button" size="sm" disabled={busy} onClick={upload}>
         {busy ? "Uploading..." : "Upload"}

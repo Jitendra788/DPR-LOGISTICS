@@ -12,6 +12,7 @@ import {
   Database,
   FileText,
   FolderPlus,
+  Globe,
   LayoutDashboard,
   MapPin,
   Truck,
@@ -33,6 +34,7 @@ const icons: Record<string, ComponentType<{ className?: string }>> = {
   truck: Truck,
   map: MapPin,
   car: Car,
+  globe: Globe,
 };
 
 function isActive(pathname: string, item: NavItem) {

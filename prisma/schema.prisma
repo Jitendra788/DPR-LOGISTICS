@@ -454,3 +454,46 @@ model TrackingAlert {
 
   @@index([tripId, acknowledgedAt])
 }
+
+model BlogPost {
+  id             Int      @id @default(autoincrement())
+  slug           String   @unique
+  title          String
+  excerpt        String   @default("")
+  seoDescription String   @default("")
+  category       String   @default("")
+  coverPath      String   @default("")
+  publishedAt    String   @default("")
+  readTime       String   @default("5 min")
+  author         String   @default("DPR Logistics Team")
+  contentJson    String   @default("[]")
+  published      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+}
+
+model MarketingMedia {
+  id         Int      @id @default(autoincrement())
+  title      String   @default("")
+  alt        String   @default("")
+  category   String   @default("gallery")
+  storedName String
+  mimeType   String   @default("image/jpeg")
+  sortOrder  Int      @default(0)
+  published  Boolean  @default(true)
+  createdAt  DateTime @default(now())
+}
+
+model WebInquiry {
+  id          Int      @id @default(autoincrement())
+  type        String
+  referenceId String   @unique
+  name        String   @default("")
+  mobile      String   @default("")
+  email       String   @default("")
+  summary     String   @default("")
+  payloadJson String   @default("{}")
+  emailed     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([type, createdAt])
+}

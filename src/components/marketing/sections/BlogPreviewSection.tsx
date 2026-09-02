@@ -1,14 +1,12 @@
 import Link from "next/link";
 import { ArrowRight, Clock } from "lucide-react";
-import { getLatestPosts } from "@/data/marketing/blog";
+import type { PublicBlogPost } from "@/lib/blog-content";
 import { BlogCover } from "@/components/marketing/BlogCover";
 import { SectionHeading } from "@/components/marketing/SectionHeading";
 import { ScrollReveal } from "@/components/marketing/ScrollReveal";
 import { MarketingButton } from "@/components/marketing/Button";
 
-export function BlogPreviewSection() {
-  const posts = getLatestPosts(3);
-
+export function BlogPreviewSection({ posts }: { posts: PublicBlogPost[] }) {
   return (
     <section className="mkt-section">
       <div className="mkt-container">

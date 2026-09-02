@@ -31,8 +31,6 @@ export const navItems: NavItem[] = [
       { label: "Total Booking (MIS) Report", href: "/booking/mis-report" },
     ],
   },
-  { label: "Trip Desk", href: "/trip-desk", icon: "truck" },
-  { label: "Tracking Desk", href: "/tracking-desk", icon: "map" },
   {
     label: "LHC",
     icon: "grid",
@@ -100,6 +98,17 @@ export const navItems: NavItem[] = [
       { label: "Maintanance Entry", href: "/vehicle-register/maintenance" },
       { label: "Tyre/Servicing Status", href: "/vehicle-register/tyre-status" },
       { label: "Monthwise Report", href: "/vehicle-register/monthwise" },
+    ],
+  },
+  { label: "Trip Desk", href: "/trip-desk", icon: "truck" },
+  { label: "Tracking Desk", href: "/tracking-desk", icon: "map" },
+  {
+    label: "Website Content",
+    icon: "globe",
+    children: [
+      { label: "Blog Posts", href: "/website/blog" },
+      { label: "Photos & Gallery", href: "/website/photos" },
+      { label: "Contact & Quote Inbox", href: "/website/inquiries" },
     ],
   },
 ];

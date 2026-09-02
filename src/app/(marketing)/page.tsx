@@ -1,4 +1,3 @@
-import { testimonials } from "@/data/marketing/company";
 import { homeServices } from "@/data/marketing/homepage";
 import { HeroBannerCarousel } from "@/components/marketing/HeroBannerCarousel";
 import { HomeServiceCard } from "@/components/marketing/HomeServiceCard";
@@ -12,6 +11,7 @@ import { BlogPreviewSection } from "@/components/marketing/sections/BlogPreviewS
 import { TrackingSection } from "@/components/marketing/sections/TrackingSection";
 import { ValuableCustomersSection } from "@/components/marketing/sections/ValuableCustomersSection";
 import { WhyDprSection } from "@/components/marketing/sections/WhyDprSection";
+import { getLatestPosts } from "@/services/blogService";
 import { company } from "@/data/marketing/company";
 import { createPageMetadata } from "@/lib/seo";
 
@@ -28,7 +28,11 @@ export const metadata = createPageMetadata({
   ],
 });
 
-export default function HomePage() {
+export const revalidate = 60;
+
+export default async function HomePage() {
+  const latestPosts = await getLatestPosts(3);
+
   return (
     <>
       <HeroBannerCarousel />
@@ -59,34 +63,7 @@ export default function HomePage() {
       <TrackingSection />
       <PopularRoutesSection />
 
-      <section className="mkt-section mkt-section-alt">
-        <div className="mkt-container">
-          <ScrollReveal>
-            <SectionHeading
-              eyebrow="Feedback"
-              title="What shippers value in a logistics partner"
-              subtitle="Illustrative examples — representative of common customer priorities, not verified reviews."
-              align="center"
-            />
-          </ScrollReveal>
-          <div className="mkt-quote-grid">
-            {testimonials.map((t, idx) => (
-              <ScrollReveal key={t.author + idx} delay={idx * 60}>
-                <blockquote className="mkt-quote-card mkt-quote-card-premium">
-                  <span className="mkt-demo-label">Illustrative</span>
-                  <p>{t.quote}</p>
-                  <footer>
-                    <strong>{t.author}</strong>
-                    <span>{t.company}</span>
-                  </footer>
-                </blockquote>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <BlogPreviewSection />
+      <BlogPreviewSection posts={latestPosts} />
 
       <ValuableCustomersSection />
 

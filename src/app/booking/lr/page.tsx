@@ -4,7 +4,7 @@ import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, FieldWrap, InputField, MoneyField, SelectField } from "@/components/ui/FormField";
+import { DateField, DatalistField, FieldWrap, InputField, MoneyField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
 import { AdminForm } from "@/components/ui/AdminForm";
@@ -12,8 +12,6 @@ import { useCrud } from "@/hooks/useCrud";
 import { api, formToObject } from "@/lib/api-client";
 
 type Party = { id: number; name: string };
-type Station = { id: number; name: string };
-type Vehicle = { id: number; vehNo: string };
 type Booking = {
   id: number;
   bookingFrom: string;
@@ -80,23 +78,15 @@ function LrBookingInner() {
     validDate: new Date().toISOString().slice(0, 10),
   });
   const [parties, setParties] = useState<Party[]>([]);
-  const [stations, setStations] = useState<Station[]>([]);
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const partyNames = useMemo(() => parties.map((p) => p.name).filter(Boolean), [parties]);
   const [searchLr, setSearchLr] = useState("");
   const [printOpts, setPrintOpts] = useState({ consignor: true, lorry: false, consignee: false });
   const [email, setEmail] = useState("");
   const [lastShare, setLastShare] = useState<{ lrNo: string; url: string } | null>(null);
 
   useEffect(() => {
-    Promise.all([
-      api<Party[]>("/api/parties"),
-      api<Station[]>("/api/stations"),
-      api<Vehicle[]>("/api/vehicles"),
-      api<{ value: string }>("/api/next-no?type=lr"),
-    ]).then(([p, s, v, next]) => {
+    Promise.all([api<Party[]>("/api/parties"), api<{ value: string }>("/api/next-no?type=lr")]).then(([p, next]) => {
       setParties(p);
-      setStations(s);
-      setVehicles(v);
       setForm((f) => ({ ...f, lrNo: f.lrNo || next.value }));
     });
   }, []);
@@ -261,15 +251,15 @@ function LrBookingInner() {
               <InputField label="Booking From" name="bookingFrom" value={form.bookingFrom ?? ""} onChange={(e) => setForm({ ...form, bookingFrom: e.target.value })} />
               <InputField label="LR No" name="lrNo" value={form.lrNo ?? ""} onChange={(e) => setForm({ ...form, lrNo: e.target.value })} required />
               <InputField label="LR Date" type="date" name="lrDate" value={form.lrDate ?? ""} onChange={(e) => setForm({ ...form, lrDate: e.target.value })} />
-              <SelectField label="From Station" name="fromStation" value={form.fromStation ?? ""} onChange={(e) => setForm({ ...form, fromStation: e.target.value })} options={stations.map((s) => s.name)} />
-              <SelectField label="To Station" name="toStation" value={form.toStation ?? ""} onChange={(e) => setForm({ ...form, toStation: e.target.value })} options={stations.map((s) => s.name)} />
-              <SelectField label="Veh No" name="vehNo" value={form.vehNo ?? ""} onChange={(e) => setForm({ ...form, vehNo: e.target.value })} options={vehicles.map((v) => v.vehNo)} />
+              <InputField label="From Station" name="fromStation" value={form.fromStation ?? ""} onChange={(e) => setForm({ ...form, fromStation: e.target.value })} placeholder="Type station name" />
+              <InputField label="To Station" name="toStation" value={form.toStation ?? ""} onChange={(e) => setForm({ ...form, toStation: e.target.value })} placeholder="Type station name" />
+              <InputField label="Veh No" name="vehNo" value={form.vehNo ?? ""} onChange={(e) => setForm({ ...form, vehNo: e.target.value })} placeholder="e.g. MH-15-GH-4455" />
               <SelectField label="Delivery At" name="deliveryAt" value={form.deliveryAt ?? "DOOR"} onChange={(e) => setForm({ ...form, deliveryAt: e.target.value })} options={["DOOR", "GODOWN"]} />
-              <SelectField label="Billing Party" name="billingParty" value={form.billingParty ?? ""} onChange={(e) => setForm({ ...form, billingParty: e.target.value })} options={parties.map((p) => p.name)} />
-              <SelectField label="Consignor" name="consignor" value={form.consignor ?? ""} onChange={(e) => setForm({ ...form, consignor: e.target.value })} options={parties.map((p) => p.name)} />
+              <DatalistField label="Billing Party" name="billingParty" value={form.billingParty ?? ""} onChange={(e) => setForm({ ...form, billingParty: e.target.value })} options={partyNames} placeholder="Type or pick party" listId="lr-party-billing" />
+              <DatalistField label="Consignor" name="consignor" value={form.consignor ?? ""} onChange={(e) => setForm({ ...form, consignor: e.target.value })} options={partyNames} placeholder="Type or pick party" listId="lr-party-consignor" />
             </div>
             <div>
-              <SelectField label="Consignee" name="consignee" value={form.consignee ?? ""} onChange={(e) => setForm({ ...form, consignee: e.target.value })} options={parties.map((p) => p.name)} />
+              <DatalistField label="Consignee" name="consignee" value={form.consignee ?? ""} onChange={(e) => setForm({ ...form, consignee: e.target.value })} options={partyNames} placeholder="Type or pick party" listId="lr-party-consignee" />
               <InputField label="No. of Articles" name="articles" value={form.articles ?? ""} onChange={(e) => setForm({ ...form, articles: e.target.value })} />
               <InputField label="Particulars" name="particulars" value={form.particulars ?? ""} onChange={(e) => setForm({ ...form, particulars: e.target.value })} />
               <InputField label="Inv.No. & Date" name="invNoDate" value={form.invNoDate ?? ""} onChange={(e) => setForm({ ...form, invNoDate: e.target.value })} />

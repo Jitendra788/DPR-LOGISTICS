@@ -29,6 +29,27 @@ export function InputField({ label, className = "", ...props }: InputFieldProps)
   );
 }
 
+type DatalistFieldProps = InputHTMLAttributes<HTMLInputElement> & {
+  label: string;
+  options: string[];
+  listId?: string;
+};
+
+/** Manual text input with optional suggestions (all party / station names). */
+export function DatalistField({ label, className = "", options, listId, ...props }: DatalistFieldProps) {
+  const id = listId ?? `datalist-${label.replace(/\s+/g, "-").toLowerCase()}`;
+  return (
+    <FieldWrap label={label} className={className}>
+      <input className="form-control" list={id} {...props} />
+      <datalist id={id}>
+        {options.map((option) => (
+          <option key={option} value={option} />
+        ))}
+      </datalist>
+    </FieldWrap>
+  );
+}
+
 type SelectFieldProps = SelectHTMLAttributes<HTMLSelectElement> & {
   label: string;
   options: string[];
@@ -79,7 +100,7 @@ export function FileField({ label, accept, name }: { label: string; accept?: str
 
   return (
     <FieldWrap label={label} className="erp-file-field">
-      <label className={`erp-file-drop${fileName ? " has-file" : ""}`}>
+      <label className={`erp-choose-file${fileName ? " has-file" : ""}`}>
         <input
           type="file"
           name={name}
@@ -87,18 +108,10 @@ export function FileField({ label, accept, name }: { label: string; accept?: str
           className="erp-file-input"
           onChange={(e) => setFileName(e.target.files?.[0]?.name ?? "")}
         />
-        <span className="erp-file-icon" aria-hidden>
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-            <path d="M14 2v6h6M12 18v-6M9 15l3-3 3 3" />
-          </svg>
-        </span>
-        <span className="erp-file-copy">
-          <strong>{fileName ? "File selected" : "Choose file"}</strong>
-          <span>{fileName || "PDF, image or document — click to browse"}</span>
-        </span>
-        <span className="erp-file-btn">{fileName ? "Change" : "Browse"}</span>
+        <span className="erp-choose-file-btn">Choose file</span>
+        <span className="erp-choose-file-name">{fileName || "No file chosen"}</span>
       </label>
+      <p className="erp-choose-file-hint">PDF, image or document — max 12 MB</p>
     </FieldWrap>
   );
 }

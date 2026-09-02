@@ -1,11 +1,12 @@
 import type { MetadataRoute } from "next";
-import { blogPosts } from "@/data/marketing/blog";
 import { transportRoutes } from "@/data/marketing/routes";
 import { extraServices, services } from "@/data/marketing/services";
 import { absoluteUrl, marketingRoutes } from "@/lib/seo";
+import { getPublishedPosts } from "@/services/blogService";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();
+  const blogPosts = await getPublishedPosts();
 
   const staticPages = marketingRoutes.map((route) => ({
     url: absoluteUrl(route.path),

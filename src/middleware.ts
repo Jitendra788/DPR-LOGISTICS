@@ -15,6 +15,7 @@ export function middleware(req: Request) {
     pathname.startsWith("/track/") ||
     pathname.startsWith("/sim-consent/") ||
     pathname.startsWith("/api/public/") ||
+    (pathname.startsWith("/api/marketing-media/") && req.method === "GET") ||
     pathname.startsWith("/api/tracking/ingest") ||
     pathname.startsWith("/api/auth/login") ||
     pathname.startsWith("/_next") ||

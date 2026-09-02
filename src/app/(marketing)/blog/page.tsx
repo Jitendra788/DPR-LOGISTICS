@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Clock, Tag } from "lucide-react";
-import { blogPosts } from "@/data/marketing/blog";
 import { BlogCover } from "@/components/marketing/BlogCover";
 import { createPageMetadata } from "@/lib/seo";
+import { getPublishedPosts } from "@/services/blogService";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Logistics Blog & Guides",
@@ -19,8 +19,10 @@ export const metadata: Metadata = createPageMetadata({
   ],
 });
 
-export default function BlogPage() {
-  const sorted = [...blogPosts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+export const revalidate = 60;
+
+export default async function BlogPage() {
+  const sorted = await getPublishedPosts();
 
   return (
     <>

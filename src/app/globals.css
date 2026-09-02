@@ -181,6 +181,84 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   padding: 5px 10px;
 }
 
+/* Classic choose-file row (admin forms) */
+.erp-choose-file {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.erp-choose-file:hover,
+.erp-choose-file:focus-within {
+  border-color: #0f766e;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.12);
+}
+
+.erp-choose-file.has-file {
+  border-color: #14b8a6;
+}
+
+.erp-choose-file.is-disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.erp-choose-file-btn {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border: 1px solid #0f766e;
+  border-radius: 6px;
+  background: #f0fdfa;
+  color: #0f766e;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.erp-choose-file-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.erp-choose-file.has-file .erp-choose-file-name {
+  color: #0f172a;
+  text-transform: none;
+}
+
+.erp-choose-file-hint {
+  margin: 6px 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.erp-image-upload {
+  display: grid;
+  gap: 12px;
+}
+
+.erp-choose-file-inline {
+  min-width: 220px;
+  max-width: 280px;
+}
+
 .box {
   position: relative;
   margin-bottom: 14px;
