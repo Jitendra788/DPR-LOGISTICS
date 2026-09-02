@@ -15,8 +15,12 @@ export function resolveDbEnv(base = process.env) {
   if (!env.DIRECT_URL && env.POSTGRES_URL) {
     env.DIRECT_URL = env.POSTGRES_URL;
   }
-  if (!env.DIRECT_URL && env.DATABASE_URL) {
+  if (!env.DIRECT_URL && env.DATABASE_URL && !env.DATABASE_URL.startsWith("file:")) {
     env.DIRECT_URL = env.DATABASE_URL;
+  }
+
+  if (!env.DATABASE_URL && !env.POSTGRES_PRISMA_URL && !env.POSTGRES_URL && !base.VERCEL) {
+    env.DATABASE_URL = "file:./dev.db";
   }
 
   return env;
