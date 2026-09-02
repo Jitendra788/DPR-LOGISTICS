@@ -1,3 +1,5 @@
+import { lrBillableAmount, sumLrBillableAmount, type LrCharges } from "./lr-totals";
+
 type BillAmounts = {
   amount: number;
   cgstAmt?: number;
@@ -10,14 +12,17 @@ type BillAmounts = {
 
 /** Freight / subtotal before bill-level GST. */
 export function billFreightAmount(bill: BillAmounts, lrFreightSum = 0) {
-  const tax = (bill.cgstAmt || 0) + (bill.sgstAmt || 0) + (bill.igstAmt || 0);
   if (lrFreightSum > 0) return Number(lrFreightSum.toFixed(2));
+
+  const tax = (bill.cgstAmt || 0) + (bill.sgstAmt || 0) + (bill.igstAmt || 0);
   if (tax > 0) {
     const derived = Number((bill.amount - tax).toFixed(2));
     if (derived > 0) return derived;
   }
   return bill.amount;
 }
+
+export { lrBillableAmount, sumLrBillableAmount, type LrCharges };
 
 export function billGrandTotal(bill: BillAmounts, freight?: number) {
   const base = freight ?? billFreightAmount(bill);

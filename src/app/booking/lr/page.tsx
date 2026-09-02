@@ -4,7 +4,7 @@ import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, DatalistField, FieldWrap, InputField, MoneyField, SelectField } from "@/components/ui/FormField";
+import { DateField, DatalistField, DropdownField, FieldWrap, InputField, MoneyField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
 import { AdminForm } from "@/components/ui/AdminForm";
@@ -267,7 +267,7 @@ function LrBookingInner() {
               <InputField label="Act. Weight" name="actWeight" value={form.actWeight ?? ""} onChange={(e) => setForm({ ...form, actWeight: e.target.value })} />
               <InputField label="Charged Weight" name="chargedWeight" value={form.chargedWeight ?? ""} onChange={(e) => setForm({ ...form, chargedWeight: e.target.value })} />
               <InputField label="Rate" name="rate" value={form.rate ?? ""} onChange={(e) => setForm({ ...form, rate: e.target.value })} />
-              <SelectField label="Bill As" name="billAs" value={form.billAs ?? "Weight"} onChange={(e) => setForm({ ...form, billAs: e.target.value })} options={["Weight", "Mtr", "Package"]} />
+              <DropdownField label="Bill As" name="billAs" value={form.billAs ?? "Weight"} onChange={(e) => setForm({ ...form, billAs: e.target.value })} options={["Weight", "Mtr", "Package"]} />
               <InputField label="Total Meter" name="totalMeter" value={form.totalMeter ?? ""} onChange={(e) => setForm({ ...form, totalMeter: e.target.value })} />
             </div>
           </TwoCol>
@@ -289,10 +289,10 @@ function LrBookingInner() {
               <MoneyField label="Total" value={total} readOnly />
               <MoneyField label="GST" value={form.gst ?? 0} onChange={(gst) => setForm({ ...form, gst })} />
               <MoneyField label="Grand Total" value={grandTotal} readOnly />
-              <SelectField label="GST Paid By" name="gstPaidBy" value={form.gstPaidBy ?? "Consigner"} onChange={(e) => setForm({ ...form, gstPaidBy: e.target.value })} options={["Consigner", "Consignee", "Company", "Broker"]} placeholder="" />
+              <DropdownField label="GST Paid By" name="gstPaidBy" value={form.gstPaidBy ?? "Consigner"} onChange={(e) => setForm({ ...form, gstPaidBy: e.target.value })} options={["Consigner", "Consignee", "Company", "Broker"]} />
               <InputField label="E Way Bill No" name="ewayBill" value={form.ewayBill ?? ""} onChange={(e) => setForm({ ...form, ewayBill: e.target.value })} />
               <DateField label="Valid Date" value={form.validDate ?? ""} onChange={(validDate) => setForm({ ...form, validDate })} />
-              <SelectField label="LR Type" name="lrType" value={form.lrType ?? "TBB"} onChange={(e) => setForm({ ...form, lrType: e.target.value })} options={["TBB", "ToPay", "Paid"]} placeholder="" />
+              <DropdownField label="LR Type" name="lrType" value={form.lrType ?? "TBB"} onChange={(e) => setForm({ ...form, lrType: e.target.value })} options={["TBB", "ToPay", "Paid"]} />
               <InputField label="Value Rs." name="valueRs" value={form.valueRs ?? ""} onChange={(e) => setForm({ ...form, valueRs: e.target.value })} />
             </div>
           </TwoCol>

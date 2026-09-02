@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from "react";
+import { useEffect, useId, useState, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
 import { displayToIso, isoToDisplay } from "@/lib/dates";
 
 type FieldWrapProps = {
@@ -45,6 +45,50 @@ export function DatalistField({ label, className = "", options, listId, ...props
           <option key={option} value={option} />
         ))}
       </datalist>
+    </FieldWrap>
+  );
+}
+
+type DropdownFieldProps = SelectHTMLAttributes<HTMLSelectElement> & {
+  label: string;
+  options: string[];
+  placeholder?: string;
+};
+
+/** Fixed-option dropdown only (no manual typing). */
+export function DropdownField({
+  label,
+  options,
+  placeholder,
+  className = "",
+  value,
+  name,
+  onChange,
+  required,
+  disabled,
+}: DropdownFieldProps) {
+  const current = String(value ?? "");
+  return (
+    <FieldWrap label={label} className={className}>
+      <select
+        className="form-control"
+        name={name}
+        value={current}
+        required={required}
+        disabled={disabled}
+        onChange={onChange}
+      >
+        {placeholder && !current ? (
+          <option value="" disabled>
+            {placeholder}
+          </option>
+        ) : null}
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
     </FieldWrap>
   );
 }

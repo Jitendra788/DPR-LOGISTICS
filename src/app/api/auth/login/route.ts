@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { isDatabaseConfigured, prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
+    if (!isDatabaseConfigured()) {
+      return NextResponse.json(
+        {
+          error:
+            "Database not configured on Vercel. Connect Postgres in Project → Storage, then redeploy.",
+        },
+        { status: 503 },
+      );
+    }
     const { username, password, branch } = (await req.json()) as {
       username?: string;
       password?: string;

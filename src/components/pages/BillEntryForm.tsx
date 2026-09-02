@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, DatalistField, InputField, ManualNumberField, SelectField } from "@/components/ui/FormField";
+import { DateField, DatalistField, DropdownField, InputField, ManualNumberField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
 import { DataTable } from "@/components/ui/DataTable";
@@ -12,6 +12,7 @@ import { useCrud } from "@/hooks/useCrud";
 import { api } from "@/lib/api-client";
 import { isoToDisplay, todayIso } from "@/lib/dates";
 import { billFreightAmount, billGrandTotal, calcBillTaxes } from "@/lib/bill-totals";
+import { lrBillableAmount } from "@/lib/lr-totals";
 
 type Party = { name: string };
 type LrRow = {
@@ -25,6 +26,17 @@ type LrRow = {
   billAs: string;
   chargedWeight: string;
   totalMeter: string;
+  freight?: number;
+  serviceTax?: number;
+  haltage?: number;
+  insurance?: number;
+  stCharges?: number;
+  doorCollection?: number;
+  barrier?: number;
+  other?: number;
+  hamali?: number;
+  total?: number;
+  gst?: number;
   grandTotal: number;
   billed: boolean;
   billNo: string;
@@ -146,13 +158,13 @@ export function BillEntryForm({
     if (editId || !form.partyName) return;
     const ids = visibleLrs.map((row) => row.id);
     setSelectedIds(ids);
-    const sum = visibleLrs.reduce((s, row) => s + (Number(row.grandTotal) || 0), 0);
+    const sum = visibleLrs.reduce((s, row) => s + lrBillableAmount(row), 0);
     setForm((f) => ({ ...f, amount: Number(sum.toFixed(2)) }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.partyName, visibleLrs.map((row) => row.id).join(","), editId]);
 
   function fillAmount(ids: number[], list: LrRow[]) {
-    const sum = list.filter((row) => ids.includes(row.id)).reduce((s, row) => s + (Number(row.grandTotal) || 0), 0);
+    const sum = list.filter((row) => ids.includes(row.id)).reduce((s, row) => s + lrBillableAmount(row), 0);
     setForm((f) => ({ ...f, amount: Number(sum.toFixed(2)) }));
   }
 
@@ -165,7 +177,7 @@ export function BillEntryForm({
 
   function load(row: Bill) {
     const linked = bookings.filter((b) => b.billNo === row.billNo);
-    const lrSum = linked.reduce((s, r) => s + (Number(r.grandTotal) || 0), 0);
+    const lrSum = linked.reduce((s, r) => s + lrBillableAmount(r), 0);
     const freight = billFreightAmount(row, lrSum);
     setEditId(row.id);
     setForm({
@@ -307,9 +319,9 @@ export function BillEntryForm({
           <FormCard>
             <TwoCol>
               <div>
-                <SelectField
+                <DropdownField
                   label="Bill As"
-                  value={form.billAs}
+                  value={form.billAs || "Weight"}
                   onChange={(e) => setForm({ ...form, billAs: e.target.value, billAt: e.target.value })}
                   options={["Mtr", "Weight", "Package"]}
                 />
@@ -374,6 +386,18 @@ export function BillEntryForm({
               <Button type="button" variant="teal" disabled={!form.billNo.trim()} onClick={printBill}>
                 Print Bill
               </Button>
+              <Button
+                type="button"
+                variant="teal"
+                disabled={!form.billNo.trim() || !form.partyName.trim()}
+                onClick={() =>
+                  router.push(
+                    `/bills/money-receipt?partyName=${encodeURIComponent(form.partyName)}&billNo=${encodeURIComponent(form.billNo)}`,
+                  )
+                }
+              >
+                Money Reciept
+              </Button>
             </div>
           </FormCard>
         )}
@@ -408,7 +432,7 @@ export function BillEntryForm({
                   { key: "toStation", header: "To" },
                   { key: "billAs", header: "Bill As" },
                   { key: variant === "meter" ? "totalMeter" : "chargedWeight", header: variant === "meter" ? "Meter" : "Weight" },
-                  { key: "grandTotal", header: "Amount" },
+                  { key: "amount", header: "Amount", render: (row) => lrBillableAmount(row) },
                 ]}
               />
               {!editId && !visibleLrs.length ? <p className="mt-2 text-sm text-[#a94442]">No unbilled LRs found for this party.</p> : null}
@@ -450,6 +474,18 @@ export function BillEntryForm({
               </Button>
               <Button type="button" variant="teal" disabled={!form.billNo.trim()} onClick={printBill}>
                 Print Bill
+              </Button>
+              <Button
+                type="button"
+                variant="teal"
+                disabled={!form.billNo.trim() || !form.partyName.trim()}
+                onClick={() =>
+                  router.push(
+                    `/bills/money-receipt?partyName=${encodeURIComponent(form.partyName)}&billNo=${encodeURIComponent(form.billNo)}`,
+                  )
+                }
+              >
+                Money Reciept
               </Button>
             </div>
           </FormCard>

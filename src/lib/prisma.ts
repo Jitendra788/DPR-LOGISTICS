@@ -8,11 +8,13 @@ function resolveDatabaseUrl() {
     "";
 
   if (url) return url;
-  if (process.env.VERCEL) {
-    console.error("DATABASE_URL / POSTGRES_PRISMA_URL is not set on Vercel.");
-    return "";
-  }
+  if (process.env.VERCEL) return "";
   return "file:./dev.db";
+}
+
+/** False on Vercel when Postgres env vars are missing. */
+export function isDatabaseConfigured() {
+  return Boolean(resolveDatabaseUrl());
 }
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };

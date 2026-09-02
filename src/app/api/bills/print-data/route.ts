@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { billFreightAmount, billGrandTotal } from "@/lib/bill-totals";
+import { sumLrBillableAmount } from "@/lib/lr-totals";
 
 export async function GET(req: NextRequest) {
   const billNo = req.nextUrl.searchParams.get("billNo")?.trim() ?? "";
@@ -14,7 +15,7 @@ export async function GET(req: NextRequest) {
     prisma.lrBooking.findMany({ where: { billNo }, orderBy: { id: "asc" } }),
   ]);
 
-  const lrFreightSum = lrs.reduce((s, r) => s + (r.freight || r.grandTotal || 0), 0);
+  const lrFreightSum = sumLrBillableAmount(lrs);
   const freight = billFreightAmount(bill, lrFreightSum);
   const grandTotal = billGrandTotal(bill, freight);
 

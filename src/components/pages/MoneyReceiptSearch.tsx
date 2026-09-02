@@ -1,10 +1,10 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard } from "@/components/ui/FormCard";
-import { DateField, DatalistField } from "@/components/ui/FormField";
+import { DateField, DatalistField, InputField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
 import { api } from "@/lib/api-client";
@@ -30,12 +30,6 @@ type RowDraft = {
   balance: number;
   narration: string;
 };
-
-function fmtAmt(value: number) {
-  const num = Number(value) || 0;
-  if (num === 0) return "";
-  return num.toLocaleString("en-IN");
-}
 
 function parseCellNum(text: string) {
   const cleaned = text.replace(/,/g, "").trim();
@@ -95,6 +89,58 @@ function CellNumInput({
   );
 }
 
+function cellMoneyText(value: number) {
+  const num = Number(value) || 0;
+  if (Number.isInteger(num)) return String(num);
+  return num.toFixed(2);
+}
+
+function CellMoneyInput({
+  value,
+  onChange,
+  readOnly,
+  width = "68px",
+}: {
+  value: number;
+  onChange?: (n: number) => void;
+  readOnly?: boolean;
+  width?: string;
+}) {
+  const [text, setText] = useState(() => cellMoneyText(value));
+  const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    if (!focused) setText(cellMoneyText(value));
+  }, [value, focused]);
+
+  return (
+    <input
+      className="form-control mr-cell-input"
+      style={{ width, minWidth: width }}
+      type="text"
+      inputMode="decimal"
+      readOnly={readOnly}
+      value={text}
+      onFocus={() => {
+        if (!readOnly) setFocused(true);
+      }}
+      onChange={(e) => {
+        if (readOnly) return;
+        const raw = e.target.value;
+        setText(raw);
+        onChange?.(parseCellNum(raw));
+      }}
+      onBlur={() => {
+        if (readOnly) return;
+        setFocused(false);
+        const num = parseCellNum(text);
+        setText(cellMoneyText(num));
+        onChange?.(num);
+      }}
+    />
+  );
+}
+
 export function MoneyReceiptSearch({
   source = "DPR",
   reportHref,
@@ -105,9 +151,11 @@ export function MoneyReceiptSearch({
   editHref: string;
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [parties, setParties] = useState<Party[]>([]);
   const partyNames = parties.map((p) => p.name).filter(Boolean);
   const [partyName, setPartyName] = useState("");
+  const [billNoFilter, setBillNoFilter] = useState("");
   const [fromDate, setFromDate] = useState(firstOfMonthIso());
   const [toDate, setToDate] = useState(todayIso());
   const [rows, setRows] = useState<BillRow[]>([]);
@@ -118,6 +166,16 @@ export function MoneyReceiptSearch({
   useEffect(() => {
     api<Party[]>("/api/parties").then(setParties);
   }, []);
+
+  useEffect(() => {
+    const qParty = searchParams.get("partyName") ?? "";
+    const qBill = searchParams.get("billNo") ?? "";
+    if (!qParty && !qBill) return;
+    if (qParty) setPartyName(qParty);
+    if (qBill) setBillNoFilter(qBill);
+    searchBills(undefined, { partyName: qParty, billNo: qBill });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   function draftFor(row: BillRow): RowDraft {
     return (
@@ -132,33 +190,38 @@ export function MoneyReceiptSearch({
     );
   }
 
-  function updateDraft(billNo: string, patch: Partial<RowDraft>, outstanding: number) {
+  function updateDraft(billNo: string, patch: Partial<RowDraft>, row: BillRow) {
     setDrafts((prev) => {
       const cur = prev[billNo] ?? {
         tdsPct: 0,
         tdsAmt: 0,
-        paidAmt: outstanding,
+        paidAmt: row.outstanding,
         otherDed: 0,
-        balance: outstanding,
+        balance: row.outstanding,
         narration: "",
       };
       const next = { ...cur, ...patch };
-      if ("tdsPct" in patch || "paidAmt" in patch) {
-        next.tdsAmt = Number(((next.paidAmt * next.tdsPct) / 100).toFixed(2));
+      if ("tdsPct" in patch || "paidAmt" in patch || "otherDed" in patch) {
+        if (next.tdsPct > 0) {
+          next.tdsAmt = Number(((row.beforeTax * next.tdsPct) / 100).toFixed(2));
+        }
       }
-      if ("tdsPct" in patch || "paidAmt" in patch || "otherDed" in patch || "tdsAmt" in patch) {
-        next.balance = Number(Math.max(0, outstanding - next.paidAmt - next.otherDed).toFixed(2));
-      }
+      next.balance = Number(
+        Math.max(0, row.outstanding - next.paidAmt - next.otherDed - next.tdsAmt).toFixed(2),
+      );
       return { ...prev, [billNo]: next };
     });
   }
 
-  async function searchBills(e?: FormEvent) {
+  async function searchBills(e?: FormEvent, overrides?: { partyName?: string; billNo?: string }) {
     e?.preventDefault();
     setLoading(true);
+    const party = (overrides?.partyName ?? partyName).trim();
+    const billNo = (overrides?.billNo ?? billNoFilter).trim();
     try {
       const qs = new URLSearchParams({
-        ...(partyName.trim() ? { partyName: partyName.trim() } : {}),
+        ...(party ? { partyName: party } : {}),
+        ...(billNo ? { billNo } : {}),
         ...(fromDate ? { fromDate } : {}),
         ...(toDate ? { toDate } : {}),
       }).toString();
@@ -179,8 +242,8 @@ export function MoneyReceiptSearch({
       setMessage({
         type: "ok",
         text: data.length
-          ? `Found ${data.length} pending bill(s) for ${partyName.trim() || "all parties"}`
-          : `No pending bills for ${partyName.trim() || "all parties"}`,
+          ? `Found ${data.length} pending bill(s) for ${party || "all parties"}`
+          : `No pending bills for ${party || "all parties"}`,
       });
     } catch (err) {
       setMessage({ type: "err", text: err instanceof Error ? err.message : "Search failed" });
@@ -191,7 +254,7 @@ export function MoneyReceiptSearch({
 
   async function saveReceipt(row: BillRow) {
     const d = draftFor(row);
-    if (!d.paidAmt && !d.otherDed) {
+    if (!d.paidAmt && !d.otherDed && !d.tdsAmt) {
       setMessage({ type: "err", text: "Enter paid amount for this bill" });
       return;
     }
@@ -238,7 +301,7 @@ export function MoneyReceiptSearch({
               View Report
             </Button>
           </div>
-          <div className="grid grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-4">
             <DatalistField
               label="Party Name"
               value={partyName}
@@ -246,6 +309,11 @@ export function MoneyReceiptSearch({
               options={partyNames}
               placeholder="Type party name"
               listId="mr-party"
+            />
+            <InputField
+              label="Bill No (optional)"
+              value={billNoFilter}
+              onChange={(e) => setBillNoFilter(e.target.value)}
             />
             <DateField label="From Date" value={fromDate} onChange={setFromDate} />
             <DateField label="To Date" value={toDate} onChange={setToDate} />
@@ -293,40 +361,40 @@ export function MoneyReceiptSearch({
                       <td>{row.billNo}</td>
                       <td>{row.partyName}</td>
                       <td>{isoToDisplay(row.date)}</td>
-                      <td className="text-right">{fmtAmt(row.beforeTax)}</td>
-                      <td className="text-right">{fmtAmt(row.outstanding)}</td>
+                      <td className="text-right">{cellMoneyText(row.beforeTax)}</td>
+                      <td className="text-right">{cellMoneyText(row.outstanding)}</td>
                       <td>
                         <CellNumInput
                           value={d.tdsPct}
                           width="52px"
-                          onChange={(n) => updateDraft(row.billNo, { tdsPct: n }, row.outstanding)}
+                          onChange={(n) => updateDraft(row.billNo, { tdsPct: n }, row)}
                         />
                       </td>
                       <td>
-                        <CellNumInput value={d.tdsAmt} readOnly width="72px" />
+                        <CellMoneyInput value={d.tdsAmt} readOnly width="72px" />
                       </td>
                       <td>
-                        <CellNumInput
+                        <CellMoneyInput
                           value={d.paidAmt}
                           width="80px"
-                          onChange={(n) => updateDraft(row.billNo, { paidAmt: n }, row.outstanding)}
+                          onChange={(n) => updateDraft(row.billNo, { paidAmt: n }, row)}
                         />
                       </td>
                       <td>
                         <CellNumInput
                           value={d.otherDed}
                           width="72px"
-                          onChange={(n) => updateDraft(row.billNo, { otherDed: n }, row.outstanding)}
+                          onChange={(n) => updateDraft(row.billNo, { otherDed: n }, row)}
                         />
                       </td>
                       <td>
-                        <CellNumInput value={d.balance} readOnly width="72px" />
+                        <CellMoneyInput value={d.balance} readOnly width="72px" />
                       </td>
                       <td>
                         <input
                           className="form-control mr-cell-input mr-narration-input"
                           value={d.narration}
-                          onChange={(e) => updateDraft(row.billNo, { narration: e.target.value }, row.outstanding)}
+                          onChange={(e) => updateDraft(row.billNo, { narration: e.target.value }, row)}
                         />
                       </td>
                       <td>

@@ -2,6 +2,7 @@ import { BRAND_LOGO_HEADER } from "@/lib/brand";
 import { amountInWordsIndian } from "@/lib/amount-words";
 import { formatPrintDate, formatPrintMoney, lrPrintCompany } from "@/lib/lr-print";
 import { stripLrPrefix } from "@/lib/lr-no";
+import { lrBillableAmount } from "@/lib/lr-totals";
 import "./bill-print.css";
 
 export type BillPrintLr = {
@@ -52,7 +53,7 @@ function lrWeight(row: BillPrintLr) {
 }
 
 function lrLineFreight(row: BillPrintLr) {
-  return row.freight || row.grandTotal || 0;
+  return lrBillableAmount(row);
 }
 
 function fmtCharge(value: number) {
