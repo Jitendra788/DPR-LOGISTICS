@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
+import { useEffect, useId, useState, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from "react";
 import { displayToIso, isoToDisplay } from "@/lib/dates";
 
 type FieldWrapProps = {
@@ -49,7 +49,7 @@ export function DatalistField({ label, className = "", options, listId, ...props
   );
 }
 
-type SelectFieldProps = SelectHTMLAttributes<HTMLSelectElement> & {
+type SelectFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   label: string;
   options: string[];
   placeholder?: string;
