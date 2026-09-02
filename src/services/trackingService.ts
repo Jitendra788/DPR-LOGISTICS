@@ -89,21 +89,25 @@ function last4Matches(phones: string[], last4: string) {
 }
 
 async function getLrTrackToken(lrId: number) {
-  const rows = await prisma.$queryRaw<{ trackToken: string | null }[]>`
-    SELECT trackToken FROM LrBooking WHERE id = ${lrId} LIMIT 1
-  `;
-  return String(rows[0]?.trackToken ?? "").trim();
+  const row = await prisma.lrBooking.findUnique({
+    where: { id: lrId },
+    select: { trackToken: true },
+  });
+  return String(row?.trackToken ?? "").trim();
 }
 
 async function setLrTrackToken(lrId: number, token: string) {
-  await prisma.$executeRaw`UPDATE LrBooking SET trackToken = ${token} WHERE id = ${lrId}`;
+  await prisma.lrBooking.update({
+    where: { id: lrId },
+    data: { trackToken: token },
+  });
 }
 
 async function findLrIdByTrackToken(token: string) {
-  const rows = await prisma.$queryRaw<{ id: number; lrNo: string }[]>`
-    SELECT id, lrNo FROM LrBooking WHERE trackToken = ${token} LIMIT 1
-  `;
-  return rows[0] ?? null;
+  return prisma.lrBooking.findFirst({
+    where: { trackToken: token },
+    select: { id: true, lrNo: true },
+  });
 }
 
 async function ensureLrTrackToken(lrId: number, existing = "") {
