@@ -2,10 +2,14 @@ import { execSync } from "node:child_process";
 import { resolveDbEnv } from "./resolve-db-env.mjs";
 import { applySchema } from "./select-schema.mjs";
 
+function run(cmd, env) {
+  execSync(cmd, { stdio: "inherit", env, cwd: process.cwd() });
+}
+
 const env = resolveDbEnv();
 
 if (!env.DATABASE_URL && process.env.VERCEL) {
-  console.warn("Vercel build: POSTGRES_PRISMA_URL / DATABASE_URL not set — skipping database setup.");
+  console.warn("Vercel build: no Postgres URL found — skipping database setup.");
   console.log("Database ready (skipped).");
   process.exit(0);
 }
@@ -18,15 +22,32 @@ const kind = applySchema(env);
 
 if (kind === "sqlite") {
   console.log("Preparing local SQLite database…");
-  execSync("npx prisma db push --skip-generate --accept-data-loss", { stdio: "inherit", env, cwd: process.cwd() });
+  run("npx prisma db push --skip-generate --accept-data-loss", env);
 } else {
   if (!env.DATABASE_URL) {
-    console.error("DATABASE_URL is missing. Connect Vercel Postgres in project env.");
+    console.error("DATABASE_URL is missing. Connect Neon Postgres in Vercel Storage.");
     process.exit(1);
   }
-  console.log("Applying database migrations to Vercel Postgres…");
-  execSync("npx prisma migrate deploy", { stdio: "inherit", env, cwd: process.cwd() });
+  if (!env.DATABASE_URL_UNPOOLED) {
+    console.error(
+      "DATABASE_URL_UNPOOLED is missing. Reconnect Neon in Vercel Storage and redeploy.",
+    );
+    process.exit(1);
+  }
+
+  console.log("Postgres env ready:", {
+    DATABASE_URL: true,
+    DATABASE_URL_UNPOOLED: true,
+  });
+
+  console.log("Syncing Postgres schema…");
+  try {
+    run("npx prisma migrate deploy", env);
+  } catch {
+    console.warn("migrate deploy failed — falling back to db push…");
+    run("npx prisma db push --skip-generate --accept-data-loss", env);
+  }
 }
 
-execSync("npx tsx prisma/bootstrap.ts", { stdio: "inherit", env, cwd: process.cwd() });
+run("npx tsx prisma/bootstrap.ts", env);
 console.log("Database ready.");

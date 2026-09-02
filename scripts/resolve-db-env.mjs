@@ -27,8 +27,16 @@ export function resolveDbEnv(base = process.env) {
       env.POSTGRES_URL?.trim() ||
       "";
   }
+  if (!env.DATABASE_URL_UNPOOLED) {
+    env.DATABASE_URL_UNPOOLED =
+      env.DIRECT_URL?.trim() ||
+      env.POSTGRES_URL_NON_POOLING?.trim() ||
+      env.POSTGRES_URL?.trim() ||
+      "";
+  }
   if (!env.DIRECT_URL && env.DATABASE_URL && !env.DATABASE_URL.startsWith("file:")) {
     env.DIRECT_URL = env.DATABASE_URL;
+    env.DATABASE_URL_UNPOOLED = env.DATABASE_URL;
   }
 
   if (!env.DATABASE_URL && !env.POSTGRES_PRISMA_URL && !env.POSTGRES_URL && !base.VERCEL) {
