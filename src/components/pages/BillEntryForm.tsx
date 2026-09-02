@@ -265,7 +265,7 @@ export function BillEntryForm({
     if (!confirm("Delete this record?")) return;
     try {
       await api("/api/bills/unlink", { method: "POST", body: JSON.stringify({ billNo: form.billNo }) });
-      await api(`/api/bills/${editId}`, { method: "DELETE" });
+      await api(`/api/bills/${editId}?billNo=${encodeURIComponent(form.billNo)}`, { method: "DELETE" });
       setMessage({ type: "ok", text: "Deleted successfully" });
       await reset();
     } catch (err) {

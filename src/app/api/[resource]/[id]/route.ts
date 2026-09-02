@@ -1,7 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getModel, isResource, sanitize } from "@/lib/resources";
+import { getModel, isResource, sanitize, type ResourceKey } from "@/lib/resources";
+import { resolveBillDeleteId, resolveUpdateId } from "@/lib/resolve-update";
 
 type Ctx = { params: Promise<{ resource: string; id: string }> };
+
+async function resolveId(resource: ResourceKey, id: number, body?: Record<string, unknown>) {
+  const model = getModel(resource);
+  const existing = await model.findUnique({ where: { id } });
+  if (existing) return id;
+  if (!body) return null;
+  const fallback = await resolveUpdateId(resource, body);
+  return fallback;
+}
 
 export async function GET(_req: NextRequest, ctx: Ctx) {
   const { resource, id } = await ctx.params;
@@ -26,17 +36,16 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
 
   const body = (await req.json()) as Record<string, unknown>;
   try {
-    const model = getModel(resource);
-    const existing = await model.findUnique({ where: { id } });
-    if (!existing) {
+    const updateId = await resolveId(resource, id, body);
+    if (!updateId) {
       return NextResponse.json(
         { error: "Record not found. Refresh the page and try again." },
         { status: 404 },
       );
     }
 
-    const updated = await model.update({
-      where: { id },
+    const updated = await getModel(resource).update({
+      where: { id: updateId },
       data: sanitize(body, resource),
     });
     return NextResponse.json(updated);
@@ -46,13 +55,34 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
   }
 }
 
-export async function DELETE(_req: NextRequest, ctx: Ctx) {
-  const { resource, id } = await ctx.params;
+export async function DELETE(req: NextRequest, ctx: Ctx) {
+  const { resource, id: idParam } = await ctx.params;
   if (!isResource(resource)) {
     return NextResponse.json({ error: "Unknown resource" }, { status: 404 });
   }
+
+  const id = Number(idParam);
+  if (!Number.isFinite(id) || id <= 0) {
+    return NextResponse.json({ error: "Invalid record id" }, { status: 400 });
+  }
+
   try {
-    await getModel(resource).delete({ where: { id: Number(id) } });
+    let deleteId = id;
+    if (resource === "bills") {
+      const billNo = req.nextUrl.searchParams.get("billNo") ?? undefined;
+      const resolved = await resolveBillDeleteId(id, billNo);
+      if (!resolved) {
+        return NextResponse.json({ error: "Bill not found" }, { status: 404 });
+      }
+      deleteId = resolved;
+    } else {
+      const existing = await getModel(resource).findUnique({ where: { id } });
+      if (!existing) {
+        return NextResponse.json({ error: "Record not found" }, { status: 404 });
+      }
+    }
+
+    await getModel(resource).delete({ where: { id: deleteId } });
     return NextResponse.json({ ok: true });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Delete failed";
