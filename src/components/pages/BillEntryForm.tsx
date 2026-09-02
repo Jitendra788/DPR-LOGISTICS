@@ -105,8 +105,8 @@ export function BillEntryForm({
     billDate: todayIso(),
     partyName: "",
     amount: 0,
-    cgstPct: 0,
-    sgstPct: 0,
+    cgstPct: 9,
+    sgstPct: 9,
     igstPct: 0,
     paidRs: 0,
     remark: "",
@@ -298,8 +298,8 @@ export function BillEntryForm({
       billDate: todayIso(),
       partyName: "",
       amount: 0,
-      cgstPct: 0,
-      sgstPct: 0,
+      cgstPct: 9,
+      sgstPct: 9,
       igstPct: 0,
       paidRs: 0,
       remark: "",
@@ -347,10 +347,10 @@ export function BillEntryForm({
               <div>
                 <DateField label="Bill Date" value={form.billDate} onChange={(billDate) => setForm({ ...form, billDate })} />
                 <ManualNumberField label="Total Amount" value={form.amount} onChange={(amount) => setForm({ ...form, amount })} />
-                <ManualNumberField label="IGST %" value={form.igstPct} onChange={(igstPct) => setForm({ ...form, igstPct })} />
                 <ManualNumberField label="CGST %" value={form.cgstPct} onChange={(cgstPct) => setForm({ ...form, cgstPct })} />
-                <ManualNumberField label="IGST Amount" value={igstAmt} readOnly />
+                <ManualNumberField label="SGST %" value={form.sgstPct} onChange={(sgstPct) => setForm({ ...form, sgstPct })} />
                 <ManualNumberField label="CGST Amount" value={cgstAmt} readOnly />
+                <ManualNumberField label="SGST Amount" value={sgstAmt} readOnly />
               </div>
               <div>
                 <InputField label="Bill No" value={form.billNo} onChange={(e) => setForm({ ...form, billNo: e.target.value })} required />
@@ -365,8 +365,8 @@ export function BillEntryForm({
                 />
                 <InputField label="Remark" value={form.remark} onChange={(e) => setForm({ ...form, remark: e.target.value })} />
                 <ManualNumberField label="Total Amount" value={grand} readOnly />
-                <ManualNumberField label="SGST %" value={form.sgstPct} onChange={(sgstPct) => setForm({ ...form, sgstPct })} />
-                <ManualNumberField label="SGST Amount" value={sgstAmt} readOnly />
+                <ManualNumberField label="IGST %" value={form.igstPct} onChange={(igstPct) => setForm({ ...form, igstPct })} />
+                <ManualNumberField label="IGST Amount" value={igstAmt} readOnly />
                 <DateField label="Subm Date" value={form.submitDate} onChange={(submitDate) => setForm({ ...form, submitDate })} />
               </div>
             </TwoCol>
@@ -446,16 +446,16 @@ export function BillEntryForm({
             <TwoCol>
               <div>
                 <ManualNumberField label="Total Amount" value={form.amount} onChange={(amount) => setForm({ ...form, amount })} />
-                <ManualNumberField label="IGST %" value={form.igstPct} onChange={(igstPct) => setForm({ ...form, igstPct })} />
                 <ManualNumberField label="CGST %" value={form.cgstPct} onChange={(cgstPct) => setForm({ ...form, cgstPct })} />
-                <ManualNumberField label="IGST Amount" value={igstAmt} readOnly />
+                <ManualNumberField label="SGST %" value={form.sgstPct} onChange={(sgstPct) => setForm({ ...form, sgstPct })} />
                 <ManualNumberField label="CGST Amount" value={cgstAmt} readOnly />
+                <ManualNumberField label="SGST Amount" value={sgstAmt} readOnly />
               </div>
               <div>
                 <ManualNumberField label="Total Amount" value={grand} readOnly />
-                <ManualNumberField label="SGST %" value={form.sgstPct} onChange={(sgstPct) => setForm({ ...form, sgstPct })} />
+                <ManualNumberField label="IGST %" value={form.igstPct} onChange={(igstPct) => setForm({ ...form, igstPct })} />
                 <InputField label="Remark" value={form.remark} onChange={(e) => setForm({ ...form, remark: e.target.value })} />
-                <ManualNumberField label="SGST Amount" value={sgstAmt} readOnly />
+                <ManualNumberField label="IGST Amount" value={igstAmt} readOnly />
                 <DateField label="Subm. Date" value={form.submitDate} onChange={(submitDate) => setForm({ ...form, submitDate })} />
               </div>
             </TwoCol>
