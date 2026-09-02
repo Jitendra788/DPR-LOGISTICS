@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, InputField, SelectField } from "@/components/ui/FormField";
+import { DateField, DatalistField, InputField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -147,11 +147,13 @@ export default function PodStatusPage() {
               <Button type="submit">Show All</Button>
             </div>
             <div>
-              <SelectField
+              <DatalistField
                 label="Select Veh No"
                 value={filters.vehNo}
                 onChange={(e) => setFilters({ ...filters, vehNo: e.target.value })}
                 options={vehicles.map((v) => v.vehNo)}
+                placeholder="Type or pick vehicle"
+                listId="pod-veh"
               />
               <InputField label="Enter LHC No." value={filters.lhcNo} onChange={(e) => setFilters({ ...filters, lhcNo: e.target.value })} />
             </div>

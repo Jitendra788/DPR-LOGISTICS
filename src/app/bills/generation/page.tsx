@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, SelectField } from "@/components/ui/FormField";
+import { InputField, DatalistField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
 import { AdminForm } from "@/components/ui/AdminForm";
@@ -11,7 +11,6 @@ import { DataTable } from "@/components/ui/DataTable";
 import { api } from "@/lib/api-client";
 
 type Party = { name: string };
-type Station = { name: string };
 type Bill = {
   id: number;
   billNo: string;
@@ -25,7 +24,7 @@ type Bill = {
 
 export default function BillGenerationPage() {
   const [parties, setParties] = useState<Party[]>([]);
-  const [stations, setStations] = useState<Station[]>([]);
+  const partyNames = parties.map((p) => p.name).filter(Boolean);
   const [bills, setBills] = useState<Bill[]>([]);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string; at?: number } | null>(null);
   const [form, setForm] = useState({
@@ -41,10 +40,9 @@ export default function BillGenerationPage() {
   }
 
   useEffect(() => {
-    Promise.all([api<Party[]>("/api/parties"), api<Station[]>("/api/stations"), api<Bill[]>("/api/bills")]).then(
-      ([p, s, b]) => {
+    Promise.all([api<Party[]>("/api/parties"), api<Bill[]>("/api/bills")]).then(
+      ([p, b]) => {
         setParties(p);
-        setStations(s);
         setBills(b);
       },
     );
@@ -83,13 +81,13 @@ export default function BillGenerationPage() {
         <FormCard>
           <TwoCol>
             <div>
-              <SelectField label="Billing Party" value={form.partyName} onChange={(e) => setForm({ ...form, partyName: e.target.value })} options={parties.map((p) => p.name)} />
+              <DatalistField label="Billing Party" value={form.partyName} onChange={(e) => setForm({ ...form, partyName: e.target.value })} options={partyNames} placeholder="Type or pick party" listId="bill-gen-party" />
               <InputField label="From Date" type="date" value={form.fromDate} onChange={(e) => setForm({ ...form, fromDate: e.target.value })} />
               <InputField label="To Date" type="date" value={form.toDate} onChange={(e) => setForm({ ...form, toDate: e.target.value })} />
             </div>
             <div>
-              <SelectField label="From Station" value={form.fromStation} onChange={(e) => setForm({ ...form, fromStation: e.target.value })} options={stations.map((s) => s.name)} />
-              <SelectField label="To Station" value={form.toStation} onChange={(e) => setForm({ ...form, toStation: e.target.value })} options={stations.map((s) => s.name)} />
+              <InputField label="From Station" value={form.fromStation} onChange={(e) => setForm({ ...form, fromStation: e.target.value })} placeholder="Type station" />
+              <InputField label="To Station" value={form.toStation} onChange={(e) => setForm({ ...form, toStation: e.target.value })} placeholder="Type station" />
             </div>
           </TwoCol>
           <div className="flex gap-2">

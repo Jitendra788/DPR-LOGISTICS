@@ -80,6 +80,9 @@ export async function POST(req: NextRequest) {
     const billNo = body.billNo?.trim() || `BILL-${String((last?.id ?? 0) + 1).padStart(4, "0")}`;
     const lrAmount = matched.reduce((sum, row) => sum + row.grandTotal, 0);
     const amount = Number(body.amount ?? lrAmount) || 0;
+    const cgstAmt = Number(body.cgstAmt) || 0;
+    const sgstAmt = Number(body.sgstAmt) || 0;
+    const igstAmt = Number(body.igstAmt) || 0;
 
     const bill = await prisma.bill.create({
       data: {
@@ -96,11 +99,11 @@ export async function POST(req: NextRequest) {
         billAt: body.billAt ?? "",
         billDate: body.billDate ?? body.toDate ?? "",
         cgstPct: Number(body.cgstPct) || 0,
-        cgstAmt: Number(body.cgstAmt) || 0,
+        cgstAmt: cgstAmt || Number(((amount * (Number(body.cgstPct) || 0)) / 100).toFixed(2)),
         sgstPct: Number(body.sgstPct) || 0,
-        sgstAmt: Number(body.sgstAmt) || 0,
+        sgstAmt: sgstAmt || Number(((amount * (Number(body.sgstPct) || 0)) / 100).toFixed(2)),
         igstPct: Number(body.igstPct) || 0,
-        igstAmt: Number(body.igstAmt) || 0,
+        igstAmt: igstAmt || Number(((amount * (Number(body.igstPct) || 0)) / 100).toFixed(2)),
         paidRs: Number(body.paidRs) || 0,
         remark: body.remark ?? "",
         scanDate: body.scanDate ?? "",

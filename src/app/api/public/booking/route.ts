@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sanitize } from "@/lib/resources";
-
-function nextLrNo(lastId: number) {
-  return `LR-${String(lastId + 22451).padStart(5, "0")}`;
-}
+import { nextLrNumber } from "@/lib/lr-no";
 
 export async function GET(req: NextRequest) {
   const lrNo = req.nextUrl.searchParams.get("lrNo");
@@ -22,7 +19,7 @@ export async function GET(req: NextRequest) {
   ]);
 
   return NextResponse.json({
-    lrNo: nextLrNo(last?.id ?? 0),
+    lrNo: nextLrNumber(last?.id ?? 0),
     stations: stations.map((s) => s.name),
   });
 }
@@ -30,7 +27,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as Record<string, unknown>;
   const last = await prisma.lrBooking.findFirst({ orderBy: { id: "desc" } });
-  const lrNo = String(body.lrNo || nextLrNo(last?.id ?? 0));
+  const lrNo = String(body.lrNo || nextLrNumber(last?.id ?? 0));
 
   const exists = await prisma.lrBooking.findUnique({ where: { lrNo } });
   if (exists) {

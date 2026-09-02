@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { nextLrNumber } from "@/lib/lr-no";
 
 export async function GET(req: NextRequest) {
   const type = req.nextUrl.searchParams.get("type") ?? "lr";
   if (type === "lr") {
     const last = await prisma.lrBooking.findFirst({ orderBy: { id: "desc" } });
-    return NextResponse.json({ value: `LR-${String((last?.id ?? 0) + 22451).padStart(5, "0")}` });
+    return NextResponse.json({ value: nextLrNumber(last?.id ?? 0) });
   }
   if (type === "lhc") {
     const last = await prisma.lhcContract.findFirst({ orderBy: { id: "desc" } });

@@ -6,7 +6,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api-client";
 
 type Hit = {
-  type: "lr" | "vehicle" | "driver" | "party" | "lhc";
+  type: "lr" | "vehicle" | "driver" | "party" | "lhc" | "bill";
   title: string;
   subtitle: string;
   href: string;
@@ -18,6 +18,7 @@ const labels: Record<Hit["type"], string> = {
   driver: "Driver",
   party: "Party",
   lhc: "LHC",
+  bill: "Bill",
 };
 
 export function GlobalSearch() {
@@ -84,8 +85,8 @@ export function GlobalSearch() {
         value={q}
         onChange={(e) => setQ(e.target.value)}
         onFocus={() => hits.length && setOpen(true)}
-        placeholder="LR no, vehicle, driver, party…"
-        aria-label="Search LR number, vehicle number, driver name or party"
+        placeholder="Bill no, LR no, vehicle, party…"
+        aria-label="Search bill number, LR number, vehicle number, driver name or party"
         aria-autocomplete="list"
         aria-expanded={open}
         autoComplete="off"

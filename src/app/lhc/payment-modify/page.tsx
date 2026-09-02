@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, SelectField } from "@/components/ui/FormField";
+import { InputField, DatalistField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -74,7 +74,7 @@ export default function LhcPaymentModifyPage() {
         <FormCard>
           <TwoCol>
             <div>
-              <SelectField label="Select Veh No" value={vehNo} onChange={(e) => setVehNo(e.target.value)} options={vehicles.map((v) => v.vehNo)} />
+              <DatalistField label="Select Veh No" value={vehNo} onChange={(e) => setVehNo(e.target.value)} options={vehicles.map((v) => v.vehNo)} placeholder="Type or pick vehicle" listId="lhc-mod-veh" />
               <Button type="submit" className="mt-1">
                 Show Report
               </Button>

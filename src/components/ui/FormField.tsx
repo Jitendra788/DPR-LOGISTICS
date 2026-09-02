@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
+import { useEffect, useId, useState, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
 import { displayToIso, isoToDisplay } from "@/lib/dates";
-import { SearchSelect } from "./SearchSelect";
 
 type FieldWrapProps = {
   label: string;
@@ -59,7 +58,7 @@ type SelectFieldProps = SelectHTMLAttributes<HTMLSelectElement> & {
 export function SelectField({
   label,
   options,
-  placeholder = "--Select--",
+  placeholder = "Type or select",
   className = "",
   value,
   name,
@@ -67,21 +66,25 @@ export function SelectField({
   required,
   disabled,
 }: SelectFieldProps) {
+  const listId = useId().replace(/:/g, "");
   return (
-    <div className={`form-group block ${className}`}>
-      <span className="form-label">{label}</span>
-      <SearchSelect
+    <FieldWrap label={label} className={className}>
+      <input
+        className="form-control"
+        list={listId}
         name={name}
         value={String(value ?? "")}
-        options={options}
         placeholder={placeholder}
         required={required}
         disabled={disabled}
-        onChange={(next) => {
-          onChange?.({ target: { name, value: next } } as Parameters<NonNullable<SelectFieldProps["onChange"]>>[0]);
-        }}
+        onChange={onChange}
       />
-    </div>
+      <datalist id={listId}>
+        {options.map((option) => (
+          <option key={option} value={option} />
+        ))}
+      </datalist>
+    </FieldWrap>
   );
 }
 

@@ -42,7 +42,7 @@ export function DataTable<T extends object>({ columns, rows, searchKeys, stackOn
   }, [current, totalPages]);
 
   return (
-    <div className="box overflow-hidden">
+    <div className="box overflow-x-auto overflow-y-visible">
       <div className="box-body">
         <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <label className="erp-dt-meta">

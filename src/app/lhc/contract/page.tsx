@@ -3,15 +3,15 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, ManualNumberField, SelectField } from "@/components/ui/FormField";
+import { InputField, ManualNumberField, DatalistField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
 import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { api } from "@/lib/api-client";
+import { stripLrPrefix } from "@/lib/lr-no";
 
-type Station = { name: string };
 type Vendor = { name: string; type: string };
 type Vehicle = {
   vehNo: string;
@@ -90,7 +90,6 @@ export default function LorryHireContractPage() {
     dieselLtr: 0,
     fuel: 0,
   });
-  const [stations, setStations] = useState<Station[]>([]);
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -98,13 +97,11 @@ export default function LorryHireContractPage() {
 
   useEffect(() => {
     Promise.all([
-      api<Station[]>("/api/stations"),
       api<Vendor[]>("/api/vendors"),
       api<Vehicle[]>("/api/vehicles"),
       api<Booking[]>("/api/bookings"),
       api<{ value: string }>("/api/next-no?type=lhc"),
-    ]).then(([s, v, veh, b, next]) => {
-      setStations(s);
+    ]).then(([v, veh, b, next]) => {
       setVendors(v);
       setVehicles(veh);
       setBookings(b);
@@ -227,9 +224,9 @@ export default function LorryHireContractPage() {
             <div>
               <InputField label="Challan No." name="challanNo" value={form.challanNo ?? ""} onChange={(e) => setForm({ ...form, challanNo: e.target.value })} />
               <InputField label="Challan Date" type="date" name="challanDate" value={form.challanDate ?? ""} onChange={(e) => setForm({ ...form, challanDate: e.target.value })} />
-              <SelectField label="Vehicle No." name="vehNo" value={form.vehNo ?? ""} onChange={(e) => onVehicleChange(e.target.value)} options={vehicles.map((v) => v.vehNo)} />
-              <SelectField label="From Station" name="fromStation" value={form.fromStation ?? ""} onChange={(e) => setForm({ ...form, fromStation: e.target.value })} options={stations.map((s) => s.name)} />
-              <SelectField label="To Station" name="toStation" value={form.toStation ?? ""} onChange={(e) => setForm({ ...form, toStation: e.target.value })} options={stations.map((s) => s.name)} />
+              <InputField label="Vehicle No." name="vehNo" value={form.vehNo ?? ""} onChange={(e) => setForm({ ...form, vehNo: e.target.value })} onBlur={(e) => onVehicleChange(e.target.value)} placeholder="e.g. DL01MB1248" />
+              <InputField label="From Station" name="fromStation" value={form.fromStation ?? ""} onChange={(e) => setForm({ ...form, fromStation: e.target.value })} placeholder="Type station name" />
+              <InputField label="To Station" name="toStation" value={form.toStation ?? ""} onChange={(e) => setForm({ ...form, toStation: e.target.value })} placeholder="Type station name" />
               <InputField label="Owner Name" name="ownerName" value={form.ownerName ?? ""} onChange={(e) => setForm({ ...form, ownerName: e.target.value })} />
               <InputField label="Owner Mob No." name="ownerMob" value={form.ownerMob ?? ""} onChange={(e) => setForm({ ...form, ownerMob: e.target.value })} />
               <InputField label="Owner PAN No." name="ownerPan" value={form.ownerPan ?? ""} onChange={(e) => setForm({ ...form, ownerPan: e.target.value })} />
@@ -249,7 +246,7 @@ export default function LorryHireContractPage() {
               <InputField label="All P. Permit No" name="allPermitNo" value={form.allPermitNo ?? ""} onChange={(e) => setForm({ ...form, allPermitNo: e.target.value })} />
               <InputField label="All P. Exp. Date" type="date" name="allPermitExp" value={form.allPermitExp ?? ""} onChange={(e) => setForm({ ...form, allPermitExp: e.target.value })} />
               <InputField label="Fitness/Tax Exp. Date" type="date" name="fitnessExp" value={form.fitnessExp ?? ""} onChange={(e) => setForm({ ...form, fitnessExp: e.target.value })} />
-              <SelectField label="Broker Name" name="brokerName" value={form.brokerName ?? ""} onChange={(e) => setForm({ ...form, brokerName: e.target.value })} options={brokers.length ? brokers : vendors.map((v) => v.name)} />
+              <DatalistField label="Broker Name" name="brokerName" value={form.brokerName ?? ""} onChange={(e) => setForm({ ...form, brokerName: e.target.value })} options={brokers.length ? brokers : vendors.map((v) => v.name)} placeholder="Type or pick broker" listId="lhc-broker" />
               <InputField label="Broker Pan No" name="brokerPan" value={form.brokerPan ?? ""} onChange={(e) => setForm({ ...form, brokerPan: e.target.value })} />
             </div>
           </TwoCol>
@@ -289,7 +286,7 @@ export default function LorryHireContractPage() {
               />
             ),
           },
-          { key: "lrNo", header: "Lr No" },
+          { key: "lrNo", header: "Lr No", render: (row) => stripLrPrefix(row.lrNo) },
           { key: "lrDate", header: "Lr Date" },
           { key: "vehNo", header: "Veh No" },
           { key: "fromStation", header: "From" },

@@ -4,13 +4,14 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, InputField, ManualNumberField, SelectField } from "@/components/ui/FormField";
+import { DateField, DatalistField, InputField, ManualNumberField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
 import { DataTable } from "@/components/ui/DataTable";
 import { useCrud } from "@/hooks/useCrud";
 import { api } from "@/lib/api-client";
 import { isoToDisplay, todayIso } from "@/lib/dates";
+import { billFreightAmount, billGrandTotal, calcBillTaxes } from "@/lib/bill-totals";
 
 type Party = { name: string };
 type LrRow = {
@@ -79,6 +80,7 @@ export function BillEntryForm({
   const searchParams = useSearchParams();
   const { rows, message, update, setMessage, reload } = useCrud<Bill>("bills");
   const [parties, setParties] = useState<Party[]>([]);
+  const partyNames = parties.map((p) => p.name).filter(Boolean);
   const [bookings, setBookings] = useState<LrRow[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [editId, setEditId] = useState<number | null>(null);
@@ -129,9 +131,14 @@ export function BillEntryForm({
   }, []);
 
   useEffect(() => {
+    if (!editId || !form.billNo || !bookings.length) return;
+    setSelectedIds(bookings.filter((b) => b.billNo === form.billNo).map((b) => b.id));
+  }, [bookings, editId, form.billNo]);
+
+  useEffect(() => {
     const q = searchParams.get("billNo");
     if (!q || !rows.length) return;
-    const found = rows.find((r) => r.billNo.toLowerCase() === q.toLowerCase());
+    const found = rows.find((r) => r.billNo.toLowerCase().includes(q.toLowerCase()) || r.billNo.toLowerCase() === q.toLowerCase());
     if (found) load(found);
   }, [searchParams, rows]);
 
@@ -157,6 +164,9 @@ export function BillEntryForm({
   }
 
   function load(row: Bill) {
+    const linked = bookings.filter((b) => b.billNo === row.billNo);
+    const lrSum = linked.reduce((s, r) => s + (Number(r.grandTotal) || 0), 0);
+    const freight = billFreightAmount(row, lrSum);
     setEditId(row.id);
     setForm({
       billNo: row.billNo,
@@ -165,7 +175,7 @@ export function BillEntryForm({
       billAs: row.billAt || "",
       billDate: row.billDate || todayIso(),
       partyName: row.partyName,
-      amount: row.amount,
+      amount: freight,
       cgstPct: row.cgstPct,
       sgstPct: row.sgstPct,
       igstPct: row.igstPct,
@@ -175,21 +185,21 @@ export function BillEntryForm({
       submitDate: row.submitDate || todayIso(),
       source: row.source || source,
     });
-    setSelectedIds(bookings.filter((b) => b.billNo === row.billNo).map((b) => b.id));
+    setSelectedIds(linked.map((b) => b.id));
     setMessage({ type: "ok", text: `Loaded bill ${row.billNo}` });
   }
 
   function billFields() {
+    const taxes = calcBillTaxes(form.amount, form.cgstPct, form.sgstPct, form.igstPct);
     return {
       ...form,
       billAt: form.billAs || form.billAt,
       fromDate: form.billDate,
       toDate: form.billDate,
-      cgstAmt,
-      sgstAmt,
-      igstAmt,
-      igstPct: form.igstPct,
-      amount: grand,
+      amount: form.amount,
+      cgstAmt: taxes.cgstAmt,
+      sgstAmt: taxes.sgstAmt,
+      igstAmt: taxes.igstAmt,
       source,
     };
   }
@@ -226,8 +236,28 @@ export function BillEntryForm({
 
   async function modify() {
     if (!editId) return;
-    const saved = await update(editId, billFields());
-    if (saved) await reset();
+    if (!form.partyName) {
+      setMessage({ type: "err", text: "Party name is required" });
+      return;
+    }
+    setSaving(true);
+    try {
+      const saved = await update(editId, billFields());
+      if (saved) {
+        setMessage({ type: "ok", text: `Bill ${form.billNo} updated` });
+        await reload();
+      }
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function printBill() {
+    if (!form.billNo.trim()) {
+      setMessage({ type: "err", text: "Save or load a bill first" });
+      return;
+    }
+    window.open(`/bills/print?billNo=${encodeURIComponent(form.billNo.trim())}`, "_blank");
   }
 
   async function del() {
@@ -288,11 +318,13 @@ export function BillEntryForm({
               </div>
               <div>
                 <InputField label="PO No" value={form.poNo} onChange={(e) => setForm({ ...form, poNo: e.target.value })} />
-                <SelectField
+                <DatalistField
                   label="Party Name"
                   value={form.partyName}
                   onChange={(e) => setForm({ ...form, partyName: e.target.value })}
-                  options={parties.map((p) => p.name)}
+                  options={partyNames}
+                  placeholder="Type or pick party"
+                  listId="bill-party-meter"
                 />
               </div>
             </TwoCol>
@@ -311,11 +343,13 @@ export function BillEntryForm({
               <div>
                 <InputField label="Bill No" value={form.billNo} onChange={(e) => setForm({ ...form, billNo: e.target.value })} required />
                 <InputField label="PO No" value={form.poNo} onChange={(e) => setForm({ ...form, poNo: e.target.value })} />
-                <SelectField
+                <DatalistField
                   label="Party Name"
                   value={form.partyName}
                   onChange={(e) => setForm({ ...form, partyName: e.target.value })}
-                  options={parties.map((p) => p.name)}
+                  options={partyNames}
+                  placeholder="Type or pick party"
+                  listId="bill-party-weight"
                 />
                 <InputField label="Remark" value={form.remark} onChange={(e) => setForm({ ...form, remark: e.target.value })} />
                 <ManualNumberField label="Total Amount" value={grand} readOnly />
@@ -328,14 +362,17 @@ export function BillEntryForm({
               <Button type="submit" disabled={!!editId || saving}>
                 {saving ? "Saving..." : "Save Bill"}
               </Button>
-              <Button type="button" variant="teal" disabled={!editId} onClick={modify}>
-                Modify Bill
+              <Button type="button" variant="teal" disabled={!editId || saving} onClick={modify}>
+                {saving ? "Updating..." : "Modify Bill"}
               </Button>
               <Button type="button" variant="danger" disabled={!editId} onClick={del}>
                 Delete Bill
               </Button>
               <Button type="button" variant="teal" onClick={() => router.push(searchHref)}>
                 Search Bill
+              </Button>
+              <Button type="button" variant="teal" disabled={!form.billNo.trim()} onClick={printBill}>
+                Print Bill
               </Button>
             </div>
           </FormCard>
@@ -402,14 +439,17 @@ export function BillEntryForm({
               <Button type="submit" disabled={!!editId || saving}>
                 {saving ? "Saving..." : "Save Bill"}
               </Button>
-              <Button type="button" variant="teal" disabled={!editId} onClick={modify}>
-                Modify Bill
+              <Button type="button" variant="teal" disabled={!editId || saving} onClick={modify}>
+                {saving ? "Updating..." : "Modify Bill"}
               </Button>
               <Button type="button" variant="danger" disabled={!editId} onClick={del}>
                 Delete Bill
               </Button>
               <Button type="button" variant="teal" onClick={() => router.push(searchHref)}>
                 Search Bill
+              </Button>
+              <Button type="button" variant="teal" disabled={!form.billNo.trim()} onClick={printBill}>
+                Print Bill
               </Button>
             </div>
           </FormCard>

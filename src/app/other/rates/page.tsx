@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
 import { InputField, SelectField } from "@/components/ui/FormField";
@@ -9,20 +9,14 @@ import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
 import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
-import { api, formToObject } from "@/lib/api-client";
+import { formToObject } from "@/lib/api-client";
 
-type Station = { name: string };
 type Rate = { id: number; fromStation: string; toStation: string; ratePerTon: number; effectiveDate: string };
 
 export default function RateMasterPage() {
   const { rows, message, create, update, remove, setMessage } = useCrud<Rate>("rates");
-  const [stations, setStations] = useState<Station[]>([]);
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState<Partial<Rate>>({ effectiveDate: new Date().toISOString().slice(0, 10), ratePerTon: 0 });
-
-  useEffect(() => {
-    api<Station[]>("/api/stations").then(setStations);
-  }, []);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -42,8 +36,8 @@ export default function RateMasterPage() {
         <FormCard>
           <TwoCol>
             <div>
-              <SelectField label="From Station" name="fromStation" value={form.fromStation ?? ""} onChange={(e) => setForm({ ...form, fromStation: e.target.value })} options={stations.map((s) => s.name)} />
-              <SelectField label="To Station" name="toStation" value={form.toStation ?? ""} onChange={(e) => setForm({ ...form, toStation: e.target.value })} options={stations.map((s) => s.name)} />
+              <InputField label="From Station" name="fromStation" value={form.fromStation ?? ""} onChange={(e) => setForm({ ...form, fromStation: e.target.value })} placeholder="Type station" />
+              <InputField label="To Station" name="toStation" value={form.toStation ?? ""} onChange={(e) => setForm({ ...form, toStation: e.target.value })} placeholder="Type station" />
             </div>
             <div>
               <InputField label="Rate / Ton" type="number" name="ratePerTon" value={form.ratePerTon ?? 0} onChange={(e) => setForm({ ...form, ratePerTon: Number(e.target.value) || 0 })} />

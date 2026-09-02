@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, SelectField } from "@/components/ui/FormField";
+import { InputField, DatalistField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -11,21 +11,16 @@ import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { api } from "@/lib/api-client";
 
-type Station = { name: string };
 type Vehicle = { vehNo: string };
 type Row = { id: number; tripDate: string; vehNo: string; driverName: string; fromStation: string; toStation: string; freight: number };
 
 export default function TripSheetPage() {
   const { rows, message, create, remove } = useCrud<Row>("trips");
-  const [stations, setStations] = useState<Station[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [form, setForm] = useState({ tripDate: new Date().toISOString().slice(0, 10), vehNo: "", driverName: "", fromStation: "", toStation: "", freight: 0 });
 
   useEffect(() => {
-    Promise.all([api<Station[]>("/api/stations"), api<Vehicle[]>("/api/vehicles")]).then(([s, v]) => {
-      setStations(s);
-      setVehicles(v);
-    });
+    api<Vehicle[]>("/api/vehicles").then(setVehicles);
   }, []);
 
   async function onSubmit(e: FormEvent) {
@@ -43,12 +38,12 @@ export default function TripSheetPage() {
           <TwoCol>
             <div>
               <InputField label="Trip Date" type="date" value={form.tripDate} onChange={(e) => setForm({ ...form, tripDate: e.target.value })} />
-              <SelectField label="Vehicle No" value={form.vehNo} onChange={(e) => setForm({ ...form, vehNo: e.target.value })} options={vehicles.map((v) => v.vehNo)} />
+              <DatalistField label="Vehicle No" value={form.vehNo} onChange={(e) => setForm({ ...form, vehNo: e.target.value })} options={vehicles.map((v) => v.vehNo)} placeholder="Type or pick vehicle" listId="trip-veh" />
               <InputField label="Driver Name" value={form.driverName} onChange={(e) => setForm({ ...form, driverName: e.target.value })} />
             </div>
             <div>
-              <SelectField label="From Station" value={form.fromStation} onChange={(e) => setForm({ ...form, fromStation: e.target.value })} options={stations.map((s) => s.name)} />
-              <SelectField label="To Station" value={form.toStation} onChange={(e) => setForm({ ...form, toStation: e.target.value })} options={stations.map((s) => s.name)} />
+              <InputField label="From Station" value={form.fromStation} onChange={(e) => setForm({ ...form, fromStation: e.target.value })} placeholder="Type station" />
+              <InputField label="To Station" value={form.toStation} onChange={(e) => setForm({ ...form, toStation: e.target.value })} placeholder="Type station" />
               <InputField label="Freight" type="number" value={form.freight} onChange={(e) => setForm({ ...form, freight: Number(e.target.value) || 0 })} />
             </div>
           </TwoCol>

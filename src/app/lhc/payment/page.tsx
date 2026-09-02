@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, SelectField } from "@/components/ui/FormField";
+import { InputField, DatalistField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -29,6 +29,7 @@ type Lhc = {
 export default function LhcPaymentPage() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [brokers, setBrokers] = useState<string[]>([]);
+  const vehOptions = vehicles.map((v) => v.vehNo).filter(Boolean);
   const [rows, setRows] = useState<Lhc[]>([]);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
   const [filters, setFilters] = useState({
@@ -109,8 +110,8 @@ export default function LhcPaymentPage() {
               </div>
             </div>
             <div>
-              <SelectField label="Select Veh No" value={filters.vehNo} onChange={(e) => setFilters({ ...filters, vehNo: e.target.value })} options={vehicles.map((v) => v.vehNo)} />
-              <SelectField label="Select Broker Name" value={filters.brokerName} onChange={(e) => setFilters({ ...filters, brokerName: e.target.value })} options={brokers} />
+              <DatalistField label="Select Veh No" value={filters.vehNo} onChange={(e) => setFilters({ ...filters, vehNo: e.target.value })} options={vehOptions} placeholder="Type or pick vehicle" listId="lhc-pay-veh" />
+              <DatalistField label="Select Broker Name" value={filters.brokerName} onChange={(e) => setFilters({ ...filters, brokerName: e.target.value })} options={brokers} placeholder="Type or pick broker" listId="lhc-pay-broker" />
               <InputField label="Enter LHC No" value={filters.lhcNo} onChange={(e) => setFilters({ ...filters, lhcNo: e.target.value })} />
             </div>
           </TwoCol>

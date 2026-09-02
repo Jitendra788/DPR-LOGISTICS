@@ -452,6 +452,32 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   color: #4b5563;
 }
 
+.mr-receipt-table th,
+.mr-receipt-table td {
+  padding: 4px 6px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.mr-receipt-table td:nth-child(3) {
+  white-space: normal;
+  min-width: 120px;
+  max-width: 180px;
+}
+
+.mr-cell-input {
+  height: 28px;
+  min-height: 28px;
+  padding: 2px 6px;
+  font-size: 13px;
+}
+
+.mr-narration-input {
+  width: 100%;
+  min-width: 90px;
+  max-width: 140px;
+}
+
 .erp-pager {
   display: flex;
   width: 100%;
@@ -530,12 +556,34 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   border-top: 5px solid #666;
 }
 
+.form-group {
+  position: relative;
+  z-index: 1;
+}
+
+.form-group:focus-within {
+  z-index: 40;
+}
+
+.erp-form-card-body .form-group:focus-within {
+  z-index: 50;
+}
+
+.s2 {
+  position: relative;
+  z-index: 1;
+}
+
+.s2.is-open {
+  z-index: 100;
+}
+
 .s2-menu {
   position: absolute;
   top: calc(100% + 1px);
   left: 0;
   right: 0;
-  z-index: 80;
+  z-index: 120;
   overflow: hidden;
   border: 1px solid #aaa;
   background: #fff;
