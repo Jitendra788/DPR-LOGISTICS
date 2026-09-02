@@ -144,7 +144,7 @@ export function BillTaxInvoice({ data }: { data: BillPrintData }) {
                 <td>{row.rate || ""}</td>
                 <td>{row.fromStation}</td>
                 <td>{row.toStation}</td>
-                <td>{formatPrintMoney(lineFreight)}</td>
+                <td>{formatPrintMoney(row.freight)}</td>
                 <td>{fmtCharge(row.serviceTax)}</td>
                 <td>{fmtCharge(row.haltage)}</td>
                 <td>{fmtCharge(row.insurance)}</td>
@@ -159,7 +159,7 @@ export function BillTaxInvoice({ data }: { data: BillPrintData }) {
           })}
           <tr>
             <td colSpan={10} className="bill-print-bold">
-              Total Freight : {formatPrintMoney(data.grandTotal)}
+              Total Freight : {formatPrintMoney(freightTotal)}
             </td>
             <td colSpan={8} className="bill-print-no-pad">
               <table className="bill-print-inner">

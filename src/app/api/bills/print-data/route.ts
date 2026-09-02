@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { billFreightAmount, billGrandTotal } from "@/lib/bill-totals";
+import { billFreightAmount, billGrandTotal, calcBillTaxes } from "@/lib/bill-totals";
 import { sumLrBillableAmount } from "@/lib/lr-totals";
 
 export async function GET(req: NextRequest) {
@@ -17,10 +17,11 @@ export async function GET(req: NextRequest) {
 
   const lrFreightSum = sumLrBillableAmount(lrs);
   const freight = billFreightAmount(bill, lrFreightSum);
-  const grandTotal = billGrandTotal(bill, freight);
+  const taxes = calcBillTaxes(freight, bill.cgstPct, bill.sgstPct, bill.igstPct);
+  const grandTotal = billGrandTotal({ ...bill, ...taxes }, freight);
 
   return NextResponse.json({
-    bill: { ...bill, freight, grandTotal },
+    bill: { ...bill, freight, ...taxes, grandTotal },
     party,
     lrs,
   });

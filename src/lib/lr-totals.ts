@@ -28,11 +28,13 @@ const CHARGE_KEYS = [
 
 /** Subtotal before LR-level GST (freight + all extra charges). */
 export function lrSubtotal(row: LrCharges) {
+  const sum = CHARGE_KEYS.reduce((acc, key) => acc + (Number(row[key]) || 0), 0);
+  if (sum > 0) return Number(sum.toFixed(2));
+
   const stored = Number(row.total) || 0;
   if (stored > 0) return Number(stored.toFixed(2));
 
-  const sum = CHARGE_KEYS.reduce((acc, key) => acc + (Number(row[key]) || 0), 0);
-  return Number(sum.toFixed(2));
+  return 0;
 }
 
 /** Billable amount per LR — excludes LR GST (bill GST applied separately). */
