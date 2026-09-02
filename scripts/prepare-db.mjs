@@ -1,11 +1,16 @@
 import { execSync } from "node:child_process";
-import path from "node:path";
+import { resolveDbEnv } from "./resolve-db-env.mjs";
 
-const dbUrl = "file:./prod.db";
-const env = { ...process.env, DATABASE_URL: dbUrl };
-const cwd = process.cwd();
+const env = resolveDbEnv();
 
-console.log("Preparing SQLite database for deploy:", path.join(cwd, "prisma", "prod.db"));
-execSync("npx prisma db push --skip-generate --accept-data-loss", { stdio: "inherit", env, cwd });
-execSync("npx tsx prisma/seed.ts", { stdio: "inherit", env, cwd });
+if (!env.DATABASE_URL) {
+  console.error(
+    "DATABASE_URL is missing. Connect Vercel Postgres and set DATABASE_URL (or POSTGRES_PRISMA_URL) in project env.",
+  );
+  process.exit(1);
+}
+
+console.log("Applying database migrations to Vercel Postgres…");
+execSync("npx prisma migrate deploy", { stdio: "inherit", env, cwd: process.cwd() });
+execSync("npx tsx prisma/bootstrap.ts", { stdio: "inherit", env, cwd: process.cwd() });
 console.log("Database ready.");

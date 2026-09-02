@@ -1,7 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": "nextjs",
-  "env": {
-    "DATABASE_URL": "file:./prod.db"
-  }
+  "framework": "nextjs"
 }
