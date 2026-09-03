@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, DatalistField, DropdownField, InputField, ManualNumberField } from "@/components/ui/FormField";
+import { DateField, DropdownField, InputField, ManualNumberField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
 import { DataTable } from "@/components/ui/DataTable";
@@ -204,11 +204,21 @@ export function BillEntryForm({
   function billFields() {
     const taxes = calcBillTaxes(form.amount, form.cgstPct, form.sgstPct, form.igstPct);
     return {
-      ...form,
+      billNo: form.billNo,
+      poNo: form.poNo,
       billAt: form.billAs || form.billAt,
+      billDate: form.billDate,
+      partyName: form.partyName,
+      amount: form.amount,
+      cgstPct: form.cgstPct,
+      sgstPct: form.sgstPct,
+      igstPct: form.igstPct,
+      paidRs: form.paidRs,
+      remark: form.remark,
+      scanDate: form.scanDate,
+      submitDate: form.submitDate,
       fromDate: form.billDate,
       toDate: form.billDate,
-      amount: form.amount,
       cgstAmt: taxes.cgstAmt,
       sgstAmt: taxes.sgstAmt,
       igstAmt: taxes.igstAmt,
@@ -330,13 +340,12 @@ export function BillEntryForm({
               </div>
               <div>
                 <InputField label="PO No" value={form.poNo} onChange={(e) => setForm({ ...form, poNo: e.target.value })} />
-                <DatalistField
+                <DropdownField
                   label="Party Name"
                   value={form.partyName}
                   onChange={(e) => setForm({ ...form, partyName: e.target.value })}
                   options={partyNames}
-                  placeholder="Type or pick party"
-                  listId="bill-party-meter"
+                  placeholder="Select party"
                 />
               </div>
             </TwoCol>
@@ -355,13 +364,12 @@ export function BillEntryForm({
               <div>
                 <InputField label="Bill No" value={form.billNo} onChange={(e) => setForm({ ...form, billNo: e.target.value })} required />
                 <InputField label="PO No" value={form.poNo} onChange={(e) => setForm({ ...form, poNo: e.target.value })} />
-                <DatalistField
+                <DropdownField
                   label="Party Name"
                   value={form.partyName}
                   onChange={(e) => setForm({ ...form, partyName: e.target.value })}
                   options={partyNames}
-                  placeholder="Type or pick party"
-                  listId="bill-party-weight"
+                  placeholder="Select party"
                 />
                 <InputField label="Remark" value={form.remark} onChange={(e) => setForm({ ...form, remark: e.target.value })} />
                 <ManualNumberField label="Total Amount" value={grand} readOnly />

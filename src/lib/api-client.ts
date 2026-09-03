@@ -44,7 +44,11 @@ export async function api<T>(url: string, init?: RequestInit): Promise<T> {
   });
   const data = (await res.json().catch(() => ({}))) as T & { error?: string };
   if (!res.ok) {
-    throw new Error(data.error || `Request failed (${res.status})`);
+    const raw = String(data.error ?? "").trim();
+    if (raw && !/prisma|invocation|unknown argument/i.test(raw) && raw.length <= 160) {
+      throw new Error(raw);
+    }
+    throw new Error("Something went wrong. Please try again.");
   }
   return data;
 }

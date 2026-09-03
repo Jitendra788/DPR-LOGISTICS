@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getModel, isResource, sanitize, type ResourceKey } from "@/lib/resources";
 import { resolveBillDeleteId, resolveUpdateId } from "@/lib/resolve-update";
+import { userFacingError } from "@/lib/handle-api-error";
 
 type Ctx = { params: Promise<{ resource: string; id: string }> };
 
@@ -50,8 +51,7 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
     });
     return NextResponse.json(updated);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Update failed";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return NextResponse.json({ error: userFacingError(err, "Could not update. Please try again.") }, { status: 400 });
   }
 }
 
@@ -85,7 +85,6 @@ export async function DELETE(req: NextRequest, ctx: Ctx) {
     await getModel(resource).delete({ where: { id: deleteId } });
     return NextResponse.json({ ok: true });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Delete failed";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return NextResponse.json({ error: userFacingError(err, "Could not delete. Please try again.") }, { status: 400 });
   }
 }

@@ -23,8 +23,7 @@ export function Flash({ message }: { message: FlashMessage }) {
     }
     setCurrent(message);
     setVisible(true);
-    if (message.type !== "ok") return;
-    const t = window.setTimeout(() => setVisible(false), 5000);
+    const t = window.setTimeout(() => setVisible(false), message.type === "ok" ? 4000 : 7000);
     return () => window.clearTimeout(t);
   }, [message, message?.at, message?.text, message?.type]);
 

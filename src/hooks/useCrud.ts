@@ -57,7 +57,6 @@ export function useCrud<T extends { id: number }>(resource: string) {
     const now = Date.now();
     const last = recentCreates.get(key) ?? 0;
     if (now - last < 4000) {
-      setMessage({ type: "err", text: "Already saving — please wait" });
       return null;
     }
     recentCreates.set(key, now);
@@ -66,11 +65,15 @@ export function useCrud<T extends { id: number }>(resource: string) {
       try {
         const saved = await api<T>(`/api/${resource}`, { method: "POST", body: JSON.stringify(body) });
         setMessage({ type: "ok", text: "Saved successfully" });
-        await reload();
+        try {
+          await reload();
+        } catch {
+          /* save already succeeded */
+        }
         return saved;
       } catch (err) {
         recentCreates.delete(key);
-        setMessage({ type: "err", text: err instanceof Error ? err.message : "Save failed" });
+        setMessage({ type: "err", text: err instanceof Error ? err.message : "Could not save. Please try again." });
         return null;
       }
     });
@@ -81,10 +84,14 @@ export function useCrud<T extends { id: number }>(resource: string) {
       try {
         const saved = await api<T>(`/api/${resource}/${id}`, { method: "PUT", body: JSON.stringify(body) });
         setMessage({ type: "ok", text: "Updated successfully" });
-        await reload();
+        try {
+          await reload();
+        } catch {
+          /* update already succeeded */
+        }
         return saved;
       } catch (err) {
-        setMessage({ type: "err", text: err instanceof Error ? err.message : "Update failed" });
+        setMessage({ type: "err", text: err instanceof Error ? err.message : "Could not update. Please try again." });
         return null;
       }
     });
@@ -96,10 +103,14 @@ export function useCrud<T extends { id: number }>(resource: string) {
       try {
         await api(`/api/${resource}/${id}`, { method: "DELETE" });
         setMessage({ type: "ok", text: "Deleted successfully" });
-        await reload();
+        try {
+          await reload();
+        } catch {
+          /* delete already succeeded */
+        }
         return true;
       } catch (err) {
-        setMessage({ type: "err", text: err instanceof Error ? err.message : "Delete failed" });
+        setMessage({ type: "err", text: err instanceof Error ? err.message : "Could not delete. Please try again." });
         return false;
       }
     });

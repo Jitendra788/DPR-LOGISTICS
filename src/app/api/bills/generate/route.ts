@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { calcBillTaxes } from "@/lib/bill-totals";
 import { lrBillableAmount } from "@/lib/lr-totals";
 import { nextPadded } from "@/lib/doc-numbers";
+import { isUniqueViolation, userFacingError } from "@/lib/handle-api-error";
 
 export const dynamic = "force-dynamic";
 
@@ -82,7 +83,7 @@ export async function POST(req: NextRequest) {
     }
 
     const lastBills = await prisma.bill.findMany({ select: { billNo: true } });
-    const billNo = body.billNo?.trim() || nextPadded(lastBills.map((r) => r.billNo), 2);
+    let billNo = body.billNo?.trim() || nextPadded(lastBills.map((r) => r.billNo), 2);
     const lrAmount = matched.reduce((sum, row) => sum + lrBillableAmount(row), 0);
     const amount = Number(body.amount ?? lrAmount) || 0;
     const taxes = calcBillTaxes(
@@ -95,32 +96,45 @@ export async function POST(req: NextRequest) {
     const sgstAmt = Number(body.sgstAmt) || taxes.sgstAmt;
     const igstAmt = Number(body.igstAmt) || taxes.igstAmt;
 
-    const bill = await prisma.bill.create({
-      data: {
-        billNo,
-        partyName: body.partyName,
-        fromDate: body.fromDate ?? body.billDate ?? "",
-        toDate: body.toDate ?? body.billDate ?? "",
-        fromStation: body.fromStation ?? "",
-        toStation: body.toStation ?? "",
-        amount,
-        lrCount: matched.length,
-        source: body.source ?? "DPR",
-        poNo: body.poNo ?? "",
-        billAt: body.billAt ?? "",
-        billDate: body.billDate ?? body.toDate ?? "",
-        cgstPct: Number(body.cgstPct) || 0,
-        cgstAmt,
-        sgstPct: Number(body.sgstPct) || 0,
-        sgstAmt,
-        igstPct: Number(body.igstPct) || 0,
-        igstAmt,
-        paidRs: Number(body.paidRs) || 0,
-        remark: body.remark ?? "",
-        scanDate: body.scanDate ?? "",
-        submitDate: body.submitDate ?? "",
-      },
-    });
+    const billData = {
+      billNo,
+      partyName: body.partyName,
+      fromDate: body.fromDate ?? body.billDate ?? "",
+      toDate: body.toDate ?? body.billDate ?? "",
+      fromStation: body.fromStation ?? "",
+      toStation: body.toStation ?? "",
+      amount,
+      lrCount: matched.length,
+      source: body.source ?? "DPR",
+      poNo: body.poNo ?? "",
+      billAt: body.billAt ?? "",
+      billDate: body.billDate ?? body.toDate ?? "",
+      cgstPct: Number(body.cgstPct) || 0,
+      cgstAmt,
+      sgstPct: Number(body.sgstPct) || 0,
+      sgstAmt,
+      igstPct: Number(body.igstPct) || 0,
+      igstAmt,
+      paidRs: Number(body.paidRs) || 0,
+      remark: body.remark ?? "",
+      scanDate: body.scanDate ?? "",
+      submitDate: body.submitDate ?? "",
+    };
+
+    let bill;
+    for (let attempt = 0; attempt < 8; attempt++) {
+      try {
+        bill = await prisma.bill.create({ data: { ...billData, billNo } });
+        break;
+      } catch (err) {
+        if (!isUniqueViolation(err, "billNo")) throw err;
+        const rows = await prisma.bill.findMany({ select: { billNo: true } });
+        billNo = nextPadded(rows.map((r) => r.billNo), 2);
+      }
+    }
+    if (!bill) {
+      return NextResponse.json({ error: "Could not assign a unique bill number. Please try again." }, { status: 400 });
+    }
 
     await prisma.lrBooking.updateMany({
       where: { id: { in: matched.map((r) => r.id) } },
@@ -129,7 +143,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ bill, lrCount: matched.length });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Bill failed";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return NextResponse.json({ error: userFacingError(err, "Could not generate bill. Please try again.") }, { status: 400 });
   }
 }

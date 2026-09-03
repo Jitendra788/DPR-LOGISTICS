@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sanitize } from "@/lib/resources";
 import { nextPadded } from "@/lib/doc-numbers";
+import { createWithUniqueRetry } from "@/lib/unique-create";
+import { userFacingError } from "@/lib/handle-api-error";
+import { stripBookingTrackToken } from "@/services/trackingService";
 
 export const dynamic = "force-dynamic";
 
@@ -32,28 +35,20 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const body = (await req.json()) as Record<string, unknown>;
-  const lrNo = String(body.lrNo || (await nextCustomerLrNo()));
-
-  const exists = await prisma.lrBooking.findUnique({ where: { lrNo } });
-  if (exists) {
-    return NextResponse.json({ error: "LR number already exists. Refresh and try again." }, { status: 400 });
-  }
-
   try {
-    const created = await prisma.lrBooking.create({
-      data: {
-        ...sanitize(body, "bookings"),
-        lrNo,
-        source: "CUSTOMER",
-        billed: false,
-        lhcNo: "",
-        podStatus: "Pending",
-      } as never,
-    });
+    const body = (await req.json()) as Record<string, unknown>;
+    const data = {
+      ...stripBookingTrackToken(sanitize(body, "bookings")),
+      lrNo: String(body.lrNo || (await nextCustomerLrNo())),
+      source: "CUSTOMER",
+      billed: false,
+      lhcNo: "",
+      podStatus: "Pending",
+    };
+
+    const created = await createWithUniqueRetry("bookings", data);
     return NextResponse.json(created);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Booking failed";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return NextResponse.json({ error: userFacingError(err, "Could not save booking. Please try again.") }, { status: 400 });
   }
 }

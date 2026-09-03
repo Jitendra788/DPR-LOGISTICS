@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getModel, isResource, sanitize } from "@/lib/resources";
-import { apiError } from "@/lib/handle-api-error";
+import { apiError, userFacingError } from "@/lib/handle-api-error";
 import { prisma } from "@/lib/prisma";
 import { attachBookingTrackToken, stripBookingTrackToken } from "@/services/trackingService";
+import { createWithUniqueRetry } from "@/lib/unique-create";
 
 type Ctx = { params: Promise<{ resource: string }> };
 
@@ -15,7 +16,7 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
     const rows = await getModel(resource).findMany({ orderBy: { id: "desc" } });
     return NextResponse.json(rows);
   } catch (err) {
-    return apiError(err, `GET /api/${resource} failed`);
+    return apiError(err, "Could not load records");
   }
 }
 
@@ -47,14 +48,13 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     let data = sanitize(body, resource);
     if (resource === "bookings") data = stripBookingTrackToken(data);
 
-    const created = await getModel(resource).create({ data });
+    const created = await createWithUniqueRetry(resource, data);
     if (resource === "bookings" && created && typeof created === "object" && "id" in created) {
       const withToken = await attachBookingTrackToken(created as { id: number });
       return NextResponse.json(withToken);
     }
     return NextResponse.json(created);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Create failed";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return NextResponse.json({ error: userFacingError(err, "Could not save. Please try again.") }, { status: 400 });
   }
 }
