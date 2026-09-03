@@ -37,7 +37,7 @@ export const navItems: NavItem[] = [
     children: [
       { label: "Lorry Hire Contract", href: "/lhc/contract" },
       { label: "LHC Payment", href: "/lhc/payment" },
-      { label: "LHC Payment Modify", href: "/lhc/payment-modify" },
+      { label: "LHC Payment Update", href: "/lhc/payment-modify" },
       { label: "POD Status", href: "/lhc/pod-status" },
     ],
   },

@@ -383,7 +383,7 @@ export function BillEntryForm({
                 {saving ? "Saving..." : "Save Bill"}
               </Button>
               <Button type="button" variant="teal" disabled={!editId || saving} onClick={modify}>
-                {saving ? "Updating..." : "Modify Bill"}
+                {saving ? "Updating..." : "Update Bill"}
               </Button>
               <Button type="button" variant="danger" disabled={!editId} onClick={del}>
                 Delete Bill
@@ -472,7 +472,7 @@ export function BillEntryForm({
                 {saving ? "Saving..." : "Save Bill"}
               </Button>
               <Button type="button" variant="teal" disabled={!editId || saving} onClick={modify}>
-                {saving ? "Updating..." : "Modify Bill"}
+                {saving ? "Updating..." : "Update Bill"}
               </Button>
               <Button type="button" variant="danger" disabled={!editId} onClick={del}>
                 Delete Bill
