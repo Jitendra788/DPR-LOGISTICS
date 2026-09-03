@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { resetErpData } from "@/lib/reset-erp";
 import { apiError } from "@/lib/handle-api-error";
 
+export const dynamic = "force-dynamic";
+
 function isAdminSession(raw: string | undefined) {
   if (!raw) return false;
   try {
@@ -19,10 +21,12 @@ async function runReset(req: NextRequest) {
     return NextResponse.json({ error: "Admin login required" }, { status: 401 });
   }
 
-  const body = (await req.json().catch(() => ({}))) as { confirm?: string };
-  const confirm = body.confirm || req.nextUrl.searchParams.get("confirm") || "";
+  const confirm =
+    req.nextUrl.searchParams.get("confirm") ||
+    ((await req.json().catch(() => ({}))) as { confirm?: string }).confirm ||
+    "";
   if (confirm !== "RESET_ERP") {
-    return NextResponse.json({ error: "Send { confirm: \"RESET_ERP\" } to wipe ERP data" }, { status: 400 });
+    return NextResponse.json({ error: "Send confirm=RESET_ERP to wipe ERP data" }, { status: 400 });
   }
 
   try {
