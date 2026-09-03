@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { sanitize } from "@/lib/resources";
 import { nextPadded } from "@/lib/doc-numbers";
 
+export const dynamic = "force-dynamic";
+
 async function nextCustomerLrNo() {
   const rows = await prisma.lrBooking.findMany({ select: { lrNo: true } });
   return nextPadded(rows.map((r) => r.lrNo), 3);

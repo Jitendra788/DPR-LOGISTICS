@@ -4,6 +4,8 @@ import { calcBillTaxes } from "@/lib/bill-totals";
 import { lrBillableAmount } from "@/lib/lr-totals";
 import { nextPadded } from "@/lib/doc-numbers";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as {
     partyName?: string;
