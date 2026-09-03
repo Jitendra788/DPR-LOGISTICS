@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, DatalistField } from "@/components/ui/FormField";
+import { InputField, ComboboxField, DatalistField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -11,7 +11,7 @@ import { AdminForm } from "@/components/ui/AdminForm";
 import { api, downloadCsv } from "@/lib/api-client";
 
 type Vehicle = { vehNo: string };
-type Vendor = { name: string; type: string };
+type Party = { name: string; partyType?: string };
 type Lhc = {
   id: number;
   challanNo: string;
@@ -41,9 +41,14 @@ export default function LhcPaymentPage() {
   });
 
   useEffect(() => {
-    Promise.all([api<Vehicle[]>("/api/vehicles"), api<Vendor[]>("/api/vendors")]).then(([v, vendors]) => {
+    Promise.all([api<Vehicle[]>("/api/vehicles"), api<Party[]>("/api/parties")]).then(([v, parties]) => {
       setVehicles(v);
-      setBrokers(vendors.filter((x) => x.type === "Broker").map((x) => x.name));
+      setBrokers(
+        parties
+          .filter((x) => String(x.partyType || "").toLowerCase() === "broker")
+          .map((x) => x.name)
+          .filter(Boolean),
+      );
     });
   }, []);
 
@@ -111,7 +116,13 @@ export default function LhcPaymentPage() {
             </div>
             <div>
               <DatalistField label="Select Veh No" value={filters.vehNo} onChange={(e) => setFilters({ ...filters, vehNo: e.target.value })} options={vehOptions} placeholder="Type or pick vehicle" listId="lhc-pay-veh" />
-              <DatalistField label="Select Broker Name" value={filters.brokerName} onChange={(e) => setFilters({ ...filters, brokerName: e.target.value })} options={brokers} placeholder="Type or pick broker" listId="lhc-pay-broker" />
+              <ComboboxField
+                label="Select Broker Name"
+                value={filters.brokerName}
+                onChange={(brokerName) => setFilters({ ...filters, brokerName })}
+                options={brokers}
+                placeholder="Search or select broker"
+              />
               <InputField label="Enter LHC No" value={filters.lhcNo} onChange={(e) => setFilters({ ...filters, lhcNo: e.target.value })} />
             </div>
           </TwoCol>

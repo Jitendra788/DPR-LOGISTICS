@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, ManualNumberField, DatalistField, SelectField } from "@/components/ui/FormField";
+import { InputField, ManualNumberField, ComboboxField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -13,6 +13,7 @@ import { api } from "@/lib/api-client";
 import { lrNoEquals, stripLrPrefix } from "@/lib/lr-no";
 
 type Vendor = { name: string; type: string };
+type Party = { name: string; partyType?: string; pan?: string };
 type Vehicle = {
   vehNo: string;
   ownerName: string;
@@ -91,6 +92,7 @@ export default function LorryHireContractPage() {
     fuel: 0,
   });
   const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [parties, setParties] = useState<Party[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [selectedLrs, setSelectedLrs] = useState<string[]>([]);
@@ -98,19 +100,35 @@ export default function LorryHireContractPage() {
   useEffect(() => {
     Promise.all([
       api<Vendor[]>("/api/vendors"),
+      api<Party[]>("/api/parties"),
       api<Vehicle[]>("/api/vehicles"),
       api<Booking[]>("/api/bookings"),
       api<{ value: string }>("/api/next-no?type=lhc"),
-    ]).then(([v, veh, b, next]) => {
+    ]).then(([v, p, veh, b, next]) => {
       setVendors(v);
+      setParties(p);
       setVehicles(veh);
       setBookings(b);
       setForm((f) => ({ ...f, challanNo: f.challanNo || next.value }));
     });
   }, []);
 
-  const brokers = vendors.filter((v) => v.type === "Broker").map((v) => v.name);
+  /** Brokers created in Party Creation with Party Type = Broker */
+  const brokerParties = useMemo(
+    () => parties.filter((p) => String(p.partyType || "").toLowerCase() === "broker"),
+    [parties],
+  );
+  const brokerNames = useMemo(() => brokerParties.map((p) => p.name).filter(Boolean), [brokerParties]);
   const fuelVendors = vendors.filter((v) => v.type === "Fuel" || v.type === "Other").map((v) => v.name);
+
+  function onBrokerSelect(brokerName: string) {
+    const hit = brokerParties.find((p) => p.name.trim().toLowerCase() === brokerName.trim().toLowerCase());
+    setForm((f) => ({
+      ...f,
+      brokerName,
+      brokerPan: hit?.pan?.trim() || (brokerName ? f.brokerPan : "") || "",
+    }));
+  }
   const pendingLrs = bookings.filter(
     (b) => !b.lhcNo || (editId && selectedLrs.some((lr) => lrNoEquals(lr, b.lrNo))),
   );
@@ -239,8 +257,21 @@ export default function LorryHireContractPage() {
               <InputField label="All P. Permit No" name="allPermitNo" value={form.allPermitNo ?? ""} onChange={(e) => setForm({ ...form, allPermitNo: e.target.value })} />
               <InputField label="All P. Exp. Date" type="date" name="allPermitExp" value={form.allPermitExp ?? ""} onChange={(e) => setForm({ ...form, allPermitExp: e.target.value })} />
               <InputField label="Fitness/Tax Exp. Date" type="date" name="fitnessExp" value={form.fitnessExp ?? ""} onChange={(e) => setForm({ ...form, fitnessExp: e.target.value })} />
-              <DatalistField label="Broker Name" name="brokerName" value={form.brokerName ?? ""} onChange={(e) => setForm({ ...form, brokerName: e.target.value })} options={brokers.length ? brokers : vendors.map((v) => v.name)} placeholder="Type or pick broker" listId="lhc-broker" />
-              <InputField label="Broker Pan No" name="brokerPan" value={form.brokerPan ?? ""} onChange={(e) => setForm({ ...form, brokerPan: e.target.value })} />
+              <ComboboxField
+                label="Broker Name"
+                name="brokerName"
+                value={form.brokerName ?? ""}
+                onChange={onBrokerSelect}
+                options={brokerNames}
+                placeholder="Search or select broker (Party Type = Broker)"
+              />
+              <InputField
+                label="Broker Pan No"
+                name="brokerPan"
+                value={form.brokerPan ?? ""}
+                onChange={(e) => setForm({ ...form, brokerPan: e.target.value })}
+                placeholder="Auto-fills from selected broker"
+              />
             </div>
           </TwoCol>
         </FormCard>
