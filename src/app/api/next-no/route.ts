@@ -1,50 +1,50 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { nextLrNumber } from "@/lib/lr-no";
+import { nextPadded } from "@/lib/doc-numbers";
 
 export async function GET(req: NextRequest) {
   const type = req.nextUrl.searchParams.get("type") ?? "lr";
+
   if (type === "lr") {
-    const last = await prisma.lrBooking.findFirst({ orderBy: { id: "desc" } });
-    return NextResponse.json({ value: nextLrNumber(last?.id ?? 0) });
+    const rows = await prisma.lrBooking.findMany({ select: { lrNo: true } });
+    return NextResponse.json({ value: nextPadded(rows.map((r) => r.lrNo), 3) });
   }
   if (type === "lhc") {
-    const last = await prisma.lhcContract.findFirst({ orderBy: { id: "desc" } });
-    return NextResponse.json({ value: String((last?.id ?? 0) + 2249) });
+    const rows = await prisma.lhcContract.findMany({ select: { challanNo: true } });
+    return NextResponse.json({ value: nextPadded(rows.map((r) => r.challanNo), 2) });
   }
   if (type === "party") {
-    const last = await prisma.party.findFirst({ orderBy: { id: "desc" } });
-    return NextResponse.json({
-      sr: (last?.id ?? 0) + 1,
-      partyCode: String((last?.id ?? 0) + 1006),
-    });
+    const rows = await prisma.party.findMany({ select: { id: true, partyCode: true } });
+    const code = nextPadded(rows.map((r) => r.partyCode || r.id), 2);
+    return NextResponse.json({ sr: rows.length + 1, partyCode: code });
   }
   if (type === "vehicle") {
     const last = await prisma.vehicle.findFirst({ orderBy: { id: "desc" } });
-    return NextResponse.json({ sr: (last?.id ?? 0) + 1 });
+    return NextResponse.json({ sr: last ? last.id + 1 : 1 });
   }
   if (type === "slip") {
-    const last = await prisma.bookingSlip.findFirst({ orderBy: { id: "desc" } });
-    return NextResponse.json({
-      sr: (last?.id ?? 0) + 504,
-      receiptNo: String((last?.id ?? 0) + 438),
-    });
+    const rows = await prisma.bookingSlip.findMany({ select: { receiptNo: true, slipNo: true } });
+    const next = nextPadded(
+      rows.flatMap((r) => [r.receiptNo, r.slipNo]),
+      2,
+    );
+    return NextResponse.json({ sr: rows.length + 1, receiptNo: next });
   }
   if (type === "bill") {
-    const last = await prisma.bill.findFirst({ orderBy: { id: "desc" } });
-    return NextResponse.json({ value: String((last?.id ?? 0) + 2177) });
+    const rows = await prisma.bill.findMany({ select: { billNo: true } });
+    return NextResponse.json({ value: nextPadded(rows.map((r) => r.billNo), 2) });
   }
   if (type === "fleet") {
     const last = await prisma.fleetVehicle.findFirst({ orderBy: { id: "desc" } });
-    return NextResponse.json({ sr: (last?.id ?? 0) + 27 });
+    return NextResponse.json({ sr: last ? last.id + 1 : 1 });
   }
   if (type === "driver") {
     const last = await prisma.driver.findFirst({ orderBy: { id: "desc" } });
-    return NextResponse.json({ sr: (last?.id ?? 0) + 37 });
+    return NextResponse.json({ sr: last ? last.id + 1 : 1 });
   }
   if (type === "vendor-voucher") {
     const last = await prisma.vendorVoucher.findFirst({ orderBy: { id: "desc" } });
-    return NextResponse.json({ sr: (last?.id ?? 0) + 835 });
+    return NextResponse.json({ sr: last ? last.id + 1 : 1 });
   }
   return NextResponse.json({ error: "Unknown type" }, { status: 400 });
 }

@@ -98,7 +98,7 @@ export function BillEntryForm({
   const [editId, setEditId] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
-    billNo: "220",
+    billNo: "01",
     poNo: "",
     billAt: "",
     billAs: "",
@@ -137,7 +137,7 @@ export function BillEntryForm({
       ([p, next, lrs]) => {
         setParties(p);
         setBookings(lrs);
-        setForm((f) => ({ ...f, billNo: f.billNo === "220" ? next.value : f.billNo }));
+        setForm((f) => ({ ...f, billNo: f.billNo === "01" ? next.value : f.billNo }));
       },
     );
   }, []);

@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sanitize } from "@/lib/resources";
-import { nextLrNumber } from "@/lib/lr-no";
+import { nextPadded } from "@/lib/doc-numbers";
+
+async function nextCustomerLrNo() {
+  const rows = await prisma.lrBooking.findMany({ select: { lrNo: true } });
+  return nextPadded(rows.map((r) => r.lrNo), 3);
+}
 
 export async function GET(req: NextRequest) {
   const lrNo = req.nextUrl.searchParams.get("lrNo");
@@ -13,21 +18,20 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(row);
   }
 
-  const [last, stations] = await Promise.all([
-    prisma.lrBooking.findFirst({ orderBy: { id: "desc" } }),
+  const [lrNo, stations] = await Promise.all([
+    nextCustomerLrNo(),
     prisma.station.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
   ]);
 
   return NextResponse.json({
-    lrNo: nextLrNumber(last?.id ?? 0),
+    lrNo,
     stations: stations.map((s) => s.name),
   });
 }
 
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as Record<string, unknown>;
-  const last = await prisma.lrBooking.findFirst({ orderBy: { id: "desc" } });
-  const lrNo = String(body.lrNo || nextLrNumber(last?.id ?? 0));
+  const lrNo = String(body.lrNo || (await nextCustomerLrNo()));
 
   const exists = await prisma.lrBooking.findUnique({ where: { lrNo } });
   if (exists) {

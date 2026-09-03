@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { billFreightAmount, billGrandTotal, calcBillTaxes } from "@/lib/bill-totals";
+import { calcBillTaxes } from "@/lib/bill-totals";
 import { lrBillableAmount } from "@/lib/lr-totals";
+import { nextPadded } from "@/lib/doc-numbers";
 
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as {
@@ -78,8 +79,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No unbilled LRs found for these filters" }, { status: 400 });
     }
 
-    const last = await prisma.bill.findFirst({ orderBy: { id: "desc" } });
-    const billNo = body.billNo?.trim() || `BILL-${String((last?.id ?? 0) + 1).padStart(4, "0")}`;
+    const lastBills = await prisma.bill.findMany({ select: { billNo: true } });
+    const billNo = body.billNo?.trim() || nextPadded(lastBills.map((r) => r.billNo), 2);
     const lrAmount = matched.reduce((sum, row) => sum + lrBillableAmount(row), 0);
     const amount = Number(body.amount ?? lrAmount) || 0;
     const taxes = calcBillTaxes(
