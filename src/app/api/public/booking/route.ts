@@ -20,13 +20,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(row);
   }
 
-  const [lrNo, stations] = await Promise.all([
+  const [nextLrNo, stations] = await Promise.all([
     nextCustomerLrNo(),
     prisma.station.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
   ]);
 
   return NextResponse.json({
-    lrNo,
+    lrNo: nextLrNo,
     stations: stations.map((s) => s.name),
   });
 }
