@@ -10,6 +10,6 @@ export function padDoc(n: number, width: number) {
 }
 
 export function nextPadded(values: Array<string | number | null | undefined>, width: number) {
-  const max = values.reduce((m, v) => Math.max(m, parseDocNumber(v)), 0);
+  const max = values.reduce<number>((m, v) => Math.max(m, parseDocNumber(v)), 0);
   return padDoc(max + 1, width);
 }
