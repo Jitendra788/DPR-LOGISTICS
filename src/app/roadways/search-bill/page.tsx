@@ -1,10 +1,10 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, InputField, SelectField } from "@/components/ui/FormField";
+import { DateField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -19,6 +19,7 @@ export default function RoadwaysSearchBillPage() {
   const router = useRouter();
   const [parties, setParties] = useState<Party[]>([]);
   const [rows, setRows] = useState<Bill[] | null>(null);
+  const [allBills, setAllBills] = useState<Bill[]>([]);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
   const [filters, setFilters] = useState({
     partyName: "",
@@ -26,10 +27,19 @@ export default function RoadwaysSearchBillPage() {
     fromDate: todayIso(),
     toDate: todayIso(),
   });
+  const billOptions = useMemo(() => {
+    const list = allBills.filter((b) => {
+      if (b.source && b.source !== "ROADWAYS") return false;
+      if (filters.partyName && b.partyName !== filters.partyName) return false;
+      return true;
+    });
+    return list.map((b) => b.billNo).filter(Boolean);
+  }, [allBills, filters.partyName]);
 
   useEffect(() => {
-    api<Party[]>("/api/parties").then((p) => {
+    Promise.all([api<Party[]>("/api/parties"), api<Bill[]>("/api/bills")]).then(([p, bills]) => {
       setParties(p);
+      setAllBills(bills);
       setFilters((f) => ({ ...f, partyName: f.partyName || p[0]?.name || "" }));
     });
   }, []);
@@ -62,18 +72,24 @@ export default function RoadwaysSearchBillPage() {
         <FormCard>
           <TwoCol>
             <div>
-              <SelectField
-                label="Enter Party Name"
+              <ComboboxField
+                label="Party Name"
                 value={filters.partyName}
-                onChange={(e) => setFilters({ ...filters, partyName: e.target.value })}
+                onChange={(partyName) => setFilters({ ...filters, partyName, billNo: "" })}
                 options={parties.map((p) => p.name)}
-                placeholder=""
+                placeholder="Search or select party"
               />
               <DateField label="From Date" value={filters.fromDate} onChange={(fromDate) => setFilters({ ...filters, fromDate })} />
               <Button type="submit">Show All</Button>
             </div>
             <div>
-              <InputField label="Bill No" value={filters.billNo} onChange={(e) => setFilters({ ...filters, billNo: e.target.value })} />
+              <ComboboxField
+                label="Bill No"
+                value={filters.billNo}
+                onChange={(billNo) => setFilters({ ...filters, billNo })}
+                options={billOptions}
+                placeholder="Search or select bill"
+              />
               <DateField label="To Date" value={filters.toDate} onChange={(toDate) => setFilters({ ...filters, toDate })} />
             </div>
           </TwoCol>

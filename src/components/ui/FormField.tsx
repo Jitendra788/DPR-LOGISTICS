@@ -1,6 +1,17 @@
 "use client";
 
-import { useEffect, useId, useState, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
+import {
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type InputHTMLAttributes,
+  type KeyboardEvent,
+  type ReactNode,
+  type SelectHTMLAttributes,
+  type TextareaHTMLAttributes,
+} from "react";
 import { displayToIso, isoToDisplay } from "@/lib/dates";
 
 type FieldWrapProps = {
@@ -90,6 +101,153 @@ export function DropdownField({
         ))}
       </select>
     </FieldWrap>
+  );
+}
+
+type ComboboxFieldProps = {
+  label: string;
+  options: string[];
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  className?: string;
+  name?: string;
+  required?: boolean;
+  disabled?: boolean;
+};
+
+/** Type to search + click to select from filtered list. */
+export function ComboboxField({
+  label,
+  options,
+  value,
+  onChange,
+  placeholder = "Type to search or select",
+  className = "",
+  name,
+  required,
+  disabled,
+}: ComboboxFieldProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const listId = useId().replace(/:/g, "");
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [active, setActive] = useState(0);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return options;
+    return options.filter((option) => option.toLowerCase().includes(q));
+  }, [options, query]);
+
+  useEffect(() => {
+    if (!open) return;
+    function onDoc(e: MouseEvent) {
+      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    setQuery("");
+    setActive(0);
+    const t = window.setTimeout(() => searchRef.current?.focus(), 0);
+    return () => window.clearTimeout(t);
+  }, [open]);
+
+  function pick(option: string) {
+    onChange(option);
+    setOpen(false);
+  }
+
+  function onKeyDown(e: KeyboardEvent) {
+    if (!open) {
+      if (e.key === "ArrowDown" || e.key === "Enter") {
+        e.preventDefault();
+        setOpen(true);
+      }
+      return;
+    }
+    if (e.key === "Escape") {
+      e.preventDefault();
+      setOpen(false);
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActive((i) => Math.min(i + 1, Math.max(filtered.length - 1, 0)));
+      return;
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActive((i) => Math.max(i - 1, 0));
+      return;
+    }
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const hit = filtered[active];
+      if (hit) pick(hit);
+    }
+  }
+
+  return (
+    <div className={`form-group block ${className}`.trim()} ref={rootRef}>
+      <span className="form-label">{label}</span>
+      {name ? <input type="hidden" name={name} value={value} required={required} /> : null}
+      <div className={`s2${open ? " is-open" : ""}${disabled ? " is-disabled" : ""}`}>
+        <button
+          type="button"
+          className="s2-control"
+          disabled={disabled}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          aria-controls={listId}
+          onClick={() => !disabled && setOpen((v) => !v)}
+          onKeyDown={onKeyDown}
+        >
+          <span className={value ? "" : "s2-placeholder"}>{value || placeholder}</span>
+          <span className="s2-caret" aria-hidden />
+        </button>
+        {open ? (
+          <div className="s2-menu" role="presentation">
+            <input
+              ref={searchRef}
+              className="s2-search"
+              value={query}
+              placeholder="Search…"
+              aria-label={`Search ${label}`}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setActive(0);
+              }}
+              onKeyDown={onKeyDown}
+            />
+            <div className="s2-list" id={listId} role="listbox">
+              {filtered.length ? (
+                filtered.map((option, index) => (
+                  <button
+                    key={option}
+                    type="button"
+                    role="option"
+                    aria-selected={option === value}
+                    className={`s2-opt${option === value ? " is-selected" : ""}${index === active ? " is-active" : ""}`}
+                    onMouseEnter={() => setActive(index)}
+                    onClick={() => pick(option)}
+                  >
+                    {option}
+                  </button>
+                ))
+              ) : (
+                <div className="s2-empty">No match found</div>
+              )}
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </div>
   );
 }
 

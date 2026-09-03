@@ -1,10 +1,10 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard } from "@/components/ui/FormCard";
-import { FieldWrap } from "@/components/ui/FormField";
+import { ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
 import { AdminForm } from "@/components/ui/AdminForm";
@@ -15,12 +15,17 @@ type Bill = { billNo: string };
 export default function SearchBillStatusPage() {
   const router = useRouter();
   const [billNo, setBillNo] = useState("");
+  const [billOptions, setBillOptions] = useState<string[]>([]);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+
+  useEffect(() => {
+    api<Bill[]>("/api/bills").then((all) => setBillOptions(all.map((b) => b.billNo).filter(Boolean)));
+  }, []);
 
   async function search(e: FormEvent) {
     e.preventDefault();
     if (!billNo.trim()) {
-      setMessage({ type: "err", text: "Enter bill no" });
+      setMessage({ type: "err", text: "Select a bill number" });
       return;
     }
     const all = await api<Bill[]>("/api/bills");
@@ -36,19 +41,28 @@ export default function SearchBillStatusPage() {
     <>
       <PageHeader
         title="Search Bill For Update"
-        subtitle="Enter Details For Search"
+        subtitle="Search or select bill number, then open for update"
         crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Search Bill" }]}
       />
       <Flash message={message} />
       <AdminForm onSubmit={search}>
-        <FormCard>
-          <div className="flex w-full max-w-3xl flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-            <FieldWrap label="Enter Bill No for Search" className="mb-0 min-w-0 w-full flex-1 sm:min-w-[280px]">
-              <input className="form-control" value={billNo} onChange={(e) => setBillNo(e.target.value)} />
-            </FieldWrap>
-            <Button type="submit" variant="teal" className="w-full sm:w-auto">
-              Search
-            </Button>
+        <FormCard title="Find bill" subtitle="Type to filter the list, then select a bill">
+          <div className="erp-search-bill-panel">
+            <div className="erp-search-bill-row">
+              <ComboboxField
+                label="Bill No"
+                value={billNo}
+                onChange={setBillNo}
+                options={billOptions}
+                placeholder="Search or select bill no"
+              />
+              <Button type="submit" variant="teal">
+                Search
+              </Button>
+            </div>
+            <p className="erp-search-bill-meta">
+              {billOptions.length ? `${billOptions.length} bill(s) available` : "Loading bills…"}
+            </p>
           </div>
         </FormCard>
       </AdminForm>

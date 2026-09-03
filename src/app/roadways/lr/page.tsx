@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, DropdownField, InputField, ManualNumberField, SelectField } from "@/components/ui/FormField";
+import { DateField, ComboboxField, DropdownField, InputField, ManualNumberField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
 import { AdminForm } from "@/components/ui/AdminForm";
@@ -310,12 +310,12 @@ export default function RoadwaysLrPage() {
         <FormCard>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <DropdownField
+              <ComboboxField
                 label="Select LR No for Find"
                 value={searchLr}
-                onChange={(e) => setSearchLr(e.target.value)}
+                onChange={setSearchLr}
                 options={lrOptions}
-                placeholder="Select LR"
+                placeholder="Search or select LR"
               />
               <Button type="button" onClick={search}>
                 Search LR

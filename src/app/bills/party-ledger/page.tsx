@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, DatalistField } from "@/components/ui/FormField";
+import { DateField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -17,7 +17,7 @@ type Row = Record<string, string | number>;
 
 function matchesParty(name: string, filter: string) {
   if (!filter.trim()) return true;
-  return name.trim().toLowerCase().includes(filter.trim().toLowerCase());
+  return name.trim().toLowerCase() === filter.trim().toLowerCase();
 }
 
 export default function PartyLedgerPage() {
@@ -101,13 +101,12 @@ export default function PartyLedgerPage() {
                 Show Ledger
               </Button>
             </div>
-            <DatalistField
+            <ComboboxField
               label="Party Name"
               value={partyName}
-              onChange={(e) => setPartyName(e.target.value)}
+              onChange={setPartyName}
               options={partyNames}
-              placeholder="All parties"
-              listId="ledger-party"
+              placeholder="Search or select party"
             />
           </TwoCol>
         </FormCard>

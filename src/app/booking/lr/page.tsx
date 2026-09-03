@@ -4,7 +4,7 @@ import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, DatalistField, DropdownField, FieldWrap, InputField, MoneyField, SelectField } from "@/components/ui/FormField";
+import { DateField, ComboboxField, DatalistField, DropdownField, FieldWrap, InputField, MoneyField, SelectField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
 import { AdminForm } from "@/components/ui/AdminForm";
@@ -83,7 +83,9 @@ function LrBookingInner() {
   const [searchLr, setSearchLr] = useState("");
   const [printOpts, setPrintOpts] = useState({ consignor: true, lorry: false, consignee: false });
   const [email, setEmail] = useState("");
+  const [emailSending, setEmailSending] = useState(false);
   const [lastShare, setLastShare] = useState<{ lrNo: string; url: string } | null>(null);
+  const lrOptions = useMemo(() => rows.map((r) => r.lrNo).filter(Boolean), [rows]);
 
   useEffect(() => {
     Promise.all([api<Party[]>("/api/parties"), api<{ value: string }>("/api/next-no?type=lr")]).then(([p, next]) => {
@@ -189,13 +191,26 @@ function LrBookingInner() {
     window.open(`/booking/lr/print?lrNo=${encodeURIComponent(form.lrNo)}&copies=${copies}`, "_blank");
   }
 
-  function emailLr() {
-    if (!email || !form.lrNo) return;
-    const subject = encodeURIComponent(`LR ${form.lrNo}`);
-    const body = encodeURIComponent(
-      `LR No: ${form.lrNo}\nFrom: ${form.fromStation}\nTo: ${form.toStation}\nParty: ${form.billingParty}\nGrand Total: ${grandTotal}`,
-    );
-    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+  async function emailLr() {
+    if (!email.trim() || !form.lrNo) {
+      setMessage({ type: "err", text: "Enter receiver email and load/save LR first" });
+      return;
+    }
+    const copies = [printOpts.consignor ? "Consignor" : "", printOpts.lorry ? "Lorry" : "", printOpts.consignee ? "Consignee" : ""]
+      .filter(Boolean)
+      .join(",");
+    setEmailSending(true);
+    try {
+      const res = await api<{ message: string }>("/api/bookings/email", {
+        method: "POST",
+        body: JSON.stringify({ lrNo: form.lrNo, to: email.trim(), copies }),
+      });
+      setMessage({ type: "ok", text: res.message || `LR emailed to ${email}` });
+    } catch (err) {
+      setMessage({ type: "err", text: err instanceof Error ? err.message : "Email failed" });
+    } finally {
+      setEmailSending(false);
+    }
   }
 
   return (
@@ -312,9 +327,13 @@ function LrBookingInner() {
         <FormCard>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <FieldWrap label="Enter LR No for Find">
-                <input className="form-control" value={searchLr} onChange={(e) => setSearchLr(e.target.value)} />
-              </FieldWrap>
+              <ComboboxField
+                label="Select LR No for Find"
+                value={searchLr}
+                onChange={setSearchLr}
+                options={lrOptions}
+                placeholder="Search or select LR"
+              />
               <Button type="button" onClick={search}>
                 Search LR
               </Button>
@@ -336,8 +355,8 @@ function LrBookingInner() {
                 <Button type="button" onClick={printLr}>
                   Print LR
                 </Button>
-                <Button type="button" onClick={emailLr}>
-                  Email
+                <Button type="button" onClick={emailLr} disabled={emailSending}>
+                  {emailSending ? "Sending…" : "Email"}
                 </Button>
               </div>
             </div>

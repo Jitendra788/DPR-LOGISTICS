@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, DropdownField, InputField, ManualNumberField } from "@/components/ui/FormField";
+import { DateField, ComboboxField, DropdownField, InputField, ManualNumberField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
 import { DataTable } from "@/components/ui/DataTable";
@@ -340,12 +340,12 @@ export function BillEntryForm({
               </div>
               <div>
                 <InputField label="PO No" value={form.poNo} onChange={(e) => setForm({ ...form, poNo: e.target.value })} />
-                <DropdownField
+                <ComboboxField
                   label="Party Name"
                   value={form.partyName}
-                  onChange={(e) => setForm({ ...form, partyName: e.target.value })}
+                  onChange={(partyName) => setForm({ ...form, partyName })}
                   options={partyNames}
-                  placeholder="Select party"
+                  placeholder="Search or select party"
                 />
               </div>
             </TwoCol>
@@ -364,12 +364,12 @@ export function BillEntryForm({
               <div>
                 <InputField label="Bill No" value={form.billNo} onChange={(e) => setForm({ ...form, billNo: e.target.value })} required />
                 <InputField label="PO No" value={form.poNo} onChange={(e) => setForm({ ...form, poNo: e.target.value })} />
-                <DropdownField
+                <ComboboxField
                   label="Party Name"
                   value={form.partyName}
-                  onChange={(e) => setForm({ ...form, partyName: e.target.value })}
+                  onChange={(partyName) => setForm({ ...form, partyName })}
                   options={partyNames}
-                  placeholder="Select party"
+                  placeholder="Search or select party"
                 />
                 <InputField label="Remark" value={form.remark} onChange={(e) => setForm({ ...form, remark: e.target.value })} />
                 <ManualNumberField label="Total Amount" value={grand} readOnly />

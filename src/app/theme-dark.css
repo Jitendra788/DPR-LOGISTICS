@@ -277,6 +277,14 @@
   color: #e5e7eb;
 }
 
+[data-theme="dark"] .s2-placeholder {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .s2-search {
+  background: #111827;
+}
+
 [data-theme="dark"] .s2-opt {
   background: #0f172a;
   color: #e5e7eb;
@@ -289,7 +297,8 @@
 }
 
 [data-theme="dark"] .s2-opt.is-selected:not(.is-active) {
-  background: #1e293b;
+  background: #134e4a;
+  color: #5eead4;
 }
 
 [data-theme="dark"] .td-stat,

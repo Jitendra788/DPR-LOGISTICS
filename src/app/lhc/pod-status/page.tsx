@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, DatalistField, InputField, SelectField } from "@/components/ui/FormField";
+import { DateField, ComboboxField, DropdownField, InputField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -135,25 +135,24 @@ export default function PodStatusPage() {
         <FormCard>
           <TwoCol>
             <div>
-              <SelectField
+              <DropdownField
                 label="Show Report From"
                 value={filters.podStatus}
                 onChange={(e) => setFilters({ ...filters, podStatus: e.target.value })}
                 options={["Received", "Pending"]}
-                placeholder=""
+                placeholder="Select status"
               />
               <DateField label="From Date" value={filters.fromDate} onChange={(fromDate) => setFilters({ ...filters, fromDate })} />
               <DateField label="To Date" value={filters.toDate} onChange={(toDate) => setFilters({ ...filters, toDate })} />
               <Button type="submit">Show All</Button>
             </div>
             <div>
-              <DatalistField
+              <ComboboxField
                 label="Select Veh No"
                 value={filters.vehNo}
-                onChange={(e) => setFilters({ ...filters, vehNo: e.target.value })}
+                onChange={(vehNo) => setFilters({ ...filters, vehNo })}
                 options={vehicles.map((v) => v.vehNo)}
-                placeholder="Type or pick vehicle"
-                listId="pod-veh"
+                placeholder="Search or select vehicle"
               />
               <InputField label="Enter LHC No." value={filters.lhcNo} onChange={(e) => setFilters({ ...filters, lhcNo: e.target.value })} />
             </div>

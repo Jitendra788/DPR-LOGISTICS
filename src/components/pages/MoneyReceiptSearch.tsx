@@ -4,13 +4,14 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard } from "@/components/ui/FormCard";
-import { DateField, DatalistField, InputField } from "@/components/ui/FormField";
+import { DateField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
 import { api } from "@/lib/api-client";
 import { firstOfMonthIso, isoToDisplay, todayIso } from "@/lib/dates";
 
 type Party = { name: string };
+type BillOption = { billNo: string; partyName: string };
 type BillRow = {
   srNo: number;
   billNo: string;
@@ -153,9 +154,14 @@ export function MoneyReceiptSearch({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [parties, setParties] = useState<Party[]>([]);
-  const partyNames = parties.map((p) => p.name).filter(Boolean);
+  const [allBills, setAllBills] = useState<BillOption[]>([]);
   const [partyName, setPartyName] = useState("");
   const [billNoFilter, setBillNoFilter] = useState("");
+  const partyNames = parties.map((p) => p.name).filter(Boolean);
+  const billOptions = useMemo(() => {
+    const list = allBills.filter((b) => !partyName.trim() || b.partyName === partyName.trim());
+    return list.map((b) => b.billNo).filter(Boolean);
+  }, [allBills, partyName]);
   const [fromDate, setFromDate] = useState(firstOfMonthIso());
   const [toDate, setToDate] = useState(todayIso());
   const [rows, setRows] = useState<BillRow[]>([]);
@@ -164,7 +170,10 @@ export function MoneyReceiptSearch({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    api<Party[]>("/api/parties").then(setParties);
+    Promise.all([api<Party[]>("/api/parties"), api<BillOption[]>("/api/bills")]).then(([p, bills]) => {
+      setParties(p);
+      setAllBills(bills);
+    });
   }, []);
 
   useEffect(() => {
@@ -307,18 +316,22 @@ export function MoneyReceiptSearch({
             </Button>
           </div>
           <div className="grid grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-4">
-            <DatalistField
+            <ComboboxField
               label="Party Name"
               value={partyName}
-              onChange={(e) => setPartyName(e.target.value)}
+              onChange={(value) => {
+                setPartyName(value);
+                setBillNoFilter("");
+              }}
               options={partyNames}
-              placeholder="Type party name"
-              listId="mr-party"
+              placeholder="Search or select party"
             />
-            <InputField
+            <ComboboxField
               label="Bill No (optional)"
               value={billNoFilter}
-              onChange={(e) => setBillNoFilter(e.target.value)}
+              onChange={setBillNoFilter}
+              options={billOptions}
+              placeholder="Search or select bill"
             />
             <DateField label="From Date" value={fromDate} onChange={setFromDate} />
             <DateField label="To Date" value={toDate} onChange={setToDate} />
