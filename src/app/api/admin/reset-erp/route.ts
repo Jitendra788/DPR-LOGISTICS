@@ -13,14 +13,15 @@ function isAdminSession(raw: string | undefined) {
   }
 }
 
-export async function POST(req: NextRequest) {
+async function runReset(req: NextRequest) {
   const raw = (await cookies()).get("dpr_session")?.value;
   if (!isAdminSession(raw)) {
     return NextResponse.json({ error: "Admin login required" }, { status: 401 });
   }
 
   const body = (await req.json().catch(() => ({}))) as { confirm?: string };
-  if (body.confirm !== "RESET_ERP") {
+  const confirm = body.confirm || req.nextUrl.searchParams.get("confirm") || "";
+  if (confirm !== "RESET_ERP") {
     return NextResponse.json({ error: "Send { confirm: \"RESET_ERP\" } to wipe ERP data" }, { status: 400 });
   }
 
@@ -30,4 +31,12 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     return apiError(err, "ERP reset failed");
   }
+}
+
+export async function GET(req: NextRequest) {
+  return runReset(req);
+}
+
+export async function POST(req: NextRequest) {
+  return runReset(req);
 }
