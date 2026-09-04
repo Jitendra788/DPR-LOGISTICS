@@ -15,8 +15,18 @@ export function sessionMaxAge() {
 }
 
 function sessionSecret() {
-  const secret = process.env.SESSION_SECRET?.trim();
-  if (secret) return secret;
+  const explicit = process.env.SESSION_SECRET?.trim();
+  if (explicit) return explicit;
+
+  // Fallback so production is not locked out if SESSION_SECRET was forgotten on Vercel.
+  // Prefer setting SESSION_SECRET explicitly; rotating it will invalidate existing cookies.
+  const derived =
+    process.env.DATABASE_URL?.trim() ||
+    process.env.POSTGRES_PRISMA_URL?.trim() ||
+    process.env.POSTGRES_URL?.trim() ||
+    "";
+  if (derived) return `dpr-session-v1:${derived}`;
+
   if (process.env.NODE_ENV === "production" || process.env.VERCEL) {
     throw new Error("SESSION_SECRET env is required in production");
   }
@@ -37,7 +47,13 @@ function fromB64url(input: string) {
 }
 
 function sign(payloadB64: string) {
-  return createHmac("sha256", sessionSecret()).update(payloadB64).digest("base64url");
+  // Match edge verifier encoding (base64url via standard base64 + replace)
+  return createHmac("sha256", sessionSecret())
+    .update(payloadB64)
+    .digest("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
 }
 
 export function createSessionToken(user: Omit<SessionUser, "exp">, maxAgeSec = MAX_AGE_SEC) {

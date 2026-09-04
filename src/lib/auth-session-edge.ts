@@ -10,8 +10,16 @@ export type SessionUser = {
 };
 
 function edgeSecret() {
-  const secret = process.env.SESSION_SECRET?.trim();
-  if (secret) return secret;
+  const explicit = process.env.SESSION_SECRET?.trim();
+  if (explicit) return explicit;
+
+  const derived =
+    process.env.DATABASE_URL?.trim() ||
+    process.env.POSTGRES_PRISMA_URL?.trim() ||
+    process.env.POSTGRES_URL?.trim() ||
+    "";
+  if (derived) return `dpr-session-v1:${derived}`;
+
   if (process.env.NODE_ENV === "production" || process.env.VERCEL) return "";
   return "dev-only-session-secret-change-me";
 }

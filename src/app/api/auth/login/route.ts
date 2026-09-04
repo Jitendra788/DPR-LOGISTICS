@@ -68,6 +68,13 @@ export async function POST(req: NextRequest) {
     return res;
   } catch (err) {
     console.error("Login failed", err);
+    const message = err instanceof Error ? err.message : "";
+    if (/SESSION_SECRET/i.test(message)) {
+      return NextResponse.json(
+        { error: "Server misconfigured: set SESSION_SECRET in Vercel env, then redeploy." },
+        { status: 503 },
+      );
+    }
     return NextResponse.json({ error: "Login failed" }, { status: 500 });
   }
 }
