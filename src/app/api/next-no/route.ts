@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { nextPadded } from "@/lib/doc-numbers";
-import { docSourceWhere, nextModuleDoc } from "@/lib/module-docs";
+import { docSourceWhere, nextUniqueModuleDoc } from "@/lib/module-docs";
 
 export const dynamic = "force-dynamic";
 
@@ -10,11 +10,21 @@ export async function GET(req: NextRequest) {
   const source = req.nextUrl.searchParams.get("source");
 
   if (type === "lr") {
-    const rows = await prisma.lrBooking.findMany({
-      where: docSourceWhere(source),
-      select: { lrNo: true },
+    const [moduleRows, allRows] = await Promise.all([
+      prisma.lrBooking.findMany({
+        where: docSourceWhere(source),
+        select: { lrNo: true },
+      }),
+      prisma.lrBooking.findMany({ select: { lrNo: true } }),
+    ]);
+    return NextResponse.json({
+      value: nextUniqueModuleDoc(
+        moduleRows.map((r) => r.lrNo),
+        allRows.map((r) => r.lrNo),
+        3,
+        source,
+      ),
     });
-    return NextResponse.json({ value: nextModuleDoc(rows.map((r) => r.lrNo), 3, source) });
   }
   if (type === "lhc") {
     const rows = await prisma.lhcContract.findMany({ select: { challanNo: true } });
@@ -41,11 +51,21 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ sr: rows.length + 1, receiptNo: next });
   }
   if (type === "bill") {
-    const rows = await prisma.bill.findMany({
-      where: docSourceWhere(source),
-      select: { billNo: true },
+    const [moduleRows, allRows] = await Promise.all([
+      prisma.bill.findMany({
+        where: docSourceWhere(source),
+        select: { billNo: true },
+      }),
+      prisma.bill.findMany({ select: { billNo: true } }),
+    ]);
+    return NextResponse.json({
+      value: nextUniqueModuleDoc(
+        moduleRows.map((r) => r.billNo),
+        allRows.map((r) => r.billNo),
+        2,
+        source,
+      ),
     });
-    return NextResponse.json({ value: nextModuleDoc(rows.map((r) => r.billNo), 2, source) });
   }
   if (type === "fleet") {
     const last = await prisma.fleetVehicle.findFirst({ orderBy: { id: "desc" } });

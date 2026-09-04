@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { calcBillTaxes } from "@/lib/bill-totals";
 import { lrBillableAmount, isMeterBillAs } from "@/lib/lr-totals";
 import { isUniqueViolation, userFacingError } from "@/lib/handle-api-error";
-import { docSourceWhere, nextModuleDoc, normalizeDocSource } from "@/lib/module-docs";
+import { docSourceWhere, nextUniqueModuleDoc, normalizeDocSource } from "@/lib/module-docs";
 import { isBillableLrType, normalizeLrType } from "@/lib/lr-type";
 
 export const dynamic = "force-dynamic";
@@ -115,14 +115,19 @@ export async function POST(req: NextRequest) {
     }
 
     const billSource = normalizeDocSource(body.source);
-    const lastBills = await prisma.bill.findMany({
-      where: docSourceWhere(billSource),
-      select: { billNo: true },
-    });
-    let billNo = body.billNo?.trim() || nextModuleDoc(
-      lastBills.map((r) => r.billNo),
+    const [moduleBills, allBills] = await Promise.all([
+      prisma.bill.findMany({
+        where: docSourceWhere(billSource),
+        select: { billNo: true },
+      }),
+      prisma.bill.findMany({ select: { billNo: true } }),
+    ]);
+    let billNo = nextUniqueModuleDoc(
+      moduleBills.map((r) => r.billNo),
+      allBills.map((r) => r.billNo),
       2,
       billSource,
+      body.billNo,
     );
     const lrAmount = matched.reduce((sum, row) => sum + lrBillableAmount(row), 0);
     const amount = Number(body.amount ?? lrAmount) || 0;
@@ -162,18 +167,25 @@ export async function POST(req: NextRequest) {
     };
 
     let bill;
-    for (let attempt = 0; attempt < 8; attempt++) {
+    const taken = new Set(allBills.map((r) => r.billNo.trim()).filter(Boolean));
+    for (let attempt = 0; attempt < 16; attempt++) {
       try {
         bill = await prisma.bill.create({ data: { ...billData, billNo } });
         break;
       } catch (err) {
         if (!isUniqueViolation(err, "billNo")) throw err;
+        taken.add(billNo);
         const rows = await prisma.bill.findMany({
           where: docSourceWhere(billSource),
           select: { billNo: true },
         });
-        billNo = nextModuleDoc(
+        const freshAll = await prisma.bill.findMany({ select: { billNo: true } });
+        for (const r of freshAll) {
+          if (r.billNo.trim()) taken.add(r.billNo.trim());
+        }
+        billNo = nextUniqueModuleDoc(
           rows.map((r) => r.billNo),
+          [...taken],
           2,
           billSource,
         );
