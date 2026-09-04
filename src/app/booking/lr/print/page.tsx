@@ -16,6 +16,7 @@ const copyMap: Record<string, string> = {
 function PrintInner() {
   const params = useSearchParams();
   const lrNo = params.get("lrNo") ?? "";
+  const share = params.get("share") ?? "";
   const copies = (params.get("copies") || "Consignor").split(",").filter(Boolean);
   const [row, setRow] = useState<LrPrintBooking | null>(null);
   const [consignorParty, setConsignorParty] = useState<Party | undefined>();
@@ -28,11 +29,13 @@ function PrintInner() {
       return;
     }
     let cancelled = false;
+    const qs = new URLSearchParams({ lrNo, source: "DPR" });
+    if (share) qs.set("share", share);
     api<{
       booking: LrPrintBooking;
       consignorParty: Party | null;
       consigneeParty: Party | null;
-    }>(`/api/bookings/print-data?lrNo=${encodeURIComponent(lrNo)}&source=DPR`)
+    }>(`/api/bookings/print-data?${qs.toString()}`)
       .then((res) => {
         if (cancelled) return;
         setRow(res.booking);
@@ -48,7 +51,7 @@ function PrintInner() {
     return () => {
       cancelled = true;
     };
-  }, [lrNo]);
+  }, [lrNo, share]);
 
   if (error) return <p className="p-8">{error}</p>;
   if (!row) return <p className="p-8">Loading LR…</p>;

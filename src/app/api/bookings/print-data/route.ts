@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { findLrBookingByNo } from "@/lib/find-lr";
 import { apiError } from "@/lib/handle-api-error";
 import { stripBookingTrackToken } from "@/services/trackingService";
+import { verifyLrPrintShareToken } from "@/lib/lr-email";
+import { sessionFromRequest } from "@/lib/api-auth";
 
 type PartyLite = { name: string; address: string; gst: string };
 
@@ -16,13 +18,25 @@ export async function GET(req: NextRequest) {
   try {
     const lrNo = req.nextUrl.searchParams.get("lrNo")?.trim() || "";
     const source = req.nextUrl.searchParams.get("source")?.trim().toUpperCase() || "";
+    const share = req.nextUrl.searchParams.get("share")?.trim() || "";
     if (!lrNo) {
       return NextResponse.json({ error: "LR number required" }, { status: 400 });
+    }
+
+    const session = sessionFromRequest(req);
+    if (!session) {
+      if (!verifyLrPrintShareToken(share)) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
     }
 
     const lr = await findLrBookingByNo(lrNo);
     if (!lr) {
       return NextResponse.json({ error: "LR not found" }, { status: 404 });
+    }
+
+    if (!session && !verifyLrPrintShareToken(share, lr.lrNo) && !verifyLrPrintShareToken(share, lrNo)) {
+      return NextResponse.json({ error: "Invalid print link" }, { status: 403 });
     }
 
     const lrSource = (lr.source || "DPR").toUpperCase();

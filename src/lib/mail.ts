@@ -1,5 +1,10 @@
 import nodemailer from "nodemailer";
 import { company } from "@/data/marketing/company";
+import {
+  buildLrEmailHtml,
+  buildLrEmailText,
+  buildLrPrintHtmlDocument,
+} from "@/lib/lr-email";
 
 export type MailPayload = {
   subject: string;
@@ -7,6 +12,11 @@ export type MailPayload = {
   html?: string;
   replyTo?: string;
   to?: string | string[];
+  attachments?: Array<{
+    filename: string;
+    content: string | Buffer;
+    contentType?: string;
+  }>;
 };
 
 const SMTP_CONNECT_MS = 20_000;
@@ -124,6 +134,7 @@ export async function sendMail(payload: MailPayload) {
       subject: payload.subject,
       text: payload.text,
       html: payload.html || `<pre style="font-family:inherit;white-space:pre-wrap">${escapeHtml(payload.text)}</pre>`,
+      attachments: payload.attachments,
     }),
     SMTP_SEND_MS,
     "SMTP send",
@@ -213,30 +224,35 @@ export function formatLrEmail(
     vehNo: string;
     grandTotal: number;
     freight: number;
+    articles?: string;
+    particulars?: string;
+    actWeight?: string;
+    chargedWeight?: string;
+    rate?: string;
+    gst?: number;
+    lrType?: string;
+    ewayBill?: string;
+    deliveryAt?: string;
   },
   printUrl: string,
+  copyLabel = "Consignor Copy",
 ) {
-  const text = [
-    "DPR Logistics — Lorry Receipt (LR)",
-    "",
-    `LR No: ${lr.lrNo}`,
-    `Date: ${lr.lrDate}`,
-    `From: ${lr.fromStation}`,
-    `To: ${lr.toStation}`,
-    `Vehicle: ${lr.vehNo}`,
-    `Billing Party: ${lr.billingParty}`,
-    `Consignor: ${lr.consignor}`,
-    `Consignee: ${lr.consignee}`,
-    `Freight: ${lr.freight}`,
-    `Grand Total: ${lr.grandTotal}`,
-    "",
-    `View / Print LR: ${printUrl}`,
-  ].join("\n");
+  const text = buildLrEmailText(lr, printUrl);
+  const html = buildLrEmailHtml(lr, printUrl);
+  const printDoc = buildLrPrintHtmlDocument(lr, copyLabel);
+  const safeName = String(lr.lrNo).replace(/[^\w.-]+/g, "_");
 
   return {
     subject: `LR ${lr.lrNo} — DPR Logistics`,
     text,
-    html: `<p>Please find LR details below.</p><pre style="font-family:inherit;white-space:pre-wrap">${escapeHtml(text)}</pre><p><a href="${printUrl}">Open LR print</a></p>`,
+    html,
+    attachments: [
+      {
+        filename: `LR-${safeName}.html`,
+        content: printDoc,
+        contentType: "text/html; charset=utf-8",
+      },
+    ],
   };
 }
 
