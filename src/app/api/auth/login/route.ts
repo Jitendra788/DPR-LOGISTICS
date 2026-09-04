@@ -75,6 +75,10 @@ export async function POST(req: NextRequest) {
         { status: 503 },
       );
     }
+    // Surface short infra errors so deploy misconfig is diagnosable
+    if (message && message.length <= 180 && !/password|secret|scrypt\$/i.test(message)) {
+      return NextResponse.json({ error: `Login failed: ${message}` }, { status: 500 });
+    }
     return NextResponse.json({ error: "Login failed" }, { status: 500 });
   }
 }
