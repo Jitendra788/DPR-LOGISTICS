@@ -1,4 +1,5 @@
 import { prisma } from "./prisma";
+import { hashPassword } from "./auth-session";
 
 const ERP_SEQUENCE_TABLES = [
   "Party",
@@ -71,7 +72,7 @@ export async function resetErpData() {
   await prisma.user.create({
     data: {
       username: "admin",
-      password: "admin123",
+      password: hashPassword("admin123"),
       name: "Admin User",
       mobile: "9999999999",
       role: "Admin",
@@ -92,6 +93,6 @@ export async function resetErpData() {
     kept: { blogs, media, inquiries },
     erp: { lrs, bills, users: 1 },
     next: { lr: "001", bill: "01", lhc: "01" },
-    login: { username: "admin", password: "admin123" },
+    login: { username: "admin", password: "(set at reset — default admin123, stored hashed)" },
   };
 }

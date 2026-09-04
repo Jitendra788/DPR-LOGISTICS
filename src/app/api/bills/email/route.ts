@@ -5,7 +5,7 @@ import { apiError } from "@/lib/handle-api-error";
 
 function siteOrigin(req: NextRequest) {
   const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
-  const proto = req.headers.get("x-forwarded-proto") || "https";
+  const proto = req.headers.get("x-forwarded-proto") || (host?.includes("localhost") ? "http" : "https");
   if (host) return `${proto}://${host}`;
   return process.env.NEXT_PUBLIC_SITE_URL || "https://www.dprlogistics.in";
 }

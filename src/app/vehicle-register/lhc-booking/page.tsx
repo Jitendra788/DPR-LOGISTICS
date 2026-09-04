@@ -12,7 +12,13 @@ import { useCrud } from "@/hooks/useCrud";
 import { api } from "@/lib/api-client";
 import { todayIso } from "@/lib/dates";
 
-type Vehicle = { vehNo: string };
+type FleetVehicle = {
+  vehNo: string;
+  opKm?: string;
+  olKm?: string;
+  tyreChangeKmAfter?: string;
+  servicingAfter?: string;
+};
 type Lhc = {
   challanNo: string;
   challanDate: string;
@@ -39,23 +45,32 @@ type Row = {
   freight: number;
 };
 
+function normVeh(value?: string | null) {
+  return String(value ?? "")
+    .trim()
+    .toUpperCase()
+    .replace(/[\s-]/g, "");
+}
+
+const emptyForm = {
+  vehNo: "",
+  fromStation: "",
+  toStation: "",
+  openingMeter: "",
+  closingMeter: "",
+  lhcDate: todayIso(),
+  lhcNo: "",
+  lhcFreight: 0,
+  tyreChangeAfterKm: "",
+  servicingKmAfter: "",
+};
+
 export default function LhcWiseBookingPage() {
   const { rows, message, create, update, remove, setMessage } = useCrud<Row>("trips");
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [vehicles, setVehicles] = useState<FleetVehicle[]>([]);
   const [contracts, setContracts] = useState<Lhc[]>([]);
   const [editId, setEditId] = useState<number | null>(null);
-  const [form, setForm] = useState({
-    vehNo: "",
-    fromStation: "",
-    toStation: "",
-    openingMeter: "",
-    closingMeter: "",
-    lhcDate: todayIso(),
-    lhcNo: "",
-    lhcFreight: 0,
-    tyreChangeAfterKm: "",
-    servicingKmAfter: "",
-  });
+  const [form, setForm] = useState(emptyForm);
 
   const totalKm = useMemo(() => {
     const open = Number(form.openingMeter) || 0;
@@ -71,11 +86,47 @@ export default function LhcWiseBookingPage() {
   }, [form.tyreChangeAfterKm, totalKm]);
 
   useEffect(() => {
-    Promise.all([api<Vehicle[]>("/api/fleet"), api<Lhc[]>("/api/lhc")]).then(([v, l]) => {
+    Promise.all([api<FleetVehicle[]>("/api/fleet"), api<Lhc[]>("/api/lhc")]).then(([v, l]) => {
       setVehicles(v);
       setContracts(l);
     });
   }, []);
+
+  /** Old site: pick vehicle → fill OpKM / tyre / servicing from Self Vehicle Creation. */
+  function fleetDefaults(vehNo: string) {
+    const key = normVeh(vehNo);
+    const fleet = vehicles.find((v) => normVeh(v.vehNo) === key);
+    const lastTrip = [...rows]
+      .filter((r) => normVeh(r.vehNo) === key && (r.closingMeter || r.openingMeter))
+      .sort((a, b) => b.id - a.id)[0];
+
+    const openingFromTrip = String(lastTrip?.closingMeter || "").trim();
+    const openingFromFleet = String(fleet?.opKm || fleet?.olKm || "").trim();
+
+    return {
+      openingMeter: openingFromTrip || openingFromFleet,
+      tyreChangeAfterKm: String(fleet?.tyreChangeKmAfter || "").trim(),
+      servicingKmAfter: String(fleet?.servicingAfter || "").trim(),
+      found: Boolean(fleet),
+    };
+  }
+
+  function applyVehicle(vehNo: string) {
+    const defaults = fleetDefaults(vehNo);
+    setForm((f) => ({
+      ...f,
+      vehNo,
+      openingMeter: defaults.openingMeter || (vehNo ? "" : f.openingMeter),
+      tyreChangeAfterKm: defaults.tyreChangeAfterKm || (vehNo ? "" : f.tyreChangeAfterKm),
+      servicingKmAfter: defaults.servicingKmAfter || (vehNo ? "" : f.servicingKmAfter),
+    }));
+    if (!vehNo.trim()) return;
+    if (!defaults.found) {
+      setMessage({ type: "err", text: `No Self Vehicle data found for ${vehNo}` });
+    } else {
+      setMessage({ type: "ok", text: `Loaded Self Vehicle data for ${vehNo}` });
+    }
+  }
 
   function applyLhc(lhcNo: string) {
     const c = contracts.find((x) => x.challanNo === lhcNo);
@@ -83,14 +134,23 @@ export default function LhcWiseBookingPage() {
       setForm((f) => ({ ...f, lhcNo }));
       return;
     }
+    const vehNo = c.vehNo || "";
+    const defaults = vehNo ? fleetDefaults(vehNo) : null;
     setForm((f) => ({
       ...f,
       lhcNo: c.challanNo,
       lhcDate: c.challanDate || f.lhcDate || todayIso(),
-      vehNo: c.vehNo || f.vehNo,
+      vehNo: vehNo || f.vehNo,
       fromStation: c.fromStation || f.fromStation,
       toStation: c.toStation || f.toStation,
       lhcFreight: Number(c.lorryFreight) || f.lhcFreight,
+      ...(defaults
+        ? {
+            openingMeter: defaults.openingMeter || f.openingMeter,
+            tyreChangeAfterKm: defaults.tyreChangeAfterKm || f.tyreChangeAfterKm,
+            servicingKmAfter: defaults.servicingKmAfter || f.servicingKmAfter,
+          }
+        : {}),
     }));
   }
 
@@ -106,18 +166,7 @@ export default function LhcWiseBookingPage() {
     const saved = editId ? await update(editId, body) : await create(body);
     if (saved) {
       setEditId(null);
-      setForm({
-        vehNo: "",
-        fromStation: "",
-        toStation: "",
-        openingMeter: "",
-        closingMeter: "",
-        lhcDate: todayIso(),
-        lhcNo: "",
-        lhcFreight: 0,
-        tyreChangeAfterKm: "",
-        servicingKmAfter: "",
-      });
+      setForm({ ...emptyForm, lhcDate: todayIso() });
     }
   }
 
@@ -137,7 +186,7 @@ export default function LhcWiseBookingPage() {
               <ComboboxField
                 label="Enter Vehicle Number"
                 value={form.vehNo}
-                onChange={(vehNo) => setForm({ ...form, vehNo })}
+                onChange={applyVehicle}
                 options={vehicles.map((v) => v.vehNo)}
                 placeholder="Search or select vehicle"
               />

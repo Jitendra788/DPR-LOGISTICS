@@ -34,24 +34,46 @@ export function downloadCsv(filename: string, rows: Record<string, unknown>[]) {
   URL.revokeObjectURL(url);
 }
 
-export async function api<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url, {
-    ...init,
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...(init?.headers ?? {}),
-    },
-  });
-  const data = (await res.json().catch(() => ({}))) as T & { error?: string };
-  if (!res.ok) {
-    const raw = String(data.error ?? "").trim();
-    if (raw && !/prisma|invocation|unknown argument/i.test(raw) && raw.length <= 200) {
-      throw new Error(raw);
+type ApiInit = RequestInit & { timeoutMs?: number };
+
+export async function api<T>(url: string, init?: ApiInit): Promise<T> {
+  const { timeoutMs, ...rest } = init ?? {};
+  const controller = timeoutMs ? new AbortController() : null;
+  const timer =
+    timeoutMs && controller
+      ? setTimeout(() => controller.abort(), timeoutMs)
+      : null;
+
+  try {
+    const res = await fetch(url, {
+      ...rest,
+      credentials: "include",
+      signal: controller?.signal ?? rest.signal,
+      headers: {
+        "Content-Type": "application/json",
+        ...(rest.headers ?? {}),
+      },
+    });
+    const data = (await res.json().catch(() => ({}))) as T & { error?: string };
+    if (!res.ok) {
+      const raw = String(data.error ?? "").trim();
+      if (raw && !/prisma|invocation|unknown argument/i.test(raw) && raw.length <= 220) {
+        throw new Error(raw);
+      }
+      if (res.status === 401) throw new Error("Session expired. Please login again.");
+      if (res.status === 404) throw new Error("Record not found. Refresh and try again.");
+      throw new Error("Something went wrong. Please try again.");
     }
-    if (res.status === 401) throw new Error("Session expired. Please login again.");
-    if (res.status === 404) throw new Error("Record not found. Refresh and try again.");
-    throw new Error("Something went wrong. Please try again.");
+    return data;
+  } catch (err) {
+    if (err instanceof DOMException && err.name === "AbortError") {
+      throw new Error("Request timed out. Check SMTP settings or try again.");
+    }
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new Error("Request timed out. Check SMTP settings or try again.");
+    }
+    throw err;
+  } finally {
+    if (timer) clearTimeout(timer);
   }
-  return data;
 }

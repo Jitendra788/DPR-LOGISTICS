@@ -283,14 +283,14 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
 }
 
 .page-content {
-  padding: 10px 12px;
+  padding: 8px 10px;
   max-width: 100%;
   overflow-x: clip;
 }
 
 @media (min-width: 640px) {
   .page-content {
-    padding: 12px 16px;
+    padding: 10px 14px;
   }
 }
 

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import {
   findLiveTripByPhone,
   findTripByShareToken,
@@ -15,19 +14,16 @@ export async function GET(req: NextRequest) {
     const phone = req.nextUrl.searchParams.get("phone") ?? "";
     const token = req.nextUrl.searchParams.get("token") ?? "";
     const customer = req.nextUrl.searchParams.get("customer") ?? "";
-    const tripId = req.nextUrl.searchParams.get("tripId");
 
     let trip = null;
-    if (tripId) {
-      trip = await prisma.tripDesk.findUnique({ where: { id: Number(tripId) } });
-      if (trip && trip.status !== "InTransit" && trip.status !== "Completed") trip = null;
-    } else if (customer) {
+    if (customer) {
       trip = await findTripByCustomerToken(customer);
     } else if (token) {
       trip = await findTripByShareToken(token);
-    } else {
+    } else if (phone) {
       trip = await findLiveTripByPhone(phone);
     }
+    // tripId public lookup removed — enumerable IDs leaked live trips
 
     if (!trip) {
       return NextResponse.json(

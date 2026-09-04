@@ -15,7 +15,7 @@ export function BarChart({ data, color = "#0f766e" }: { data: BarItem[]; color?:
             <div className="erp-bar-track">
               <div
                 className="erp-bar"
-                style={{ height: `${(d.value / max) * 100}%`, background: color }}
+                style={{ height: `${(d.value / max) * 100}%`, ...(color !== "#0f766e" ? { background: color } : {}) }}
                 title={`${d.label}: ${d.value}`}
               />
             </div>

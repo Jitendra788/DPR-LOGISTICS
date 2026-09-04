@@ -1,6 +1,8 @@
 export const BRAND_NAME = "DPR Logistics";
-export const BRAND_LOGO = "/dpr-logo.jpeg";
+/** Full colour logo (truck + DPR LOGISTICS banner) */
+export const BRAND_LOGO = "/dpr-logo-google.png";
 export const BRAND_LOGO_HEADER = "/dpr-logo-header.png";
+export const BRAND_FAVICON = "/favicon.png";
 export const BRAND_LOGO_ALT = "DPR Logistics — SP Group";
 
 export type BrandLogoVariant = "default" | "header";

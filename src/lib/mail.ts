@@ -9,6 +9,9 @@ export type MailPayload = {
   to?: string | string[];
 };
 
+const SMTP_CONNECT_MS = 20_000;
+const SMTP_SEND_MS = 45_000;
+
 function mailConfig() {
   const host = process.env.SMTP_HOST || "smtp.gmail.com";
   const port = Number(process.env.SMTP_PORT || 587);
@@ -25,8 +28,77 @@ export function isMailConfigured() {
   return Boolean(user && pass);
 }
 
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string) {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new Error(`${label} timed out after ${Math.round(ms / 1000)}s. Check SMTP / network.`));
+    }, ms);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (err) => {
+        clearTimeout(timer);
+        reject(err);
+      },
+    );
+  });
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type MailTransport = any;
+
+let sharedTransporter: MailTransport | null = null;
+let sharedKey = "";
+let warmPromise: Promise<void> | null = null;
+
+function getTransporter(): MailTransport {
+  const { host, port, user, pass } = mailConfig();
+  const key = `${host}|${port}|${user}|${pass}`;
+  if (sharedTransporter && sharedKey === key) return sharedTransporter;
+
+  sharedTransporter?.close();
+  sharedKey = key;
+  warmPromise = null;
+  sharedTransporter = nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
+    pool: true,
+    maxConnections: 1,
+    maxMessages: 50,
+    connectionTimeout: SMTP_CONNECT_MS,
+    greetingTimeout: SMTP_CONNECT_MS,
+    socketTimeout: SMTP_SEND_MS,
+    ...(host.includes("gmail")
+      ? {
+          tls: { minVersion: "TLSv1.2" as const },
+        }
+      : {}),
+  });
+  return sharedTransporter;
+}
+
+/** Open SMTP early (e.g. when LR page loads) so Email is not stuck on first click. */
+export async function warmMailTransport() {
+  if (!isMailConfigured()) return;
+  const transporter = getTransporter();
+  if (!warmPromise) {
+    warmPromise = withTimeout(transporter.verify(), SMTP_CONNECT_MS, "SMTP connect").then(
+      () => undefined,
+      (err) => {
+        warmPromise = null;
+        throw err;
+      },
+    );
+  }
+  await warmPromise;
+}
+
 export async function sendMail(payload: MailPayload) {
-  const { host, port, user, pass, to: defaultTo, from } = mailConfig();
+  const { user, pass, to: defaultTo, from } = mailConfig();
   const to = payload.to || defaultTo;
 
   if (!user || !pass) {
@@ -35,26 +107,27 @@ export async function sendMail(payload: MailPayload) {
     );
   }
 
-  const transporter = nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
-    auth: { user, pass },
-    ...(host.includes("gmail")
-      ? {
-          tls: { minVersion: "TLSv1.2" as const },
-        }
-      : {}),
-  });
+  const transporter = getTransporter();
+  if (warmPromise) {
+    try {
+      await warmPromise;
+    } catch {
+      /* sendMail will surface a clearer SMTP error */
+    }
+  }
 
-  await transporter.sendMail({
-    from,
-    to,
-    replyTo: payload.replyTo,
-    subject: payload.subject,
-    text: payload.text,
-    html: payload.html || `<pre style="font-family:inherit;white-space:pre-wrap">${escapeHtml(payload.text)}</pre>`,
-  });
+  await withTimeout(
+    transporter.sendMail({
+      from,
+      to,
+      replyTo: payload.replyTo,
+      subject: payload.subject,
+      text: payload.text,
+      html: payload.html || `<pre style="font-family:inherit;white-space:pre-wrap">${escapeHtml(payload.text)}</pre>`,
+    }),
+    SMTP_SEND_MS,
+    "SMTP send",
+  );
 
   return { to };
 }

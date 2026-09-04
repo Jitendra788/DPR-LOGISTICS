@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { billFreightAmount, calcBillTaxes, billGrandTotal } from "@/lib/bill-totals";
 import { isDatabaseConfigured, prisma } from "@/lib/prisma";
 import { apiError } from "@/lib/handle-api-error";
 import { sumLrBillableAmount } from "@/lib/lr-totals";
 import { displayToIso } from "@/lib/dates";
-import { resetErpData } from "@/lib/reset-erp";
 import { docSourceWhere } from "@/lib/module-docs";
 
 export const dynamic = "force-dynamic";
@@ -33,19 +31,7 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = req.nextUrl;
-    if (searchParams.get("wipe") === "RESET_ERP") {
-      const raw = (await cookies()).get("dpr_session")?.value;
-      try {
-        const session = raw ? (JSON.parse(raw) as { role?: string }) : null;
-        if (session?.role !== "Admin") {
-          return NextResponse.json({ error: "Admin login required" }, { status: 401 });
-        }
-      } catch {
-        return NextResponse.json({ error: "Admin login required" }, { status: 401 });
-      }
-      const result = await resetErpData();
-      return NextResponse.json({ ok: true, ...result });
-    }
+    // GET wipe removed — use `npm run db:reset-erp` locally only.
 
     const fromDate = normalizeDate(searchParams.get("fromDate") ?? "");
     const toDate = normalizeDate(searchParams.get("toDate") ?? "");

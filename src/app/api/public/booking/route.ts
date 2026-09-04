@@ -25,9 +25,27 @@ export async function GET(req: NextRequest) {
   if (lrNo) {
     const row = await prisma.lrBooking.findFirst({
       where: { lrNo, source: "CUSTOMER" },
+      select: {
+        lrNo: true,
+        lrDate: true,
+        fromStation: true,
+        toStation: true,
+        billed: true,
+        lrType: true,
+        articles: true,
+      },
     });
     if (!row) return NextResponse.json({ error: "Booking not found" }, { status: 404 });
-    return NextResponse.json(row);
+    // Public: never return freight/GST/party PII
+    return NextResponse.json({
+      lrNo: row.lrNo,
+      lrDate: row.lrDate,
+      fromStation: row.fromStation,
+      toStation: row.toStation,
+      articles: row.articles,
+      status: row.billed ? "Billed" : "Booked",
+      lrType: row.lrType,
+    });
   }
 
   const [nextLrNo, stations] = await Promise.all([

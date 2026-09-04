@@ -36,7 +36,7 @@ function PrintInner() {
           grandTotal: res.bill.grandTotal,
           lrs: res.lrs,
         });
-        setTimeout(() => window.print(), 500);
+        setTimeout(() => window.print(), 50);
       })
       .catch(() => setData(null));
   }, [billNo]);

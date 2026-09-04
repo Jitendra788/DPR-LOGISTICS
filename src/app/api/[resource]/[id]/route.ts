@@ -4,8 +4,15 @@ import { resolveBillDeleteId, resolveUpdateId } from "@/lib/resolve-update";
 import { userFacingError } from "@/lib/handle-api-error";
 import { isUnknownPrismaArg, withoutUnknownArgs } from "@/lib/prisma-retry";
 import { prisma } from "@/lib/prisma";
+import { cascadeDeleteBill, syncBillAfterLrRemoved } from "@/lib/cascade-delete";
+import { hashPassword, stripPassword } from "@/lib/auth-session";
+import { requireAdmin, requireSession } from "@/lib/api-auth";
 
 type Ctx = { params: Promise<{ resource: string; id: string }> };
+
+function gate(req: NextRequest, resource: ResourceKey) {
+  return resource === "users" ? requireAdmin(req) : requireSession(req);
+}
 
 async function resolveId(resource: ResourceKey, id: number, body?: Record<string, unknown>) {
   const model = getModel(resource);
@@ -16,14 +23,19 @@ async function resolveId(resource: ResourceKey, id: number, body?: Record<string
   return fallback;
 }
 
-export async function GET(_req: NextRequest, ctx: Ctx) {
+export async function GET(req: NextRequest, ctx: Ctx) {
   const { resource, id } = await ctx.params;
   if (!isResource(resource)) {
     return NextResponse.json({ error: "Unknown resource" }, { status: 404 });
   }
+  const auth = gate(req, resource);
+  if (auth instanceof NextResponse) return auth;
   try {
     const row = await getModel(resource).findUnique({ where: { id: Number(id) } });
     if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (resource === "users") {
+      return NextResponse.json(stripPassword(row as Record<string, unknown>));
+    }
     return NextResponse.json(row);
   } catch (err) {
     return NextResponse.json({ error: userFacingError(err, "Could not load record") }, { status: 400 });
@@ -35,6 +47,8 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
   if (!isResource(resource)) {
     return NextResponse.json({ error: "Unknown resource" }, { status: 404 });
   }
+  const auth = gate(req, resource);
+  if (auth instanceof NextResponse) return auth;
 
   const id = Number(idParam);
   if (!Number.isFinite(id) || id <= 0) {
@@ -52,12 +66,22 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
     }
 
     let data = sanitize(body, resource);
+    if (resource === "users") {
+      if (typeof data.password === "string" && data.password) {
+        data.password = hashPassword(String(data.password));
+      } else {
+        delete data.password;
+      }
+    }
     for (let attempt = 0; attempt < 6; attempt++) {
       try {
         const updated = await getModel(resource).update({
           where: { id: updateId },
           data,
         });
+        if (resource === "users") {
+          return NextResponse.json(stripPassword(updated as Record<string, unknown>));
+        }
         return NextResponse.json(updated);
       } catch (err) {
         if (!isUnknownPrismaArg(err)) throw err;
@@ -79,6 +103,8 @@ export async function DELETE(req: NextRequest, ctx: Ctx) {
   if (!isResource(resource)) {
     return NextResponse.json({ error: "Unknown resource" }, { status: 404 });
   }
+  const auth = gate(req, resource);
+  if (auth instanceof NextResponse) return auth;
 
   const id = Number(idParam);
   if (!Number.isFinite(id) || id <= 0) {
@@ -86,29 +112,47 @@ export async function DELETE(req: NextRequest, ctx: Ctx) {
   }
 
   try {
-    let deleteId = id;
     if (resource === "bills") {
-      const billNo = req.nextUrl.searchParams.get("billNo") ?? undefined;
-      const resolved = await resolveBillDeleteId(id, billNo);
+      const billNoParam = req.nextUrl.searchParams.get("billNo") ?? undefined;
+      const resolved = await resolveBillDeleteId(id, billNoParam);
       if (!resolved) {
         return NextResponse.json({ error: "Bill not found" }, { status: 404 });
       }
-      deleteId = resolved;
-      const bill = await prisma.bill.findUnique({ where: { id: deleteId } });
-      if (bill?.billNo) {
-        await prisma.lrBooking.updateMany({
-          where: { billNo: bill.billNo },
-          data: { billed: false, billNo: "" },
-        });
+      const bill = await prisma.bill.findUnique({ where: { id: resolved } });
+      if (!bill) {
+        return NextResponse.json({ error: "Bill not found" }, { status: 404 });
       }
-    } else {
-      const existing = await getModel(resource).findUnique({ where: { id } });
-      if (!existing) {
-        return NextResponse.json({ error: "Record not found" }, { status: 404 });
+      // Unlink LRs + remove MRs + delete bill (outstanding goes away)
+      await cascadeDeleteBill(bill.billNo);
+      return NextResponse.json({ ok: true });
+    }
+
+    const existing = await getModel(resource).findUnique({ where: { id } });
+    if (!existing) {
+      return NextResponse.json({ error: "Record not found" }, { status: 404 });
+    }
+
+    if (resource === "bookings") {
+      const lr = existing as { billNo?: string };
+      const linkedBillNo = String(lr.billNo ?? "").trim();
+      await prisma.lrBooking.delete({ where: { id } });
+      // If this was the last LR on the bill → bill+MR gone; else refresh bill amount
+      await syncBillAfterLrRemoved(linkedBillNo);
+      return NextResponse.json({ ok: true });
+    }
+
+    if (resource === "lhc") {
+      const lhc = existing as { challanNo?: string };
+      const challanNo = String(lhc.challanNo ?? "").trim();
+      if (challanNo) {
+        await prisma.lrBooking.updateMany({
+          where: { lhcNo: challanNo },
+          data: { lhcNo: "" },
+        });
       }
     }
 
-    await getModel(resource).delete({ where: { id: deleteId } });
+    await getModel(resource).delete({ where: { id } });
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error(`DELETE /api/${resource}/${id} failed`, err);

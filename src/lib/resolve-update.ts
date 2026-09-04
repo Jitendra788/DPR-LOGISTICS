@@ -1,12 +1,6 @@
 import { prisma } from "./prisma";
-import { lrNoEquals, stripLrPrefix } from "./lr-no";
+import { lrNoCandidates, lrNoEquals } from "./lr-no";
 import type { ResourceKey } from "./resources";
-
-function lrNoCandidates(lrNo: string) {
-  const trimmed = lrNo.trim();
-  const core = stripLrPrefix(trimmed);
-  return [...new Set([trimmed, core, `LR-${core}`, `LR ${core}`])].filter(Boolean);
-}
 
 /** When URL id is stale, resolve the live row by business key from the request body. */
 export async function resolveUpdateId(

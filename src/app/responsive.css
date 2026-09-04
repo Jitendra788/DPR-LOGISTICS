@@ -95,9 +95,32 @@ body {
     font-size: 13px;
   }
 
-  .erp-kpi,
   .erp-kpi-hit {
-    min-height: 128px;
+    min-height: 0;
+    padding: 12px 10px 12px 12px;
+  }
+
+  .erp-kpi-go {
+    display: none;
+  }
+
+  .erp-dash-banner {
+    padding: 14px;
+    gap: 14px;
+  }
+
+  .erp-dash-title {
+    font-size: 1.2rem;
+  }
+
+  .erp-dash-banner-actions {
+    width: 100%;
+  }
+
+  .erp-dash-cta {
+    flex: 1 1 auto;
+    justify-content: center;
+    min-height: 40px;
   }
 
   .erp-hero {
@@ -652,11 +675,41 @@ iframe {
 
 @media (max-width: 479px) {
   .erp-kpi-grid {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px;
+  }
+
+  .erp-kpi-icon {
+    height: 34px;
+    width: 34px;
+  }
+
+  .erp-kpi-value {
+    font-size: 1.25rem;
+  }
+
+  .erp-kpi-hint {
+    display: none;
   }
 
   .erp-quick-grid {
     grid-template-columns: 1fr 1fr !important;
+  }
+
+  .erp-vgrid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .erp-dash-banner-actions {
+    flex-direction: column;
+  }
+
+  .erp-dash-cta {
+    width: 100%;
+  }
+
+  .erp-activity {
+    grid-template-columns: 1fr !important;
   }
 
   .page-content {
@@ -665,6 +718,73 @@ iframe {
 
   .box {
     border-radius: 12px;
+  }
+}
+
+/* LR find / print / email action strip */
+@media (max-width: 767px) {
+  .erp-print-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .erp-print-actions .btn-admin {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .erp-copy-checks {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .erp-copy-checks label {
+    min-height: 40px;
+  }
+
+  .erp-form-card-body > .mt-2.flex,
+  .erp-form-card-body > .flex.flex-wrap.gap-2 {
+    flex-direction: column;
+  }
+
+  .erp-form-card-body > .mt-2.flex .btn-admin,
+  .erp-form-card-body > .flex.flex-wrap.gap-2 .btn-admin,
+  .erp-form-card-body > .grid > div > .btn-admin {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .erp-panel-h {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .erp-donut-wrap {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .erp-bars {
+    height: 120px;
+    gap: 4px;
+  }
+
+  .erp-bar-col span {
+    font-size: 10px;
+  }
+
+  .erp-pagehead {
+    margin-bottom: 12px;
+  }
+
+  .erp-crumbs {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+    padding-bottom: 2px;
   }
 }
 

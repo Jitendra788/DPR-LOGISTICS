@@ -86,7 +86,7 @@ export function Header({ collapsed, onToggle, isDesktop, mobileOpen }: Props) {
         </button>
         {(!isDesktop || collapsed) && (
           <Link href={ADMIN_HOME} className="erp-header-logo">
-            <BrandLogo width={120} height={48} className="erp-header-logo-img" />
+            <BrandLogo variant="header" width={120} height={48} className="erp-header-logo-img" />
           </Link>
         )}
       </div>

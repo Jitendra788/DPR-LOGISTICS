@@ -58,7 +58,7 @@ export default function LoginPage() {
         <div className="dpr-login-stack">
           <section className="dpr-login-card" aria-labelledby="login-heading">
             <div className="dpr-login-brand">
-              <BrandLogo width={200} height={80} priority className="dpr-login-logo" />
+              <BrandLogo variant="header" width={200} height={80} priority className="dpr-login-logo" />
               <div>
                 <p>Transport & Logistics Management System</p>
               </div>

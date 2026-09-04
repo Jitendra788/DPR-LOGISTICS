@@ -49,11 +49,12 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: BRAND_LOGO, type: "image/jpeg" },
+      { url: "/favicon.png", type: "image/png" },
+      { url: BRAND_LOGO, type: "image/png" },
       { url: "/dpr-logo-header.png", type: "image/png" },
     ],
     apple: BRAND_LOGO,
-    shortcut: BRAND_LOGO,
+    shortcut: "/favicon.png",
   },
   applicationName: company.name,
 };

@@ -66,7 +66,7 @@ export function Sidebar({ open, collapsed, isDesktop, onNavigate }: Props) {
     >
       <div className="erp-sidebar-brand">
         <Link href={ADMIN_HOME} className="erp-brand-link" onClick={onNavigate} title="DPR Logistics">
-          <BrandLogo width={collapsed ? 36 : 140} height={collapsed ? 36 : 56} className={`erp-brand-logo ${collapsed ? "erp-brand-logo-collapsed" : ""}`} />
+          <BrandLogo variant="header" width={collapsed ? 36 : 140} height={collapsed ? 36 : 56} className={`erp-brand-logo ${collapsed ? "erp-brand-logo-collapsed" : ""}`} />
           {!collapsed ? (
             <span className="erp-brand-text">
               <strong>DPR Logistics</strong>

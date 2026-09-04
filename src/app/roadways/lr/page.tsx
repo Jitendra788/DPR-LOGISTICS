@@ -149,6 +149,7 @@ export default function RoadwaysLrPage() {
       setStations(st);
       setForm((f) => ({ ...f, lrNo: f.lrNo || next.value }));
     });
+    void fetch("/api/mail/warmup", { method: "POST", credentials: "include" }).catch(() => {});
   }, []);
 
   const total = useMemo(
@@ -284,6 +285,7 @@ export default function RoadwaysLrPage() {
       const res = await api<{ message: string }>("/api/bookings/email", {
         method: "POST",
         body: JSON.stringify({ lrNo: form.lrNo, to: email.trim(), copies }),
+        timeoutMs: 50_000,
       });
       setMessage({ type: "ok", text: res.message || `LR emailed to ${email}` });
     } catch (err) {
@@ -402,7 +404,7 @@ export default function RoadwaysLrPage() {
               <Button type="button" onClick={search}>
                 Search LR
               </Button>
-              <div className="mt-3 flex flex-wrap gap-4 text-sm">
+              <div className="mt-3 erp-copy-checks flex flex-wrap gap-4 text-sm">
                 <label className="flex items-center gap-1">
                   <input type="checkbox" checked={printOpts.consignor} onChange={(e) => setPrintOpts({ ...printOpts, consignor: e.target.checked })} /> Consigner Copy
                 </label>
@@ -416,7 +418,7 @@ export default function RoadwaysLrPage() {
             </div>
             <div>
               <InputField label="Enter Receiver Email ID" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-              <div className="flex flex-wrap gap-2">
+              <div className="erp-print-actions flex flex-wrap gap-2">
                 <Button type="button" onClick={printLr}>
                   Print LR
                 </Button>

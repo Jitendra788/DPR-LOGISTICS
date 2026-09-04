@@ -139,10 +139,14 @@ export function publicTripPayload(
   const hasLocation = trip.lastLat !== 0 || trip.lastLng !== 0;
   const route = (history ?? []).map((p) => ({ lat: p.lat, lng: p.lng, at: p.recordedAt, source: p.source }));
 
+  const phone = String(trip.driverPhone || "");
+  const maskedPhone =
+    phone.length >= 4 ? `${"*".repeat(Math.max(0, phone.length - 4))}${phone.slice(-4)}` : "";
+
   return {
     tripId: trip.id,
     tripNo: trip.tripNo,
-    driverPhone: trip.driverPhone,
+    driverPhone: maskedPhone,
     driverName: trip.driverName,
     vehNo: trip.vehNo,
     fromStation: trip.fromStation,
@@ -156,7 +160,6 @@ export function publicTripPayload(
     lastLocationAt: trip.lastLocationAt || null,
     etaMinutes: trip.etaMinutes > 0 ? trip.etaMinutes : null,
     distanceRemainingKm: trip.distanceRemainingKm > 0 ? Math.round(trip.distanceRemainingKm * 10) / 10 : null,
-    customerTrackToken: trip.customerTrackToken || null,
     mapsUrl: hasLocation ? `https://www.google.com/maps?q=${trip.lastLat},${trip.lastLng}` : null,
     route,
   };

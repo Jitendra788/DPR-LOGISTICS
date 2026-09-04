@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { formatLrEmail, isMailConfigured, sendMail } from "@/lib/mail";
-import { lrNoEquals } from "@/lib/lr-no";
+import { findLrBookingByNo } from "@/lib/find-lr";
 import { apiError } from "@/lib/handle-api-error";
 
 function siteOrigin(req: NextRequest) {
   const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
-  const proto = req.headers.get("x-forwarded-proto") || "https";
+  const proto = req.headers.get("x-forwarded-proto") || (host?.includes("localhost") ? "http" : "https");
   if (host) return `${proto}://${host}`;
   return process.env.NEXT_PUBLIC_SITE_URL || "https://www.dprlogistics.in";
 }
@@ -15,7 +14,7 @@ export async function POST(req: NextRequest) {
   try {
     if (!isMailConfigured()) {
       return NextResponse.json(
-        { error: "Email not configured. Set SMTP_USER and SMTP_PASS in Vercel env." },
+        { error: "Email not configured. Set SMTP_USER and SMTP_PASS in .env / Vercel env." },
         { status: 503 },
       );
     }
@@ -34,8 +33,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "LR number required" }, { status: 400 });
     }
 
-    const all = await prisma.lrBooking.findMany();
-    const lr = all.find((row) => lrNoEquals(row.lrNo, lrNo.trim()));
+    const lr = await findLrBookingByNo(lrNo.trim());
     if (!lr) {
       return NextResponse.json({ error: "LR not found" }, { status: 404 });
     }

@@ -8,8 +8,13 @@ import {
 
 function ingestKey(req: NextRequest) {
   const header = req.headers.get("x-tracking-key") ?? req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-  const expected = process.env.TRACKING_INGEST_KEY || "dpr-tracking-dev";
-  return header === expected;
+  const expected = process.env.TRACKING_INGEST_KEY?.trim();
+  if (!expected) {
+    // Fail closed outside local/dev
+    if (process.env.NODE_ENV === "production" || process.env.VERCEL) return false;
+    return header === "dpr-tracking-dev";
+  }
+  return Boolean(header) && header === expected;
 }
 
 export async function POST(req: NextRequest) {

@@ -15,6 +15,13 @@ export function lrNoEquals(a: string, b: string) {
   return lrNoKey(a) === lrNoKey(b);
 }
 
+/** Common stored/display variants for exact DB lookups. */
+export function lrNoCandidates(lrNo: string) {
+  const trimmed = lrNo.trim();
+  const core = stripLrPrefix(trimmed);
+  return [...new Set([trimmed, core, `LR-${core}`, `LR ${core}`, `RW-${core}`, `RW ${core}`])].filter(Boolean);
+}
+
 export function nextLrNumber(lastLrNoOrId: string | number = 0) {
   const last = typeof lastLrNoOrId === "number" ? lastLrNoOrId : parseDocNumber(lastLrNoOrId);
   return nextPadded([last], 3);

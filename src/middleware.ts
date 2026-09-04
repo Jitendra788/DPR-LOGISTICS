@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { isMarketingRoute } from "@/lib/marketing-routes";
+import { verifySessionTokenEdge } from "@/lib/auth-session-edge";
 
-export function middleware(req: Request) {
-  const url = new URL(req.url);
+export async function middleware(req: NextRequest) {
+  const url = req.nextUrl;
   const { pathname } = url;
   const isPublic =
     isMarketingRoute(pathname) ||
@@ -24,13 +26,17 @@ export function middleware(req: Request) {
 
   if (isPublic) return NextResponse.next();
 
-  const cookie = req.headers.get("cookie") ?? "";
-  const hasSession = cookie.split(";").some((part) => part.trim().startsWith("dpr_session="));
-  if (!hasSession) {
+  const raw = req.cookies.get("dpr_session")?.value;
+  const session = await verifySessionTokenEdge(raw);
+  if (!session) {
     if (pathname.startsWith("/api/")) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    return NextResponse.redirect(new URL("/login", url.origin));
+    const login = new URL("/login", url.origin);
+    login.searchParams.set("next", pathname);
+    const res = NextResponse.redirect(login);
+    res.cookies.set("dpr_session", "", { path: "/", maxAge: 0 });
+    return res;
   }
   return NextResponse.next();
 }
