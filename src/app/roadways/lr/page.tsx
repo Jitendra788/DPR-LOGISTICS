@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, ComboboxField, DropdownField, InputField, ManualNumberField } from "@/components/ui/FormField";
+import { DateField, ComboboxField, DropdownField, DatalistField, InputField, ManualNumberField } from "@/components/ui/FormField";
 import { LR_TYPES, normalizeLrType } from "@/lib/lr-type";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
@@ -319,29 +319,29 @@ export default function RoadwaysLrPage() {
               <InputField label="Booking From" name="bookingFrom" value={form.bookingFrom} onChange={(e) => setForm({ ...form, bookingFrom: e.target.value })} />
               <InputField label="LR No" name="lrNo" value={form.lrNo} onChange={(e) => setForm({ ...form, lrNo: e.target.value })} required />
               <DateField label="LR Date" value={form.lrDate} onChange={(lrDate) => setForm({ ...form, lrDate })} />
-              <ComboboxField
+              <DatalistField
                 label="From Station"
                 name="fromStation"
                 value={form.fromStation}
-                onChange={(fromStation) => setForm({ ...form, fromStation })}
+                onChange={(e) => setForm({ ...form, fromStation: e.target.value })}
                 options={stations.map((s) => s.name)}
-                placeholder="Search or select station"
+                placeholder="Type or select station"
               />
-              <ComboboxField
+              <DatalistField
                 label="To Station"
                 name="toStation"
                 value={form.toStation}
-                onChange={(toStation) => setForm({ ...form, toStation })}
+                onChange={(e) => setForm({ ...form, toStation: e.target.value })}
                 options={stations.map((s) => s.name)}
-                placeholder="Search or select station"
+                placeholder="Type or select station"
               />
-              <ComboboxField
+              <DatalistField
                 label="Veh.No"
                 name="vehNo"
                 value={form.vehNo}
-                onChange={(vehNo) => setForm({ ...form, vehNo })}
+                onChange={(e) => setForm({ ...form, vehNo: e.target.value })}
                 options={vehicles.map((v) => v.vehNo)}
-                placeholder="Search or select vehicle"
+                placeholder="Type or select vehicle"
               />
               <ComboboxField label="Delivery At" name="deliveryAt" value={form.deliveryAt} onChange={(deliveryAt) => setForm({ ...form, deliveryAt })} options={["DOOR", "GODOWN"]} placeholder="Select delivery" />
               <ComboboxField label="Billing Party" name="billingParty" value={form.billingParty} onChange={(billingParty) => setForm({ ...form, billingParty })} options={parties.map((p) => p.name)} placeholder="Search or select party" />

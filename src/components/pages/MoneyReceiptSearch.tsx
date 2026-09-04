@@ -222,7 +222,8 @@ export function MoneyReceiptSearch({
       const next = { ...cur, ...patch };
       if ("tdsPct" in patch || "paidAmt" in patch || "otherDed" in patch) {
         if (next.tdsPct > 0) {
-          next.tdsAmt = Number(((row.beforeTax * next.tdsPct) / 100).toFixed(2));
+          // TDS on outstanding (what user sees), not before-tax freight
+          next.tdsAmt = Number(((row.outstanding * next.tdsPct) / 100).toFixed(2));
         } else if ("tdsPct" in patch) {
           next.tdsAmt = 0;
         }
