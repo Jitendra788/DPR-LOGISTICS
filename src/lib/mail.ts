@@ -1,10 +1,33 @@
 import nodemailer from "nodemailer";
+import { readFileSync, existsSync } from "node:fs";
+import { join } from "node:path";
 import { company } from "@/data/marketing/company";
 import {
   buildLrEmailHtml,
   buildLrEmailText,
   buildLrPrintHtmlDocument,
 } from "@/lib/lr-email";
+import { BRAND_LOGO_HEADER } from "@/lib/brand";
+
+const LOGO_CID = "dpr-logo@dprlogistics";
+const PUBLIC_LOGO_URL = `https://www.dprlogistics.in${BRAND_LOGO_HEADER}`;
+
+function logoFilePath() {
+  const file = BRAND_LOGO_HEADER.replace(/^\//, "");
+  return join(process.cwd(), "public", file);
+}
+
+function logoInlineAttachment() {
+  const path = logoFilePath();
+  if (!existsSync(path)) return null;
+  return {
+    filename: "dpr-logo-header.png",
+    content: readFileSync(path),
+    contentType: "image/png",
+    cid: LOGO_CID,
+    contentDisposition: "inline" as const,
+  };
+}
 
 export type MailPayload = {
   subject: string;
@@ -14,8 +37,11 @@ export type MailPayload = {
   to?: string | string[];
   attachments?: Array<{
     filename: string;
-    content: string | Buffer;
+    content?: string | Buffer;
+    path?: string;
     contentType?: string;
+    cid?: string;
+    contentDisposition?: "inline" | "attachment";
   }>;
 };
 
@@ -236,11 +262,15 @@ export function formatLrEmail(
   },
   printUrl: string,
   copyLabel = "Consignor Copy",
-  logoUrl = "",
+  _logoUrl = "",
 ) {
+  // CID image so Gmail shows logo even when mail is sent from localhost
+  const logoAtt = logoInlineAttachment();
+  const logoSrc = logoAtt ? `cid:${LOGO_CID}` : PUBLIC_LOGO_URL;
   const text = buildLrEmailText(lr, printUrl);
-  const html = buildLrEmailHtml(lr, printUrl, logoUrl);
-  const printDoc = buildLrPrintHtmlDocument(lr, copyLabel, logoUrl);
+  const html = buildLrEmailHtml(lr, printUrl, logoSrc);
+  // Attached HTML opens in browser — use public HTTPS logo URL
+  const printDoc = buildLrPrintHtmlDocument(lr, copyLabel, PUBLIC_LOGO_URL);
   const safeName = String(lr.lrNo).replace(/[^\w.-]+/g, "_");
 
   return {
@@ -248,6 +278,7 @@ export function formatLrEmail(
     text,
     html,
     attachments: [
+      ...(logoAtt ? [logoAtt] : []),
       {
         filename: `LR-${safeName}.html`,
         content: printDoc,
@@ -260,7 +291,7 @@ export function formatLrEmail(
 export function formatBillEmail(
   bill: { billNo: string; billDate: string; partyName: string; amount: number },
   printUrl: string,
-  logoUrl = "",
+  _logoUrl = "",
 ) {
   const text = [
     "DPR Logistics — Tax Invoice",
@@ -273,9 +304,10 @@ export function formatBillEmail(
     `View / Print Bill: ${printUrl}`,
   ].join("\n");
 
-  const logo = logoUrl
-    ? `<img src="${escapeHtml(logoUrl)}" alt="DPR Logistics" width="140" style="display:block;max-width:140px;height:auto;margin:0 auto 12px;background:#fff;padding:8px;border-radius:8px;" />`
-    : "";
+  const logoAtt = logoInlineAttachment();
+  const logo = logoAtt
+    ? `<img src="cid:${LOGO_CID}" alt="DPR Logistics" width="140" style="display:block;max-width:140px;height:auto;margin:0 auto 12px;background:#fff;padding:8px;border-radius:8px;" />`
+    : `<img src="${escapeHtml(PUBLIC_LOGO_URL)}" alt="DPR Logistics" width="140" style="display:block;max-width:140px;height:auto;margin:0 auto 12px;background:#fff;padding:8px;border-radius:8px;" />`;
 
   return {
     subject: `Bill ${bill.billNo} — DPR Logistics`,
@@ -286,5 +318,6 @@ export function formatBillEmail(
       <pre style="font-family:inherit;white-space:pre-wrap">${escapeHtml(text)}</pre>
       <p><a href="${escapeHtml(printUrl)}" style="display:inline-block;background:#0f766e;color:#fff;text-decoration:none;font-weight:700;padding:10px 16px;border-radius:8px;">Open &amp; Print Bill</a></p>
     </div>`,
+    attachments: logoAtt ? [logoAtt] : [],
   };
 }
