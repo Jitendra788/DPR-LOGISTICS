@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, ComboboxField, DatalistField } from "@/components/ui/FormField";
+import { InputField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -11,7 +11,8 @@ import { AdminForm } from "@/components/ui/AdminForm";
 import { api, downloadCsv } from "@/lib/api-client";
 
 type Vehicle = { vehNo: string };
-type Party = { name: string; partyType?: string };
+type Vendor = { name: string; type: string };
+type Party = { name: string; partyType: string };
 type Lhc = {
   id: number;
   challanNo: string;
@@ -41,14 +42,17 @@ export default function LhcPaymentPage() {
   });
 
   useEffect(() => {
-    Promise.all([api<Vehicle[]>("/api/vehicles"), api<Party[]>("/api/parties")]).then(([v, parties]) => {
+    Promise.all([
+      api<Vehicle[]>("/api/vehicles"),
+      api<Vendor[]>("/api/vendors"),
+      api<Party[]>("/api/parties"),
+    ]).then(([v, vendors, parties]) => {
       setVehicles(v);
-      setBrokers(
-        parties
-          .filter((x) => String(x.partyType || "").toLowerCase() === "broker")
-          .map((x) => x.name)
-          .filter(Boolean),
-      );
+      const fromParties = parties
+        .filter((p) => (p.partyType || "").toLowerCase() === "broker")
+        .map((p) => p.name);
+      const fromVendors = vendors.filter((x) => x.type === "Broker").map((x) => x.name);
+      setBrokers([...new Set([...fromParties, ...fromVendors])].filter(Boolean));
     });
   }, []);
 
@@ -115,7 +119,13 @@ export default function LhcPaymentPage() {
               </div>
             </div>
             <div>
-              <DatalistField label="Select Veh No" value={filters.vehNo} onChange={(e) => setFilters({ ...filters, vehNo: e.target.value })} options={vehOptions} placeholder="Type or pick vehicle" listId="lhc-pay-veh" />
+              <ComboboxField
+                label="Select Veh No"
+                value={filters.vehNo}
+                onChange={(vehNo) => setFilters({ ...filters, vehNo })}
+                options={vehOptions}
+                placeholder="Search or select vehicle"
+              />
               <ComboboxField
                 label="Select Broker Name"
                 value={filters.brokerName}

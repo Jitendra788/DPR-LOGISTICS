@@ -12,8 +12,8 @@ import { useCrud } from "@/hooks/useCrud";
 import { api } from "@/lib/api-client";
 import { lrNoEquals, stripLrPrefix } from "@/lib/lr-no";
 
-type Vendor = { name: string; type: string };
-type Party = { name: string; partyType?: string; pan?: string };
+type Vendor = { name: string; type: string; pan?: string };
+type Party = { name: string; partyType: string; pan: string };
 type Vehicle = {
   vehNo: string;
   ownerName: string;
@@ -113,25 +113,31 @@ export default function LorryHireContractPage() {
     });
   }, []);
 
-  /** Brokers created in Party Creation with Party Type = Broker */
   const brokerParties = useMemo(
-    () => parties.filter((p) => String(p.partyType || "").toLowerCase() === "broker"),
+    () => parties.filter((p) => (p.partyType || "").toLowerCase() === "broker" && p.name.trim()),
     [parties],
   );
-  const brokerNames = useMemo(() => brokerParties.map((p) => p.name).filter(Boolean), [brokerParties]);
+  const brokerNames = useMemo(() => {
+    const fromParties = brokerParties.map((p) => p.name);
+    const fromVendors = vendors.filter((v) => v.type === "Broker").map((v) => v.name);
+    return [...new Set([...fromParties, ...fromVendors])].filter(Boolean);
+  }, [brokerParties, vendors]);
   const fuelVendors = vendors.filter((v) => v.type === "Fuel" || v.type === "Other").map((v) => v.name);
-
-  function onBrokerSelect(brokerName: string) {
-    const hit = brokerParties.find((p) => p.name.trim().toLowerCase() === brokerName.trim().toLowerCase());
-    setForm((f) => ({
-      ...f,
-      brokerName,
-      brokerPan: hit?.pan?.trim() || (brokerName ? f.brokerPan : "") || "",
-    }));
-  }
   const pendingLrs = bookings.filter(
     (b) => !b.lhcNo || (editId && selectedLrs.some((lr) => lrNoEquals(lr, b.lrNo))),
   );
+
+  function selectBroker(brokerName: string) {
+    const party = brokerParties.find((p) => p.name.trim().toLowerCase() === brokerName.trim().toLowerCase());
+    const vendor = vendors.find(
+      (v) => v.type === "Broker" && v.name.trim().toLowerCase() === brokerName.trim().toLowerCase(),
+    );
+    setForm((f) => ({
+      ...f,
+      brokerName,
+      brokerPan: party?.pan || vendor?.pan || (f.brokerName === brokerName ? f.brokerPan : "") || "",
+    }));
+  }
 
   const totalAdvance = useMemo(() => (form.transfer || 0) + (form.cash || 0) + (form.fuel || 0), [form]);
   const balance = (form.lorryFreight || 0) - totalAdvance;
@@ -261,17 +267,11 @@ export default function LorryHireContractPage() {
                 label="Broker Name"
                 name="brokerName"
                 value={form.brokerName ?? ""}
-                onChange={onBrokerSelect}
+                onChange={selectBroker}
                 options={brokerNames}
-                placeholder="Search or select broker (Party Type = Broker)"
+                placeholder="Search or select broker"
               />
-              <InputField
-                label="Broker Pan No"
-                name="brokerPan"
-                value={form.brokerPan ?? ""}
-                onChange={(e) => setForm({ ...form, brokerPan: e.target.value })}
-                placeholder="Auto-fills from selected broker"
-              />
+              <InputField label="Broker Pan No" name="brokerPan" value={form.brokerPan ?? ""} onChange={(e) => setForm({ ...form, brokerPan: e.target.value })} />
             </div>
           </TwoCol>
         </FormCard>
