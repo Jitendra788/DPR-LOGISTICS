@@ -236,10 +236,11 @@ export function formatLrEmail(
   },
   printUrl: string,
   copyLabel = "Consignor Copy",
+  logoUrl = "",
 ) {
   const text = buildLrEmailText(lr, printUrl);
-  const html = buildLrEmailHtml(lr, printUrl);
-  const printDoc = buildLrPrintHtmlDocument(lr, copyLabel);
+  const html = buildLrEmailHtml(lr, printUrl, logoUrl);
+  const printDoc = buildLrPrintHtmlDocument(lr, copyLabel, logoUrl);
   const safeName = String(lr.lrNo).replace(/[^\w.-]+/g, "_");
 
   return {
@@ -259,6 +260,7 @@ export function formatLrEmail(
 export function formatBillEmail(
   bill: { billNo: string; billDate: string; partyName: string; amount: number },
   printUrl: string,
+  logoUrl = "",
 ) {
   const text = [
     "DPR Logistics — Tax Invoice",
@@ -271,9 +273,18 @@ export function formatBillEmail(
     `View / Print Bill: ${printUrl}`,
   ].join("\n");
 
+  const logo = logoUrl
+    ? `<img src="${escapeHtml(logoUrl)}" alt="DPR Logistics" width="140" style="display:block;max-width:140px;height:auto;margin:0 auto 12px;background:#fff;padding:8px;border-radius:8px;" />`
+    : "";
+
   return {
     subject: `Bill ${bill.billNo} — DPR Logistics`,
     text,
-    html: `<p>Please find bill details below.</p><pre style="font-family:inherit;white-space:pre-wrap">${escapeHtml(text)}</pre><p><a href="${printUrl}">Open bill print</a></p>`,
+    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;padding:16px;">
+      ${logo}
+      <p>Please find bill details below.</p>
+      <pre style="font-family:inherit;white-space:pre-wrap">${escapeHtml(text)}</pre>
+      <p><a href="${escapeHtml(printUrl)}" style="display:inline-block;background:#0f766e;color:#fff;text-decoration:none;font-weight:700;padding:10px 16px;border-radius:8px;">Open &amp; Print Bill</a></p>
+    </div>`,
   };
 }

@@ -4,6 +4,7 @@ import { findLrBookingByNo } from "@/lib/find-lr";
 import { apiError } from "@/lib/handle-api-error";
 import { createLrPrintShareToken } from "@/lib/lr-email";
 import { stripLrPrefix } from "@/lib/lr-no";
+import { BRAND_LOGO_HEADER } from "@/lib/brand";
 
 function siteOrigin(req: NextRequest) {
   const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
@@ -64,6 +65,7 @@ export async function POST(req: NextRequest) {
       },
       printUrl,
       copyLabel,
+      `${origin}${BRAND_LOGO_HEADER}`,
     );
     await sendMail({ ...payload, to: email });
 

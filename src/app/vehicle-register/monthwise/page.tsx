@@ -23,7 +23,15 @@ type Trip = {
   totalKm: string;
   lhcNo: string;
 };
-type Maint = { vehNo: string; amount: number; serviceDate: string };
+type Maint = {
+  vehNo: string;
+  amount: number;
+  diesel?: number;
+  otherExpenses?: number;
+  fasTag?: number;
+  freight?: number;
+  serviceDate: string;
+};
 
 type MarginRow = {
   srNo: number;
@@ -83,7 +91,13 @@ export default function MonthwiseReportPage() {
         if (toDate && d && d > toDate) continue;
         if (onlySelected && vehNo && m.vehNo !== vehNo) continue;
         const key = m.vehNo;
-        expenseByVehDate[key] = (expenseByVehDate[key] || 0) + (Number(m.amount) || 0);
+        const total =
+          (Number(m.amount) || 0) +
+          (Number(m.diesel) || 0) +
+          (Number(m.otherExpenses) || 0) +
+          (Number(m.fasTag) || 0) +
+          (Number(m.freight) || 0);
+        expenseByVehDate[key] = (expenseByVehDate[key] || 0) + total;
       }
 
       // Allocate vehicle maintenance across trips in period (pro-rata by freight, else equal)

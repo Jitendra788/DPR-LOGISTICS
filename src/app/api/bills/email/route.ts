@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { formatBillEmail, isMailConfigured, sendMail } from "@/lib/mail";
 import { apiError } from "@/lib/handle-api-error";
+import { BRAND_LOGO_HEADER } from "@/lib/brand";
 
 function siteOrigin(req: NextRequest) {
   const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
@@ -43,6 +44,7 @@ export async function POST(req: NextRequest) {
         amount: bill.amount,
       },
       printUrl,
+      `${origin}${BRAND_LOGO_HEADER}`,
     );
     await sendMail({ ...payload, to: email });
 

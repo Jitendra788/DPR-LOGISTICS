@@ -66,7 +66,7 @@ function fmtTax(value: number) {
   return num.toFixed(2);
 }
 
-export function BillTaxInvoice({ data }: { data: BillPrintData }) {
+export function BillTaxInvoice({ data, hideLogo = false }: { data: BillPrintData; hideLogo?: boolean }) {
   const freightTotal = data.lrs.reduce((s, r) => s + lrLineFreight(r), 0) || data.freight;
 
   return (
@@ -80,7 +80,13 @@ export function BillTaxInvoice({ data }: { data: BillPrintData }) {
           </tr>
           <tr>
             <td colSpan={3} className="bill-print-logo-cell">
-              <img src={BRAND_LOGO_HEADER} alt="DPR Logistics" className="bill-print-logo" />
+              {hideLogo ? (
+                <div className="bill-print-title-red" style={{ fontSize: 14 }}>
+                  {lrPrintCompany.name}
+                </div>
+              ) : (
+                <img src={BRAND_LOGO_HEADER} alt="DPR Logistics" className="bill-print-logo" />
+              )}
             </td>
             <td colSpan={12} className="bill-print-center">
               <div className="bill-print-title-red">{lrPrintCompany.name}</div>

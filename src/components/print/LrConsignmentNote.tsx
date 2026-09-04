@@ -66,6 +66,8 @@ type Props = {
   consigneeParty?: LrPrintParty;
   /** Defaults to DPR Logistics; Roadways passes DELHI PUNJAB ROADWAYS. */
   company?: LrPrintCompany;
+  /** Hide company logo (e.g. email / customer share print). */
+  hideLogo?: boolean;
 };
 
 function partyLine(party: LrPrintParty | undefined, fallbackName: string) {
@@ -76,7 +78,14 @@ function partyLine(party: LrPrintParty | undefined, fallbackName: string) {
   };
 }
 
-export function LrConsignmentNote({ booking, copyLabel, consignorParty, consigneeParty, company = lrPrintCompany }: Props) {
+export function LrConsignmentNote({
+  booking,
+  copyLabel,
+  consignorParty,
+  consigneeParty,
+  company = lrPrintCompany,
+  hideLogo = false,
+}: Props) {
   const consignor = partyLine(consignorParty, booking.consignor);
   const consignee = partyLine(consigneeParty, booking.consignee);
   const total = booking.total ?? booking.freight + (booking.serviceTax || 0) + (booking.haltage || 0) + (booking.insurance || 0) + (booking.stCharges || 0) + (booking.doorCollection || 0) + (booking.barrier || 0) + (booking.other || 0) + (booking.hamali || 0);
@@ -97,7 +106,13 @@ export function LrConsignmentNote({ booking, copyLabel, consignorParty, consigne
           </tr>
           <tr>
             <td colSpan={2} className="lr-print-logo-cell">
-              <img src={BRAND_LOGO_HEADER} alt={company.name} className="lr-print-logo" />
+              {hideLogo ? (
+                <div className="lr-print-title" style={{ fontSize: 16 }}>
+                  {company.name}
+                </div>
+              ) : (
+                <img src={BRAND_LOGO_HEADER} alt={company.name} className="lr-print-logo" />
+              )}
             </td>
             <td colSpan={3} className="lr-print-center">
               <div className="lr-print-title">{company.name}</div>

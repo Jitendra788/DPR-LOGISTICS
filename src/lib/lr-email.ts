@@ -106,10 +106,13 @@ function row(label: string, value: string) {
 }
 
 /** Full printable HTML document attached to the email. */
-export function buildLrPrintHtmlDocument(lr: LrEmailBooking, copyLabel = "Consignor Copy") {
+export function buildLrPrintHtmlDocument(lr: LrEmailBooking, copyLabel = "Consignor Copy", logoUrl = "") {
   const c = lrPrintCompany;
   const lrDisp = stripLrPrefix(lr.lrNo);
   const date = formatPrintDate(lr.lrDate) || lr.lrDate;
+  const logoBlock = logoUrl
+    ? `<img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(c.name)}" style="max-height:64px;max-width:160px;display:block;margin-bottom:8px;" />`
+    : "";
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -138,6 +141,7 @@ export function buildLrPrintHtmlDocument(lr: LrEmailBooking, copyLabel = "Consig
     <div class="copy">${escapeHtml(copyLabel)}</div>
     <div class="top">
       <div>
+        ${logoBlock}
         <div class="brand">${escapeHtml(c.name)}</div>
         <div class="tag">${escapeHtml(c.tagline)}</div>
         <div class="tag">${escapeHtml(c.address)}</div>
@@ -155,7 +159,6 @@ export function buildLrPrintHtmlDocument(lr: LrEmailBooking, copyLabel = "Consig
       <tr><th>From</th><td>${escapeHtml(lr.fromStation || "—")}</td></tr>
       <tr><th>To</th><td>${escapeHtml(lr.toStation || "—")}</td></tr>
       <tr><th>Vehicle</th><td>${escapeHtml(lr.vehNo || "—")}</td></tr>
-      <tr><th>Billing Party</th><td>${escapeHtml(lr.billingParty || "—")}</td></tr>
       <tr><th>Consignor</th><td>${escapeHtml(lr.consignor || "—")}</td></tr>
       <tr><th>Consignee</th><td>${escapeHtml(lr.consignee || "—")}</td></tr>
       <tr><th>Articles</th><td>${escapeHtml(lr.articles || "—")}</td></tr>
@@ -165,7 +168,6 @@ export function buildLrPrintHtmlDocument(lr: LrEmailBooking, copyLabel = "Consig
       <tr><th>Rate</th><td>${escapeHtml(lr.rate || "—")}</td></tr>
       <tr><th>LR Type</th><td>${escapeHtml(lr.lrType || "—")}</td></tr>
       <tr><th>E-Way Bill</th><td>${escapeHtml(lr.ewayBill || "—")}</td></tr>
-      <tr><th>Freight</th><td>₹ ${escapeHtml(money(lr.freight))}</td></tr>
       <tr><th>GST</th><td>₹ ${escapeHtml(money(lr.gst || 0))}</td></tr>
       <tr><th>Grand Total</th><td><strong>₹ ${escapeHtml(money(lr.grandTotal))}</strong></td></tr>
     </table>
@@ -178,14 +180,16 @@ export function buildLrPrintHtmlDocument(lr: LrEmailBooking, copyLabel = "Consig
 }
 
 /** Rich HTML body shown inside Gmail / Outlook. */
-export function buildLrEmailHtml(lr: LrEmailBooking, printUrl: string) {
+export function buildLrEmailHtml(lr: LrEmailBooking, printUrl: string, logoUrl = "") {
   const c = lrPrintCompany;
   const lrDisp = stripLrPrefix(lr.lrNo);
   const date = formatPrintDate(lr.lrDate) || lr.lrDate;
-  const freight = formatPrintMoney(lr.freight) || money(lr.freight);
   const total = formatPrintMoney(lr.grandTotal) || money(lr.grandTotal);
   const message =
     "Dear Sir/Madam, please find your Lorry Receipt from DPR Logistics. Keep this for your records. For any query, call our customer care. Thank you for choosing DPR Logistics.";
+  const logoBlock = logoUrl
+    ? `<img src="${escapeHtml(logoUrl)}" alt="${escapeHtml(c.name)}" width="140" style="display:block;max-width:140px;height:auto;margin:0 auto 12px;background:#fff;padding:8px;border-radius:8px;" />`
+    : "";
 
   return `<!DOCTYPE html>
 <html>
@@ -195,7 +199,8 @@ export function buildLrEmailHtml(lr: LrEmailBooking, printUrl: string) {
       <td align="center">
         <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;">
           <tr>
-            <td style="background:linear-gradient(135deg,#0f766e,#115e59);padding:22px 24px;color:#fff;">
+            <td style="background:linear-gradient(135deg,#0f766e,#115e59);padding:22px 24px;color:#fff;text-align:center;">
+              ${logoBlock}
               <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.85;">${escapeHtml(c.name)}</div>
               <div style="font-size:22px;font-weight:800;margin-top:4px;">Lorry Receipt</div>
               <div style="font-size:13px;opacity:.9;margin-top:4px;">LR No ${escapeHtml(lrDisp)} · ${escapeHtml(date)}</div>
@@ -212,13 +217,11 @@ export function buildLrEmailHtml(lr: LrEmailBooking, printUrl: string) {
                 ${row("From", lr.fromStation || "—")}
                 ${row("To", lr.toStation || "—")}
                 ${row("Vehicle", lr.vehNo || "—")}
-                ${row("Billing Party", lr.billingParty || "—")}
                 ${row("Consignor", lr.consignor || "—")}
                 ${row("Consignee", lr.consignee || "—")}
                 ${row("Articles", lr.articles || "")}
                 ${row("Particulars", lr.particulars || "")}
                 ${row("Weight", [lr.actWeight, lr.chargedWeight].filter(Boolean).join(" / ") || "")}
-                ${row("Freight", `₹ ${freight}`)}
                 ${row("GST", lr.gst ? `₹ ${money(lr.gst)}` : "")}
                 ${row("Grand Total", `₹ ${total}`)}
               </table>
@@ -258,10 +261,8 @@ export function buildLrEmailText(lr: LrEmailBooking, printUrl: string) {
     `From: ${lr.fromStation}`,
     `To: ${lr.toStation}`,
     `Vehicle: ${lr.vehNo}`,
-    `Billing Party: ${lr.billingParty}`,
     `Consignor: ${lr.consignor}`,
     `Consignee: ${lr.consignee}`,
-    `Freight: ${lr.freight}`,
     `Grand Total: ${lr.grandTotal}`,
     "",
     `Print LR: ${printUrl}`,
