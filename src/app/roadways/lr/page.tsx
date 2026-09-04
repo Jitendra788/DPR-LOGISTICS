@@ -12,8 +12,6 @@ import { useCrud } from "@/hooks/useCrud";
 import { api, formToObject } from "@/lib/api-client";
 import { todayIso } from "@/lib/dates";
 import { lrNoEquals } from "@/lib/lr-no";
-import { autoLrFreight } from "@/lib/lr-totals";
-
 type Party = { name: string };
 type Booking = {
   id: number;
@@ -132,15 +130,6 @@ export default function RoadwaysLrPage() {
   function patchForm(patch: Partial<ReturnType<typeof blankForm>>) {
     setForm((prev) => {
       const next = { ...prev, ...patch };
-      const freight = autoLrFreight({
-        billAs: next.billAs,
-        rate: next.rate,
-        totalMeter: next.totalMeter,
-        chargedWeight: next.chargedWeight,
-      });
-      if (freight != null && ("rate" in patch || "totalMeter" in patch || "chargedWeight" in patch || "billAs" in patch)) {
-        next.freight = freight;
-      }
       if ("cgstAmt" in patch || "sgstAmt" in patch || "igstAmt" in patch) {
         next.gst = Number(((Number(next.cgstAmt) || 0) + (Number(next.sgstAmt) || 0) + (Number(next.igstAmt) || 0)).toFixed(2));
       }
@@ -370,7 +359,6 @@ export default function RoadwaysLrPage() {
                   label={chargeLabels[key]}
                   value={form[key]}
                   onChange={(n) => patchForm({ [key]: n })}
-                  readOnly={key === "freight"}
                 />
               ))}
             </div>
