@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, SelectField } from "@/components/ui/FormField";
+import { InputField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -65,7 +65,7 @@ export default function BillReportPage() {
               <Button type="submit">Show Report</Button>
             </div>
             <div>
-              <SelectField label="Billing Party" value={filters.partyName} onChange={(e) => setFilters({ ...filters, partyName: e.target.value })} options={parties.map((p) => p.name)} />
+              <ComboboxField label="Billing Party" value={filters.partyName} onChange={(partyName) => setFilters({ ...filters, partyName })} options={parties.map((p) => p.name)} placeholder="Search or select party" />
             </div>
           </TwoCol>
         </FormCard>

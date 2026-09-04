@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, InputField, ManualNumberField, SelectField } from "@/components/ui/FormField";
+import { DateField, InputField, ManualNumberField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -28,6 +28,9 @@ type Slip = {
   receiptNo: string;
   remark: string;
   mailId: string;
+  paid?: boolean;
+  paidAmount?: number;
+  paidDate?: string;
 };
 
 const emptyForm = {
@@ -73,15 +76,31 @@ export default function BookingSlipPage() {
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    const body = {
-      ...form,
-      vehNo: form.lorryNo,
-      date: form.receiptDate,
-      amount: form.freight,
-      balance,
-      slipNo: editId ? rows.find((r) => r.id === editId)?.slipNo || nextSr : nextSr,
-    };
-    const saved = editId ? await update(editId, body) : await create(body);
+    const existing = editId ? rows.find((r) => r.id === editId) : null;
+    const saved = editId
+      ? await update(editId, {
+          ...form,
+          vehNo: form.lorryNo,
+          date: form.receiptDate,
+          amount: form.freight,
+          slipNo: existing?.slipNo || nextSr,
+          // Keep payment state; refresh balance from freight/advance/paid
+          balance: Number(Math.max(0, form.freight - form.advance - (existing?.paidAmount || 0)).toFixed(2)),
+          paid: existing?.paid ?? false,
+          paidAmount: existing?.paidAmount ?? 0,
+          paidDate: existing?.paidDate ?? "",
+        })
+      : await create({
+          ...form,
+          vehNo: form.lorryNo,
+          date: form.receiptDate,
+          amount: form.freight,
+          balance,
+          paid: false,
+          paidAmount: 0,
+          paidDate: "",
+          slipNo: nextSr,
+        });
     if (!saved) return;
     const nxt = await api<{ sr: number; receiptNo: string }>("/api/next-no?type=slip");
     setNextSr(String(nxt.sr));
@@ -146,11 +165,12 @@ export default function BookingSlipPage() {
           <TwoCol>
             <div>
               <InputField label="Sr No." value={nextSr} readOnly />
-              <SelectField
+              <ComboboxField
                 label="Enter Party Name"
                 value={form.partyName}
-                onChange={(e) => setForm({ ...form, partyName: e.target.value })}
+                onChange={(partyName) => setForm({ ...form, partyName })}
                 options={parties.map((p) => p.name)}
+                placeholder="Search or select party"
               />
               <InputField label="Lorry No" value={form.lorryNo} onChange={(e) => setForm({ ...form, lorryNo: e.target.value })} />
               <InputField label="From" value={form.fromStation} onChange={(e) => setForm({ ...form, fromStation: e.target.value })} />

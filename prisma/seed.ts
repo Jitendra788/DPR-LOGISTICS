@@ -70,8 +70,8 @@ async function main() {
     data: [
       { name: "IOCL Diesel Pump", address: "NH-48 Surat", contact: "0261-2451001", gst: "24AAACI1681G1ZN", type: "Fuel" },
       { name: "National Insurance", address: "CG Road Ahmedabad", contact: "079-26581010", gst: "24AAACN9967E1Z2", type: "Insurance" },
-      { name: "RAJ TRANSPORT", address: "Transport Nagar Surat", contact: "9825001111", type: "Broker" },
-      { name: "SHREE LOGISTICS", address: "Narol Ahmedabad", contact: "9825002222", type: "Broker" },
+      { name: "RAJ TRANSPORT", address: "Transport Nagar Surat", contact: "9825001111", pan: "AABCR1234R", type: "Broker" },
+      { name: "SHREE LOGISTICS", address: "Narol Ahmedabad", contact: "9825002222", pan: "AAGCS8899L", type: "Broker" },
       { name: "MANMOHAN PRASAD PATHAK", address: "Transport Nagar", contact: "9825004444", type: "Other" },
       { name: "SONU YADAV", address: "Jalgaon", contact: "9825005555", type: "Other" },
       { name: "PAWAN DOCTOR", address: "Surat", contact: "9825006666", type: "Other" },

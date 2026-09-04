@@ -4,13 +4,15 @@ import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, ComboboxField, DatalistField, DropdownField, FieldWrap, InputField, MoneyField, SelectField } from "@/components/ui/FormField";
+import { DateField, ComboboxField, DropdownField, FieldWrap, InputField, MoneyField } from "@/components/ui/FormField";
+import { LR_TYPES, normalizeLrType } from "@/lib/lr-type";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
 import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { api, formToObject } from "@/lib/api-client";
 import { lrNoEquals } from "@/lib/lr-no";
+import { autoLrFreight } from "@/lib/lr-totals";
 
 type Party = { id: number; name: string };
 type Booking = {
@@ -44,12 +46,16 @@ type Booking = {
   hamali: number;
   total: number;
   gst: number;
+  cgstAmt: number;
+  sgstAmt: number;
+  igstAmt: number;
   grandTotal: number;
   gstPaidBy: string;
   ewayBill: string;
   validDate: string;
   lrType: string;
   valueRs: string;
+  source?: string;
 };
 
 const chargeKeys = ["freight", "serviceTax", "haltage", "insurance", "stCharges", "doorCollection", "barrier", "other", "hamali"] as const;
@@ -77,6 +83,10 @@ function LrBookingInner() {
     lrType: "TBB",
     lrDate: new Date().toISOString().slice(0, 10),
     validDate: new Date().toISOString().slice(0, 10),
+    cgstAmt: 0,
+    sgstAmt: 0,
+    igstAmt: 0,
+    gst: 0,
   });
   const [parties, setParties] = useState<Party[]>([]);
   const partyNames = useMemo(() => parties.map((p) => p.name).filter(Boolean), [parties]);
@@ -85,10 +95,35 @@ function LrBookingInner() {
   const [email, setEmail] = useState("");
   const [emailSending, setEmailSending] = useState(false);
   const [lastShare, setLastShare] = useState<{ lrNo: string; url: string } | null>(null);
-  const lrOptions = useMemo(() => rows.map((r) => r.lrNo).filter(Boolean), [rows]);
+  const lrOptions = useMemo(
+    () => rows.filter((r) => (r.source || "DPR") !== "ROADWAYS").map((r) => r.lrNo).filter(Boolean),
+    [rows],
+  );
+
+  function patchForm(patch: Partial<Booking>) {
+    setForm((prev) => {
+      const next = { ...prev, ...patch };
+      const freight = autoLrFreight({
+        billAs: next.billAs,
+        rate: next.rate,
+        totalMeter: next.totalMeter,
+        chargedWeight: next.chargedWeight,
+      });
+      if (freight != null && ("rate" in patch || "totalMeter" in patch || "chargedWeight" in patch || "billAs" in patch)) {
+        next.freight = freight;
+      }
+      const cgst = Number(next.cgstAmt) || 0;
+      const sgst = Number(next.sgstAmt) || 0;
+      const igst = Number(next.igstAmt) || 0;
+      if ("cgstAmt" in patch || "sgstAmt" in patch || "igstAmt" in patch) {
+        next.gst = Number((cgst + sgst + igst).toFixed(2));
+      }
+      return next;
+    });
+  }
 
   useEffect(() => {
-    Promise.all([api<Party[]>("/api/parties"), api<{ value: string }>("/api/next-no?type=lr")]).then(([p, next]) => {
+    Promise.all([api<Party[]>("/api/parties"), api<{ value: string }>("/api/next-no?type=lr&source=DPR")]).then(([p, next]) => {
       setParties(p);
       setForm((f) => ({ ...f, lrNo: f.lrNo || next.value }));
     });
@@ -116,16 +151,32 @@ function LrBookingInner() {
       (form.hamali || 0),
     [form],
   );
-  const grandTotal = total + (form.gst || 0);
+  const gstTotal = useMemo(
+    () => Number(((Number(form.cgstAmt) || 0) + (Number(form.sgstAmt) || 0) + (Number(form.igstAmt) || 0)).toFixed(2)),
+    [form.cgstAmt, form.sgstAmt, form.igstAmt],
+  );
+  const grandTotal = total + gstTotal;
 
   function load(row: Booking) {
     setEditId(row.id);
-    setForm(row);
+    const cgst = Number(row.cgstAmt) || 0;
+    const sgst = Number(row.sgstAmt) || 0;
+    const igst = Number(row.igstAmt) || 0;
+    const gstSplit = cgst + sgst + igst;
+    setForm({
+      ...row,
+      cgstAmt: gstSplit > 0 ? cgst : Number(row.gst) || 0,
+      sgstAmt: gstSplit > 0 ? sgst : 0,
+      igstAmt: gstSplit > 0 ? igst : 0,
+      gst: gstSplit > 0 ? gstSplit : Number(row.gst) || 0,
+    });
     setMessage({ type: "ok", text: `Loaded LR ${row.lrNo}` });
   }
 
   function search() {
-    const found = rows.find((r) => lrNoEquals(r.lrNo, searchLr.trim()));
+    const found = rows.find(
+      (r) => lrNoEquals(r.lrNo, searchLr.trim()) && (r.source || "DPR") !== "ROADWAYS",
+    );
     if (!found) {
       setMessage({ type: "err", text: "LR not found" });
       return;
@@ -147,9 +198,14 @@ function LrBookingInner() {
       barrier: form.barrier || 0,
       other: form.other || 0,
       hamali: form.hamali || 0,
-      gst: form.gst || 0,
+      gst: gstTotal,
+      cgstAmt: Number(form.cgstAmt) || 0,
+      sgstAmt: Number(form.sgstAmt) || 0,
+      igstAmt: Number(form.igstAmt) || 0,
       total,
       grandTotal,
+      source: "DPR",
+      lrType: normalizeLrType(form.lrType),
     };
     const saved = editId ? await update(editId, body) : await create(body);
     if (saved) {
@@ -159,7 +215,7 @@ function LrBookingInner() {
         setLastShare({ lrNo: String((saved as { lrNo?: string }).lrNo || body.lrNo || ""), url: `${origin}/track/${token}` });
       }
       setEditId(null);
-      const next = await api<{ value: string }>("/api/next-no?type=lr");
+      const next = await api<{ value: string }>("/api/next-no?type=lr&source=DPR");
       setForm({
         deliveryAt: "DOOR",
         billAs: "Weight",
@@ -178,6 +234,9 @@ function LrBookingInner() {
         other: 0,
         hamali: 0,
         gst: 0,
+        cgstAmt: 0,
+        sgstAmt: 0,
+        igstAmt: 0,
       });
       await reload();
     }
@@ -270,20 +329,20 @@ function LrBookingInner() {
               <InputField label="From Station" name="fromStation" value={form.fromStation ?? ""} onChange={(e) => setForm({ ...form, fromStation: e.target.value })} placeholder="Type station name" />
               <InputField label="To Station" name="toStation" value={form.toStation ?? ""} onChange={(e) => setForm({ ...form, toStation: e.target.value })} placeholder="Type station name" />
               <InputField label="Veh No" name="vehNo" value={form.vehNo ?? ""} onChange={(e) => setForm({ ...form, vehNo: e.target.value })} placeholder="e.g. MH-15-GH-4455" />
-              <SelectField label="Delivery At" name="deliveryAt" value={form.deliveryAt ?? "DOOR"} onChange={(e) => setForm({ ...form, deliveryAt: e.target.value })} options={["DOOR", "GODOWN"]} />
-              <DatalistField label="Billing Party" name="billingParty" value={form.billingParty ?? ""} onChange={(e) => setForm({ ...form, billingParty: e.target.value })} options={partyNames} placeholder="Type or pick party" listId="lr-party-billing" />
-              <DatalistField label="Consignor" name="consignor" value={form.consignor ?? ""} onChange={(e) => setForm({ ...form, consignor: e.target.value })} options={partyNames} placeholder="Type or pick party" listId="lr-party-consignor" />
+              <ComboboxField label="Delivery At" name="deliveryAt" value={form.deliveryAt ?? "DOOR"} onChange={(deliveryAt) => setForm({ ...form, deliveryAt })} options={["DOOR", "GODOWN"]} placeholder="Select delivery" />
+              <ComboboxField label="Billing Party" name="billingParty" value={form.billingParty ?? ""} onChange={(billingParty) => setForm({ ...form, billingParty })} options={partyNames} placeholder="Search or select party" />
+              <ComboboxField label="Consignor" name="consignor" value={form.consignor ?? ""} onChange={(consignor) => setForm({ ...form, consignor })} options={partyNames} placeholder="Search or select consignor" />
             </div>
             <div>
-              <DatalistField label="Consignee" name="consignee" value={form.consignee ?? ""} onChange={(e) => setForm({ ...form, consignee: e.target.value })} options={partyNames} placeholder="Type or pick party" listId="lr-party-consignee" />
+              <ComboboxField label="Consignee" name="consignee" value={form.consignee ?? ""} onChange={(consignee) => setForm({ ...form, consignee })} options={partyNames} placeholder="Search or select consignee" />
               <InputField label="No. of Articles" name="articles" value={form.articles ?? ""} onChange={(e) => setForm({ ...form, articles: e.target.value })} />
               <InputField label="Particulars" name="particulars" value={form.particulars ?? ""} onChange={(e) => setForm({ ...form, particulars: e.target.value })} />
               <InputField label="Inv.No. & Date" name="invNoDate" value={form.invNoDate ?? ""} onChange={(e) => setForm({ ...form, invNoDate: e.target.value })} />
               <InputField label="Act. Weight" name="actWeight" value={form.actWeight ?? ""} onChange={(e) => setForm({ ...form, actWeight: e.target.value })} />
-              <InputField label="Charged Weight" name="chargedWeight" value={form.chargedWeight ?? ""} onChange={(e) => setForm({ ...form, chargedWeight: e.target.value })} />
-              <InputField label="Rate" name="rate" value={form.rate ?? ""} onChange={(e) => setForm({ ...form, rate: e.target.value })} />
-              <DropdownField label="Bill As" name="billAs" value={form.billAs ?? "Weight"} onChange={(e) => setForm({ ...form, billAs: e.target.value })} options={["Weight", "Mtr", "Package"]} />
-              <InputField label="Total Meter" name="totalMeter" value={form.totalMeter ?? ""} onChange={(e) => setForm({ ...form, totalMeter: e.target.value })} />
+              <InputField label="Charged Weight" name="chargedWeight" value={form.chargedWeight ?? ""} onChange={(e) => patchForm({ chargedWeight: e.target.value })} />
+              <InputField label="Rate" name="rate" value={form.rate ?? ""} onChange={(e) => patchForm({ rate: e.target.value })} />
+              <ComboboxField label="Bill As" name="billAs" value={form.billAs ?? "Weight"} onChange={(billAs) => patchForm({ billAs })} options={["Weight", "Mtr", "Package"]} placeholder="Select" />
+              <InputField label="Total Meter" name="totalMeter" value={form.totalMeter ?? ""} onChange={(e) => patchForm({ totalMeter: e.target.value })} />
             </div>
           </TwoCol>
         </FormCard>
@@ -296,26 +355,30 @@ function LrBookingInner() {
                   key={key}
                   label={chargeLabels[key]}
                   value={form[key] ?? 0}
-                  onChange={(n) => setForm({ ...form, [key]: n })}
+                  onChange={(n) => patchForm({ [key]: n })}
+                  readOnly={key === "freight"}
                 />
               ))}
             </div>
             <div>
               <MoneyField label="Total" value={total} readOnly />
-              <MoneyField label="GST" value={form.gst ?? 0} onChange={(gst) => setForm({ ...form, gst })} />
+              <MoneyField label="CGST" value={form.cgstAmt ?? 0} onChange={(cgstAmt) => patchForm({ cgstAmt })} />
+              <MoneyField label="SGST" value={form.sgstAmt ?? 0} onChange={(sgstAmt) => patchForm({ sgstAmt })} />
+              <MoneyField label="IGST" value={form.igstAmt ?? 0} onChange={(igstAmt) => patchForm({ igstAmt })} />
+              <MoneyField label="GST Total" value={gstTotal} readOnly />
               <MoneyField label="Grand Total" value={grandTotal} readOnly />
-              <DropdownField label="GST Paid By" name="gstPaidBy" value={form.gstPaidBy ?? "Consigner"} onChange={(e) => setForm({ ...form, gstPaidBy: e.target.value })} options={["Consigner", "Consignee", "Company", "Broker"]} />
-              <InputField label="E Way Bill No" name="ewayBill" value={form.ewayBill ?? ""} onChange={(e) => setForm({ ...form, ewayBill: e.target.value })} />
-              <DateField label="Valid Date" value={form.validDate ?? ""} onChange={(validDate) => setForm({ ...form, validDate })} />
-              <DropdownField label="LR Type" name="lrType" value={form.lrType ?? "TBB"} onChange={(e) => setForm({ ...form, lrType: e.target.value })} options={["TBB", "ToPay", "Paid"]} />
-              <InputField label="Value Rs." name="valueRs" value={form.valueRs ?? ""} onChange={(e) => setForm({ ...form, valueRs: e.target.value })} />
+              <ComboboxField label="GST Paid By" name="gstPaidBy" value={form.gstPaidBy ?? "Consigner"} onChange={(gstPaidBy) => patchForm({ gstPaidBy })} options={["Consigner", "Consignee", "Company", "Broker"]} placeholder="Select" />
+              <InputField label="E Way Bill No" name="ewayBill" value={form.ewayBill ?? ""} onChange={(e) => patchForm({ ewayBill: e.target.value })} />
+              <DateField label="Valid Date" value={form.validDate ?? ""} onChange={(validDate) => patchForm({ validDate })} />
+              <DropdownField label="LR Type" name="lrType" value={form.lrType ?? "TBB"} onChange={(e) => patchForm({ lrType: e.target.value })} options={[...LR_TYPES]} />
+              <InputField label="Value Rs." name="valueRs" value={form.valueRs ?? ""} onChange={(e) => patchForm({ valueRs: e.target.value })} />
             </div>
           </TwoCol>
           <div className="mt-2 flex flex-wrap gap-2">
             <Button type="submit" disabled={!!editId}>
               Save LR
             </Button>
-            <Button type="button" variant="teal" disabled={!editId} onClick={() => editId && update(editId, { ...form, total, grandTotal })}>
+            <Button type="button" variant="teal" disabled={!editId} onClick={() => editId && update(editId, { ...form, gst: gstTotal, cgstAmt: Number(form.cgstAmt) || 0, sgstAmt: Number(form.sgstAmt) || 0, igstAmt: Number(form.igstAmt) || 0, total, grandTotal, lrType: normalizeLrType(form.lrType) })}>
               Update LR
             </Button>
             <Button type="button" variant="danger" disabled={!editId} onClick={() => editId && remove(editId).then((ok) => ok && setEditId(null))}>

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { displayToIso } from "@/lib/dates";
 
+import { docSourceWhere } from "@/lib/module-docs";
+
 function normalizeDate(value: string) {
   const trimmed = value.trim();
   if (!trimmed) return "";
@@ -31,8 +33,12 @@ export async function GET(req: NextRequest) {
   const billingParty = searchParams.get("billingParty") ?? "";
   const fromStation = searchParams.get("fromStation") ?? "";
   const toStation = searchParams.get("toStation") ?? "";
+  const sourceParam = searchParams.get("source");
+  // Default DPR MIS excludes Roadways (old BookingMIS.aspx)
+  const sourceFilter = sourceParam ? docSourceWhere(sourceParam) : docSourceWhere("DPR");
 
   const rows = await prisma.lrBooking.findMany({
+    where: sourceFilter,
     orderBy: { id: "desc" },
   });
 

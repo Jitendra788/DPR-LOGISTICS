@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, ComboboxField, DropdownField, InputField, ManualNumberField } from "@/components/ui/FormField";
+import { DateField, ComboboxField, InputField, ManualNumberField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
 import { DataTable } from "@/components/ui/DataTable";
@@ -12,7 +12,8 @@ import { useCrud } from "@/hooks/useCrud";
 import { api } from "@/lib/api-client";
 import { isoToDisplay, todayIso } from "@/lib/dates";
 import { billFreightAmount, billGrandTotal, calcBillTaxes } from "@/lib/bill-totals";
-import { lrBillableAmount } from "@/lib/lr-totals";
+import { isMeterBillAs, lrBillableAmount } from "@/lib/lr-totals";
+import { isBillableLrType } from "@/lib/lr-type";
 
 type Party = { name: string };
 type LrRow = {
@@ -41,6 +42,7 @@ type LrRow = {
   billed: boolean;
   billNo: string;
   source: string;
+  lrType?: string;
 };
 type Bill = {
   id: number;
@@ -64,10 +66,12 @@ type Bill = {
 };
 
 function matchesBillAs(row: LrRow, variant: "weight" | "meter", billAs?: string) {
-  const as = (row.billAs || "Weight").toLowerCase();
-  if (billAs) return as === billAs.toLowerCase();
-  if (variant === "meter") return as === "mtr" || as === "meter";
-  return as !== "mtr" && as !== "meter";
+  if (billAs) {
+    if (isMeterBillAs(billAs)) return isMeterBillAs(row.billAs);
+    return (row.billAs || "Weight").toLowerCase() === billAs.toLowerCase();
+  }
+  if (variant === "meter") return isMeterBillAs(row.billAs);
+  return !isMeterBillAs(row.billAs);
 }
 
 function matchesSource(row: LrRow, source: string) {
@@ -80,12 +84,16 @@ export function BillEntryForm({
   variant,
   source = "DPR",
   searchHref = "/bills/search",
+  moneyReceiptHref = "/bills/money-receipt",
+  printHref = "/bills/print",
   crumb = "Bill Prepration",
 }: {
   title: string;
   variant: "weight" | "meter";
   source?: string;
   searchHref?: string;
+  moneyReceiptHref?: string;
+  printHref?: string;
   crumb?: string;
 }) {
   const router = useRouter();
@@ -127,20 +135,23 @@ export function BillEntryForm({
       (row) =>
         row.billingParty === form.partyName &&
         !row.billed &&
+        isBillableLrType(row.lrType) &&
         matchesBillAs(row, variant, form.billAs) &&
         matchesSource(row, source),
     );
   }, [bookings, form.partyName, form.billNo, form.billAs, editId, variant, source]);
 
   useEffect(() => {
-    Promise.all([api<Party[]>("/api/parties"), api<{ value: string }>("/api/next-no?type=bill"), api<LrRow[]>("/api/bookings")]).then(
-      ([p, next, lrs]) => {
-        setParties(p);
-        setBookings(lrs);
-        setForm((f) => ({ ...f, billNo: f.billNo === "01" ? next.value : f.billNo }));
-      },
-    );
-  }, []);
+    Promise.all([
+      api<Party[]>("/api/parties"),
+      api<{ value: string }>(`/api/next-no?type=bill&source=${encodeURIComponent(source)}`),
+      api<LrRow[]>("/api/bookings"),
+    ]).then(([p, next, lrs]) => {
+      setParties(p);
+      setBookings(lrs);
+      setForm((f) => ({ ...f, billNo: f.billNo === "01" || f.billNo === "RW-01" ? next.value : f.billNo }));
+    });
+  }, [source]);
 
   useEffect(() => {
     if (!editId || !form.billNo || !bookings.length) return;
@@ -150,9 +161,14 @@ export function BillEntryForm({
   useEffect(() => {
     const q = searchParams.get("billNo");
     if (!q || !rows.length) return;
-    const found = rows.find((r) => r.billNo.toLowerCase().includes(q.toLowerCase()) || r.billNo.toLowerCase() === q.toLowerCase());
+    const found = rows.find((r) => {
+      const sameModule =
+        source === "ROADWAYS" ? (r.source || "DPR") === "ROADWAYS" : (r.source || "DPR") !== "ROADWAYS";
+      if (!sameModule) return false;
+      return r.billNo.toLowerCase().includes(q.toLowerCase()) || r.billNo.toLowerCase() === q.toLowerCase();
+    });
     if (found) load(found);
-  }, [searchParams, rows]);
+  }, [searchParams, rows, source]);
 
   useEffect(() => {
     if (editId || !form.partyName) return;
@@ -279,7 +295,7 @@ export function BillEntryForm({
       setMessage({ type: "err", text: "Save or load a bill first" });
       return;
     }
-    window.open(`/bills/print?billNo=${encodeURIComponent(form.billNo.trim())}`, "_blank");
+    window.open(`${printHref}?billNo=${encodeURIComponent(form.billNo.trim())}`, "_blank");
   }
 
   async function del() {
@@ -298,7 +314,10 @@ export function BillEntryForm({
   async function reset() {
     setEditId(null);
     setSelectedIds([]);
-    const [next, lrs] = await Promise.all([api<{ value: string }>("/api/next-no?type=bill"), api<LrRow[]>("/api/bookings")]);
+    const [next, lrs] = await Promise.all([
+      api<{ value: string }>(`/api/next-no?type=bill&source=${encodeURIComponent(source)}`),
+      api<LrRow[]>("/api/bookings"),
+    ]);
     setBookings(lrs);
     setForm({
       billNo: next.value,
@@ -329,11 +348,12 @@ export function BillEntryForm({
           <FormCard>
             <TwoCol>
               <div>
-                <DropdownField
+                <ComboboxField
                   label="Bill As"
                   value={form.billAs || "Weight"}
-                  onChange={(e) => setForm({ ...form, billAs: e.target.value, billAt: e.target.value })}
+                  onChange={(billAs) => setForm({ ...form, billAs, billAt: billAs })}
                   options={["Mtr", "Weight", "Package"]}
+                  placeholder="Select"
                 />
                 <InputField label="Bill No" value={form.billNo} onChange={(e) => setForm({ ...form, billNo: e.target.value })} required />
                 <DateField label="Bill Date" value={form.billDate} onChange={(billDate) => setForm({ ...form, billDate })} />
@@ -400,7 +420,7 @@ export function BillEntryForm({
                 disabled={!form.billNo.trim() || !form.partyName.trim()}
                 onClick={() =>
                   router.push(
-                    `/bills/money-receipt?partyName=${encodeURIComponent(form.partyName)}&billNo=${encodeURIComponent(form.billNo)}`,
+                    `${moneyReceiptHref}?partyName=${encodeURIComponent(form.partyName)}&billNo=${encodeURIComponent(form.billNo)}`,
                   )
                 }
               >
@@ -415,7 +435,7 @@ export function BillEntryForm({
           {form.partyName ? (
             <>
               <p className="mb-3 text-sm font-semibold text-[#333]">
-                {editId ? `Linked LRs (${visibleLrs.length})` : `Unbilled LRs auto-selected (${selectedIds.length}/${visibleLrs.length})`}
+                {editId ? `Linked LRs (${visibleLrs.length})` : `Unbilled TBB LRs auto-selected (${selectedIds.length}/${visibleLrs.length})`}
               </p>
               <DataTable
                 rows={visibleLrs.map((row, i) => ({ ...row, sr: i + 1 }))}
@@ -438,12 +458,17 @@ export function BillEntryForm({
                   { key: "vehNo", header: "Veh No" },
                   { key: "fromStation", header: "From" },
                   { key: "toStation", header: "To" },
+                  { key: "lrType", header: "Type", render: (row) => row.lrType || "TBB" },
                   { key: "billAs", header: "Bill As" },
                   { key: variant === "meter" ? "totalMeter" : "chargedWeight", header: variant === "meter" ? "Meter" : "Weight" },
                   { key: "amount", header: "Amount", render: (row) => lrBillableAmount(row) },
                 ]}
               />
-              {!editId && !visibleLrs.length ? <p className="mt-2 text-sm text-[#a94442]">No unbilled LRs found for this party.</p> : null}
+              {!editId && !visibleLrs.length ? (
+                <p className="mt-2 text-sm text-[#a94442]">
+                  No unbilled TBB LRs for this party. (ToPay / Paid LRs are not billed — old site rule)
+                </p>
+              ) : null}
             </>
           ) : null}
         </FormCard>
@@ -489,7 +514,7 @@ export function BillEntryForm({
                 disabled={!form.billNo.trim() || !form.partyName.trim()}
                 onClick={() =>
                   router.push(
-                    `/bills/money-receipt?partyName=${encodeURIComponent(form.partyName)}&billNo=${encodeURIComponent(form.billNo)}`,
+                    `${moneyReceiptHref}?partyName=${encodeURIComponent(form.partyName)}&billNo=${encodeURIComponent(form.billNo)}`,
                   )
                 }
               >

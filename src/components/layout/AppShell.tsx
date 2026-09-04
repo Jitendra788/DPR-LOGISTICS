@@ -54,7 +54,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     pathname.startsWith("/booking/lr/print") ||
     pathname.startsWith("/lhc/contract/print") ||
     pathname.startsWith("/bills/print") ||
-    pathname.startsWith("/roadways/booking-slip/print")
+    pathname.startsWith("/roadways/booking-slip/print") ||
+    pathname.startsWith("/roadways/bills/print") ||
+    pathname.startsWith("/roadways/lr/print")
   ) {
     return (
       <>

@@ -1,10 +1,9 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard } from "@/components/ui/FormCard";
-import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
 import { Button } from "@/components/ui/Button";
 
@@ -15,21 +14,32 @@ type PodDoc = {
 };
 
 function PodDocumentsInner() {
+  const router = useRouter();
   const params = useSearchParams();
   const lrNo = params.get("lrNo") ?? "";
   const [rows, setRows] = useState<PodDoc[]>([]);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  const [loading, setLoading] = useState(true);
 
   async function load() {
-    if (!lrNo) return;
-    const res = await fetch(`/api/pod-docs?lrNo=${encodeURIComponent(lrNo)}`);
-    const data = (await res.json().catch(() => [])) as PodDoc[] | { error?: string };
-    if (!res.ok || !Array.isArray(data)) {
-      setMessage({ type: "err", text: (!Array.isArray(data) && data.error) || "Failed to load documents" });
+    if (!lrNo) {
       setRows([]);
+      setLoading(false);
       return;
     }
-    setRows(data);
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/pod-docs?lrNo=${encodeURIComponent(lrNo)}`);
+      const data = (await res.json().catch(() => [])) as PodDoc[] | { error?: string };
+      if (!res.ok || !Array.isArray(data)) {
+        setMessage({ type: "err", text: (!Array.isArray(data) && data.error) || "Failed to load documents" });
+        setRows([]);
+        return;
+      }
+      setRows(data);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -38,6 +48,7 @@ function PodDocumentsInner() {
   }, [lrNo]);
 
   async function remove(id: number) {
+    if (!confirm("Delete this document?")) return;
     try {
       const res = await fetch(`/api/pod-docs/${id}`, { method: "DELETE" });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
@@ -54,60 +65,70 @@ function PodDocumentsInner() {
       <PageHeader
         title="POD Documents"
         subtitle={`View POD Documents of LR No. ${lrNo || "-"}`}
-        crumbs={[{ label: "Home", href: "/dashboard" }, { label: "POD Documents" }]}
+        crumbs={[
+          { label: "Home", href: "/dashboard" },
+          { label: "POD Status", href: "/lhc/pod-status" },
+          { label: "POD Documents" },
+        ]}
       />
       <Flash message={message} />
-      {rows.length ? (
-        <DataTable
-          rows={rows.map((r, i) => ({ ...r, srNo: i + 1 }))}
-          columns={[
-            { key: "srNo", header: "Sr No." },
-            {
-              key: "view",
-              header: "View Document",
-              render: (row) => (
-                <a href={`/api/pod-docs/${row.id}`} target="_blank" rel="noreferrer" className="text-[#3c8dbc] underline">
-                  {row.fileName}
-                </a>
-              ),
-            },
-            {
-              key: "del",
-              header: "Delete Document",
-              render: (row) => (
-                <Button type="button" size="sm" variant="danger" onClick={() => remove(row.id)}>
-                  Delete
-                </Button>
-              ),
-            },
-          ]}
-        />
-      ) : (
-        <div className="box overflow-hidden">
-          <div className="box-body">
-            <div className="table-scroll">
-              <table className="erp-dt w-full min-w-[520px] border-collapse text-[13px]">
-                <thead>
+      <div className="box overflow-hidden">
+        <div className="box-body">
+          <div className="table-scroll">
+            <table className="erp-dt w-full min-w-[520px] border-collapse text-[13px]">
+              <thead>
+                <tr>
+                  <th>Sr No.</th>
+                  <th>View Document</th>
+                  <th>Delete Document</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
                   <tr>
-                    <th>Sr No.</th>
-                    <th>View Document</th>
-                    <th>Delete Document</th>
+                    <td colSpan={3} className="erp-dt-empty">
+                      Loading…
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
+                ) : rows.length ? (
+                  rows.map((row, i) => (
+                    <tr key={row.id}>
+                      <td>{i + 1}</td>
+                      <td>
+                        <a
+                          href={`/api/pod-docs/${row.id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-[#3c8dbc] underline"
+                        >
+                          {row.fileName || "View"}
+                        </a>
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          className="text-[#c0392b] underline"
+                          onClick={() => remove(row.id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
                   <tr>
                     <td colSpan={3} className="erp-dt-empty">
                       {lrNo ? "No documents uploaded" : "LR No is missing"}
                     </td>
                   </tr>
-                </tbody>
-              </table>
-            </div>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
-      )}
+      </div>
       <FormCard className="mt-3">
-        <Button type="button" variant="teal" onClick={() => window.history.back()}>
+        <Button type="button" variant="teal" onClick={() => router.push("/lhc/pod-status")}>
           Back to POD Status
         </Button>
       </FormCard>

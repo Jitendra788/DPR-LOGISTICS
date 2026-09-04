@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { stripLrPrefix } from "@/lib/lr-no";
+import { dprBillEditHref, isMeterBill, roadwaysBillEditHref } from "@/lib/bill-route";
 
 type Hit = {
   type: "lr" | "vehicle" | "driver" | "party" | "lhc" | "bill";
@@ -39,12 +40,14 @@ export async function GET(req: NextRequest) {
 
   for (const row of bills) {
     if (has(row.billNo, q) || has(row.partyName, q) || has(row.poNo, q)) {
-      const isMeter = (row.billAt || "").toLowerCase().includes("mtr");
+      const linkedAs = bookings.filter((lr) => lr.billNo === row.billNo).map((lr) => lr.billAs);
+      const meter = isMeterBill(row, linkedAs);
+      const roadways = (row.source || "").toUpperCase() === "ROADWAYS";
       results.push({
         type: "bill",
         title: `Bill ${row.billNo}`,
         subtitle: [row.partyName, row.billDate].filter(Boolean).join(" · ") || "Bill",
-        href: `${isMeter ? "/bills/meterwise" : "/bills/weightwise"}?billNo=${encodeURIComponent(row.billNo)}`,
+        href: roadways ? roadwaysBillEditHref(row.billNo, meter) : dprBillEditHref(row.billNo, meter),
       });
     }
     if (results.length >= 25) break;

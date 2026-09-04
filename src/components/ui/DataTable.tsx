@@ -44,7 +44,7 @@ export function DataTable<T extends object>({ columns, rows, searchKeys, stackOn
   return (
     <div className="box overflow-x-auto overflow-y-visible">
       <div className="box-body">
-        <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <label className="erp-dt-meta">
             Show{" "}
             <select

@@ -2,9 +2,11 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { LoadingMemo } from "@/components/print/LoadingMemo";
 import { api } from "@/lib/api-client";
 import { isoToDisplay } from "@/lib/dates";
-import { lrPrintCompany } from "@/lib/lr-print";
+import type { LoadingMemoData } from "@/lib/roadways-print";
+import "@/components/print/loading-memo.css";
 
 type Slip = {
   id: number;
@@ -22,47 +24,52 @@ type Slip = {
   remark: string;
 };
 
+function slashDate(value: string) {
+  const text = isoToDisplay(value) || value;
+  return text.replaceAll("-", "/");
+}
+
 function PrintInner() {
   const params = useSearchParams();
   const id = Number(params.get("id") || 0);
-  const [row, setRow] = useState<Slip | null>(null);
+  const [data, setData] = useState<LoadingMemoData | null>(null);
 
   useEffect(() => {
     if (!id) return;
-    api<Slip[]>(`/api/slips`).then((rows) => {
-      setRow(rows.find((r) => r.id === id) ?? null);
+    api<Slip[]>("/api/slips").then((rows) => {
+      const row = rows.find((r) => r.id === id);
+      if (!row) {
+        setData(null);
+        return;
+      }
+      setData({
+        slipNo: row.receiptNo || row.slipNo || String(row.id),
+        date: slashDate(row.receiptDate),
+        partyName: row.partyName,
+        lorryNo: row.lorryNo,
+        fromStation: row.fromStation,
+        toStation: row.toStation,
+        guaranteeWeight: row.guaranteeWeight,
+        freight: row.freight,
+        advance: row.advance,
+        balance: row.balance,
+        remark: row.remark,
+      });
       setTimeout(() => window.print(), 400);
     });
   }, [id]);
 
-  if (!row) return <p className="p-8">Loading booking slip...</p>;
+  if (!id) return <p className="p-8">Slip id missing.</p>;
+  if (!data) return <p className="p-8">Loading Loading Memo…</p>;
 
   return (
-    <div className="mx-auto max-w-[210mm] bg-white p-8 text-black">
-      <h1 className="text-center text-xl font-bold">{lrPrintCompany.name}</h1>
-      <p className="text-center text-sm">{lrPrintCompany.tagline}</p>
-      <p className="mb-4 text-center text-sm">{lrPrintCompany.address}</p>
-      <h2 className="mb-4 text-center text-lg font-bold underline">BOOKING SLIP</h2>
-      <table className="w-full border-collapse text-sm">
-        <tbody>
-          {[
-            ["Receipt No", row.receiptNo, "Date", isoToDisplay(row.receiptDate) || row.receiptDate],
-            ["Party Name", row.partyName, "Lorry No", row.lorryNo],
-            ["From", row.fromStation, "To", row.toStation],
-            ["Weight", row.guaranteeWeight, "Freight", String(row.freight || "")],
-            ["Advance", String(row.advance || ""), "Balance", String(row.balance || "")],
-            ["Remark", row.remark, "Sr No", row.slipNo],
-          ].map((cells) => (
-            <tr key={cells.join("-")}>
-              <td className="border border-black px-2 py-1 font-semibold">{cells[0]}</td>
-              <td className="border border-black px-2 py-1">{cells[1]}</td>
-              <td className="border border-black px-2 py-1 font-semibold">{cells[2]}</td>
-              <td className="border border-black px-2 py-1">{cells[3]}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <p className="mt-8 text-right text-sm">For {lrPrintCompany.name}</p>
+    <div className="lm-page">
+      <div className="no-print mb-3 flex justify-center gap-2">
+        <button type="button" className="btn-admin btn-admin-solid bg-[#0f766e]" onClick={() => window.print()}>
+          Print
+        </button>
+      </div>
+      <LoadingMemo data={data} />
     </div>
   );
 }

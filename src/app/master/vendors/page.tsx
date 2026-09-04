@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, SelectField, TextAreaField } from "@/components/ui/FormField";
+import { InputField, ComboboxField, TextAreaField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -59,7 +59,7 @@ export default function VendorCreationPage() {
             <div>
               <InputField label="GST No" name="gst" value={form.gst ?? ""} onChange={(e) => setForm({ ...form, gst: e.target.value })} />
               <InputField label="PAN No" name="pan" value={form.pan ?? ""} onChange={(e) => setForm({ ...form, pan: e.target.value })} />
-              <SelectField label="Vendor Type" name="type" value={form.type ?? "Other"} onChange={(e) => setForm({ ...form, type: e.target.value })} options={["Fuel", "Insurance", "Workshop", "Broker", "Other"]} />
+              <ComboboxField label="Vendor Type" name="type" value={form.type ?? "Other"} onChange={(type) => setForm({ ...form, type })} options={["Fuel", "Insurance", "Workshop", "Broker", "Other"]} placeholder="Select vendor type" />
             </div>
           </TwoCol>
           <Button type="submit">{editId ? "Update Data" : "Save Data"}</Button>

@@ -1,6 +1,20 @@
 import { BRAND_LOGO_HEADER } from "@/lib/brand";
 import { formatPrintDate, formatPrintMoney, lrPrintCompany } from "@/lib/lr-print";
+import { normalizeLrType } from "@/lib/lr-type";
 import "./lr-print.css";
+
+export type LrPrintCompany = {
+  name: string;
+  tagline: string;
+  address: string;
+  email: string;
+  phones: string;
+  jurisdiction: string;
+  customerCare: string;
+  companyGst: string;
+  companyPan: string;
+  blessings: string;
+};
 
 export type LrPrintParty = {
   name: string;
@@ -50,6 +64,8 @@ type Props = {
   copyLabel: string;
   consignorParty?: LrPrintParty;
   consigneeParty?: LrPrintParty;
+  /** Defaults to DPR Logistics; Roadways passes DELHI PUNJAB ROADWAYS. */
+  company?: LrPrintCompany;
 };
 
 function partyLine(party: LrPrintParty | undefined, fallbackName: string) {
@@ -60,12 +76,15 @@ function partyLine(party: LrPrintParty | undefined, fallbackName: string) {
   };
 }
 
-export function LrConsignmentNote({ booking, copyLabel, consignorParty, consigneeParty }: Props) {
+export function LrConsignmentNote({ booking, copyLabel, consignorParty, consigneeParty, company = lrPrintCompany }: Props) {
   const consignor = partyLine(consignorParty, booking.consignor);
   const consignee = partyLine(consigneeParty, booking.consignee);
   const total = booking.total ?? booking.freight + (booking.serviceTax || 0) + (booking.haltage || 0) + (booking.insurance || 0) + (booking.stCharges || 0) + (booking.doorCollection || 0) + (booking.barrier || 0) + (booking.other || 0) + (booking.hamali || 0);
   const grandTotal = booking.grandTotal ?? total + (booking.gst || 0);
   const handlingLabel = copyLabel.toLowerCase().includes("lorry") || copyLabel.toLowerCase().includes("lory") ? "Handling" : "Halting";
+  const type = normalizeLrType(booking.lrType);
+  const freightHead =
+    type === "Paid" ? "Freight Paid" : type === "ToPay" ? "Freight To Pay" : `Freight To be bill for GST at ${booking.gstPaidBy || "Consignor"}`;
 
   return (
     <section className="lr-print-sheet">
@@ -73,19 +92,19 @@ export function LrConsignmentNote({ booking, copyLabel, consignorParty, consigne
         <tbody>
           <tr>
             <td colSpan={8} className="lr-print-center lr-print-bold">
-              {lrPrintCompany.blessings}
+              {company.blessings}
             </td>
           </tr>
           <tr>
             <td colSpan={2} className="lr-print-logo-cell">
-              <img src={BRAND_LOGO_HEADER} alt="DPR Logistics" className="lr-print-logo" />
+              <img src={BRAND_LOGO_HEADER} alt={company.name} className="lr-print-logo" />
             </td>
             <td colSpan={3} className="lr-print-center">
-              <div className="lr-print-title">{lrPrintCompany.name}</div>
-              <div className="lr-print-subtitle">{lrPrintCompany.tagline}</div>
-              <div>{lrPrintCompany.address}</div>
+              <div className="lr-print-title">{company.name}</div>
+              <div className="lr-print-subtitle">{company.tagline}</div>
+              <div>{company.address}</div>
               <div>
-                E-mail : {lrPrintCompany.email} Mob. : {lrPrintCompany.phones}
+                E-mail : {company.email} Mob. : {company.phones}
               </div>
             </td>
             <td colSpan={3} className="lr-print-copy">
@@ -99,7 +118,7 @@ export function LrConsignmentNote({ booking, copyLabel, consignorParty, consigne
           </tr>
           <tr>
             <td colSpan={8} className="lr-print-center lr-print-bold">
-              {lrPrintCompany.jurisdiction}
+              {company.jurisdiction}
             </td>
           </tr>
           <tr>
@@ -152,7 +171,7 @@ export function LrConsignmentNote({ booking, copyLabel, consignorParty, consigne
             <td>Inv.No. &amp; Date</td>
             <td>Weight</td>
             <td>Rate Per KG</td>
-            <td>Freight To be bill for GST at {booking.gstPaidBy || "Consignor"}</td>
+            <td>{freightHead}</td>
           </tr>
           <tr>
             <td className="lr-print-value">{booking.articles}</td>
@@ -181,13 +200,13 @@ export function LrConsignmentNote({ booking, copyLabel, consignorParty, consigne
             <td>Barrier<br />{formatPrintMoney(booking.barrier || 0)}</td>
             <td>Other<br />{formatPrintMoney(booking.other || 0)}</td>
             <td>Hamali<br />{formatPrintMoney(booking.hamali || 0)}</td>
-            <td>LR Type<br />{booking.lrType || "TBB"}</td>
+            <td>LR Type<br /><strong>{type}</strong></td>
             <td>Total Amt.<br />{formatPrintMoney(total)}</td>
           </tr>
 
           <tr>
             <td colSpan={3}>
-              <span className="lr-print-label">GST :</span> {lrPrintCompany.companyGst} / PAN No. {lrPrintCompany.companyPan}
+              <span className="lr-print-label">GST :</span> {company.companyGst} / PAN No. {company.companyPan}
             </td>
             <td colSpan={2}>
               <span className="lr-print-label">Value Rs.</span> {booking.valueRs}
@@ -206,10 +225,10 @@ export function LrConsignmentNote({ booking, copyLabel, consignorParty, consigne
           </tr>
           <tr className="lr-print-footer">
             <td colSpan={4} className="lr-print-bold">
-              For {lrPrintCompany.name}
+              For {company.name}
             </td>
             <td colSpan={4} className="lr-print-bold lr-print-center">
-              Customer Care No : {lrPrintCompany.customerCare}
+              Customer Care No : {company.customerCare}
             </td>
           </tr>
         </tbody>

@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, InputField, SelectField } from "@/components/ui/FormField";
+import { DateField, InputField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -25,6 +25,7 @@ export default function DriverVoucherPage() {
   const { rows, message, create, update, remove, setMessage } = useCrud<Row>("driver-vouchers");
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [editId, setEditId] = useState<number | null>(null);
+  const [sr, setSr] = useState("1");
   const [form, setForm] = useState({
     driverName: "",
     date: todayIso(),
@@ -37,13 +38,17 @@ export default function DriverVoucherPage() {
     api<Driver[]>("/api/drivers").then(setDrivers);
   }, []);
 
+  useEffect(() => {
+    api<{ sr: number }>("/api/next-no?type=driver-voucher").then((d) => setSr(String(d.sr)));
+  }, [rows]);
+
   const outstanding = form.driverName ? outstandingOf(rows, form.driverName) : 0;
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     const body = {
       ...form,
-      voucherNo: String(editId ?? rows.length + 1),
+      voucherNo: String(editId ?? sr),
     };
     const saved = editId ? await update(editId, body) : await create(body);
     if (saved) {
@@ -60,14 +65,14 @@ export default function DriverVoucherPage() {
         <FormCard>
           <TwoCol>
             <div>
-              <InputField label="Sr No." value={editId ?? rows.length + 1} readOnly />
-              <SelectField label="Select Driver" value={form.driverName} onChange={(e) => setForm({ ...form, driverName: e.target.value })} options={drivers.map((d) => d.name)} />
+              <InputField label="Sr No." value={editId ?? sr} readOnly />
+              <ComboboxField label="Select Driver" value={form.driverName} onChange={(driverName) => setForm({ ...form, driverName })} options={drivers.map((d) => d.name)} placeholder="Search or select driver" />
               <InputField label="Outstanding" value={outstanding.toFixed(2)} readOnly />
               <DateField label="Payment Date" value={form.date} onChange={(date) => setForm({ ...form, date })} />
             </div>
             <div>
               <InputField label="Amount Rs." value={form.amount || ""} onChange={(e) => setForm({ ...form, amount: Number(e.target.value) || 0 })} />
-              <SelectField label="Payment Type" value={form.paymentType} onChange={(e) => setForm({ ...form, paymentType: e.target.value })} options={["Cr", "Dr"]} placeholder="" />
+              <ComboboxField label="Payment Type" value={form.paymentType} onChange={(paymentType) => setForm({ ...form, paymentType })} options={["Cr", "Dr"]} placeholder="Select" />
               <InputField label="Narration" value={form.particulars} onChange={(e) => setForm({ ...form, particulars: e.target.value })} />
             </div>
           </TwoCol>

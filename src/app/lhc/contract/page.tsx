@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, ManualNumberField, ComboboxField, SelectField } from "@/components/ui/FormField";
+import { InputField, ManualNumberField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -12,8 +12,8 @@ import { useCrud } from "@/hooks/useCrud";
 import { api } from "@/lib/api-client";
 import { lrNoEquals, stripLrPrefix } from "@/lib/lr-no";
 
-type Vendor = { name: string; type: string; pan?: string };
-type Party = { name: string; partyType: string; pan: string };
+type Vendor = { id: number; name: string; type: string; pan?: string; gst?: string };
+type Party = { id: number; name: string; partyType: string; pan: string; gst?: string };
 type Vehicle = {
   vehNo: string;
   ownerName: string;
@@ -114,30 +114,108 @@ export default function LorryHireContractPage() {
   }, []);
 
   const brokerParties = useMemo(
-    () => parties.filter((p) => (p.partyType || "").toLowerCase() === "broker" && p.name.trim()),
+    () =>
+      parties.filter((p) => {
+        const t = (p.partyType || "").toLowerCase();
+        return p.name.trim() && (t === "broker" || t.includes("broker"));
+      }),
     [parties],
   );
+  const brokerVendors = useMemo(
+    () => vendors.filter((v) => (v.type || "").toLowerCase() === "broker" && v.name.trim()),
+    [vendors],
+  );
   const brokerNames = useMemo(() => {
-    const fromParties = brokerParties.map((p) => p.name);
-    const fromVendors = vendors.filter((v) => v.type === "Broker").map((v) => v.name);
-    return [...new Set([...fromParties, ...fromVendors])].filter(Boolean);
-  }, [brokerParties, vendors]);
+    return [...new Set([...brokerParties.map((p) => p.name), ...brokerVendors.map((v) => v.name)])].filter(Boolean);
+  }, [brokerParties, brokerVendors]);
   const fuelVendors = vendors.filter((v) => v.type === "Fuel" || v.type === "Other").map((v) => v.name);
   const pendingLrs = bookings.filter(
     (b) => !b.lhcNo || (editId && selectedLrs.some((lr) => lrNoEquals(lr, b.lrNo))),
   );
 
+  function panFromGst(gst?: string) {
+    const g = String(gst ?? "")
+      .trim()
+      .toUpperCase()
+      .replace(/\s/g, "");
+    // GSTIN = state(2) + PAN(10) + …
+    if (g.length >= 12) return g.slice(2, 12);
+    return "";
+  }
+
+  function panForBroker(brokerName: string) {
+    const key = brokerName.trim().toLowerCase();
+    if (!key) return "";
+    const partyExact = parties.find((p) => p.name.trim().toLowerCase() === key);
+    const vendorExact = vendors.find((v) => v.name.trim().toLowerCase() === key);
+    const fromBrokerParty = brokerParties.find((p) => p.name.trim().toLowerCase() === key);
+    const fromBrokerVendor = brokerVendors.find((v) => v.name.trim().toLowerCase() === key);
+    const raw =
+      fromBrokerParty?.pan ||
+      fromBrokerVendor?.pan ||
+      partyExact?.pan ||
+      vendorExact?.pan ||
+      panFromGst(fromBrokerVendor?.gst || vendorExact?.gst || fromBrokerParty?.gst || partyExact?.gst) ||
+      "";
+    return raw.trim().toUpperCase();
+  }
+
+  async function syncBrokerPanToMaster(brokerName: string, pan: string) {
+    const name = brokerName.trim();
+    const nextPan = pan.trim().toUpperCase();
+    if (!name || !nextPan) return;
+    const key = name.toLowerCase();
+
+    const vendor = vendors.find((v) => v.name.trim().toLowerCase() === key);
+    if (vendor?.id && (vendor.pan || "").trim().toUpperCase() !== nextPan) {
+      try {
+        await api(`/api/vendors/${vendor.id}`, {
+          method: "PUT",
+          body: JSON.stringify({ ...vendor, pan: nextPan }),
+        });
+        setVendors((prev) => prev.map((v) => (v.id === vendor.id ? { ...v, pan: nextPan } : v)));
+      } catch {
+        /* ignore master sync errors */
+      }
+    }
+
+    const party = parties.find((p) => p.name.trim().toLowerCase() === key);
+    if (party?.id && (party.pan || "").trim().toUpperCase() !== nextPan) {
+      try {
+        await api(`/api/parties/${party.id}`, {
+          method: "PUT",
+          body: JSON.stringify({ ...party, pan: nextPan }),
+        });
+        setParties((prev) => prev.map((p) => (p.id === party.id ? { ...p, pan: nextPan } : p)));
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
   function selectBroker(brokerName: string) {
-    const party = brokerParties.find((p) => p.name.trim().toLowerCase() === brokerName.trim().toLowerCase());
-    const vendor = vendors.find(
-      (v) => v.type === "Broker" && v.name.trim().toLowerCase() === brokerName.trim().toLowerCase(),
-    );
+    const pan = panForBroker(brokerName);
     setForm((f) => ({
       ...f,
       brokerName,
-      brokerPan: party?.pan || vendor?.pan || (f.brokerName === brokerName ? f.brokerPan : "") || "",
+      brokerPan: pan || (f.brokerName === brokerName ? f.brokerPan : "") || "",
     }));
   }
+
+  function onBrokerPanChange(brokerPan: string) {
+    const pan = brokerPan.toUpperCase();
+    setForm((f) => ({ ...f, brokerPan: pan }));
+  }
+
+  // If masters load after broker is already chosen, fill PAN once available
+  useEffect(() => {
+    if (!form.brokerName?.trim()) return;
+    if (form.brokerPan?.trim()) return;
+    const pan = panForBroker(form.brokerName);
+    if (pan) setForm((f) => ({ ...f, brokerPan: pan }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [parties, vendors, form.brokerName]);
+
 
   const totalAdvance = useMemo(() => (form.transfer || 0) + (form.cash || 0) + (form.fuel || 0), [form]);
   const balance = (form.lorryFreight || 0) - totalAdvance;
@@ -188,6 +266,10 @@ export default function LorryHireContractPage() {
     };
     const saved = editId ? await update(editId, body) : await create(body);
     if (!saved) return;
+
+    if (form.brokerName && form.brokerPan) {
+      await syncBrokerPanToMaster(String(form.brokerName), String(form.brokerPan));
+    }
 
     await api("/api/bookings/link-lhc", {
       method: "POST",
@@ -271,7 +353,18 @@ export default function LorryHireContractPage() {
                 options={brokerNames}
                 placeholder="Search or select broker"
               />
-              <InputField label="Broker Pan No" name="brokerPan" value={form.brokerPan ?? ""} onChange={(e) => setForm({ ...form, brokerPan: e.target.value })} />
+              <InputField
+                label="Broker Pan No"
+                name="brokerPan"
+                value={form.brokerPan ?? ""}
+                onChange={(e) => onBrokerPanChange(e.target.value)}
+                onBlur={() => {
+                  if (form.brokerName && form.brokerPan) {
+                    void syncBrokerPanToMaster(String(form.brokerName), String(form.brokerPan));
+                  }
+                }}
+                placeholder={form.brokerName && !form.brokerPan ? "Enter PAN (will save to master)" : "Auto from master"}
+              />
             </div>
           </TwoCol>
         </FormCard>
@@ -286,7 +379,7 @@ export default function LorryHireContractPage() {
             </div>
             <div>
               <ManualNumberField label="Fuel / Diesel" value={form.fuel ?? 0} onChange={(n) => setForm({ ...form, fuel: n })} />
-              <SelectField label="Fuel / Diesel Vendor Name" name="fuelVendor" value={form.fuelVendor ?? ""} onChange={(e) => setForm({ ...form, fuelVendor: e.target.value })} options={fuelVendors.length ? fuelVendors : vendors.map((v) => v.name)} />
+              <ComboboxField label="Fuel / Diesel Vendor Name" name="fuelVendor" value={form.fuelVendor ?? ""} onChange={(fuelVendor) => setForm({ ...form, fuelVendor })} options={fuelVendors.length ? fuelVendors : vendors.map((v) => v.name)} placeholder="Search or select vendor" />
               <InputField label="Total Advance" value={totalAdvance || ""} readOnly />
               <InputField label="Balance" value={balance || ""} readOnly />
             </div>

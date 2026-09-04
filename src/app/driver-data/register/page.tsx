@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, SelectField } from "@/components/ui/FormField";
+import { InputField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -39,7 +39,7 @@ export default function DriverRegisterPage() {
             <div>
               <InputField label="Date" type="date" name="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
               <InputField label="Driver Name" name="driverName" value={form.driverName} onChange={(e) => setForm({ ...form, driverName: e.target.value })} required />
-              <SelectField label="Vehicle No" name="vehNo" value={form.vehNo} onChange={(e) => setForm({ ...form, vehNo: e.target.value })} options={vehicles.map((v) => v.vehNo)} />
+              <ComboboxField label="Vehicle No" name="vehNo" value={form.vehNo} onChange={(vehNo) => setForm({ ...form, vehNo })} options={vehicles.map((v) => v.vehNo)} placeholder="Search or select vehicle" />
             </div>
             <div>
               <InputField label="Start KM" name="startKm" value={form.startKm} onChange={(e) => setForm({ ...form, startKm: e.target.value })} />

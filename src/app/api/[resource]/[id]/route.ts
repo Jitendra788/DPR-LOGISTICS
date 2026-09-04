@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getModel, isResource, sanitize, type ResourceKey } from "@/lib/resources";
 import { resolveBillDeleteId, resolveUpdateId } from "@/lib/resolve-update";
 import { userFacingError } from "@/lib/handle-api-error";
+import { isUnknownPrismaArg, withoutUnknownArgs } from "@/lib/prisma-retry";
+import { prisma } from "@/lib/prisma";
 
 type Ctx = { params: Promise<{ resource: string; id: string }> };
 
@@ -19,9 +21,13 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
   if (!isResource(resource)) {
     return NextResponse.json({ error: "Unknown resource" }, { status: 404 });
   }
-  const row = await getModel(resource).findUnique({ where: { id: Number(id) } });
-  if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  return NextResponse.json(row);
+  try {
+    const row = await getModel(resource).findUnique({ where: { id: Number(id) } });
+    if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json(row);
+  } catch (err) {
+    return NextResponse.json({ error: userFacingError(err, "Could not load record") }, { status: 400 });
+  }
 }
 
 export async function PUT(req: NextRequest, ctx: Ctx) {
@@ -45,12 +51,25 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
       );
     }
 
-    const updated = await getModel(resource).update({
-      where: { id: updateId },
-      data: sanitize(body, resource),
-    });
-    return NextResponse.json(updated);
+    let data = sanitize(body, resource);
+    for (let attempt = 0; attempt < 6; attempt++) {
+      try {
+        const updated = await getModel(resource).update({
+          where: { id: updateId },
+          data,
+        });
+        return NextResponse.json(updated);
+      } catch (err) {
+        if (!isUnknownPrismaArg(err)) throw err;
+        const { data: cleaned, dropped } = withoutUnknownArgs(data, err);
+        if (!dropped.length) throw err;
+        console.warn(`PUT /api/${resource}/${id}: dropped unknown Prisma fields`, dropped);
+        data = cleaned;
+      }
+    }
+    throw new Error("Could not update. Please try again.");
   } catch (err) {
+    console.error(`PUT /api/${resource}/${id} failed`, err);
     return NextResponse.json({ error: userFacingError(err, "Could not update. Please try again.") }, { status: 400 });
   }
 }
@@ -75,6 +94,13 @@ export async function DELETE(req: NextRequest, ctx: Ctx) {
         return NextResponse.json({ error: "Bill not found" }, { status: 404 });
       }
       deleteId = resolved;
+      const bill = await prisma.bill.findUnique({ where: { id: deleteId } });
+      if (bill?.billNo) {
+        await prisma.lrBooking.updateMany({
+          where: { billNo: bill.billNo },
+          data: { billed: false, billNo: "" },
+        });
+      }
     } else {
       const existing = await getModel(resource).findUnique({ where: { id } });
       if (!existing) {
@@ -85,6 +111,7 @@ export async function DELETE(req: NextRequest, ctx: Ctx) {
     await getModel(resource).delete({ where: { id: deleteId } });
     return NextResponse.json({ ok: true });
   } catch (err) {
+    console.error(`DELETE /api/${resource}/${id} failed`, err);
     return NextResponse.json({ error: userFacingError(err, "Could not delete. Please try again.") }, { status: 400 });
   }
 }

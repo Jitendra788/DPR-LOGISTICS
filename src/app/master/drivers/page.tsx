@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, FileField, InputField, SelectField } from "@/components/ui/FormField";
+import { DateField, FileField, InputField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -128,7 +128,7 @@ export default function DriverStaffPage() {
               <InputField label="PAN No." value={form.pan} onChange={(e) => setForm({ ...form, pan: e.target.value })} />
               <FileField label="Driver photo" />
               <FileField label="Driver document pdf" />
-              <SelectField label="Category" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} options={["Driver", "Staff", "Cleaner"]} placeholder="" />
+              <ComboboxField label="Category" value={form.category} onChange={(category) => setForm({ ...form, category })} options={["Driver", "Staff", "Cleaner"]} placeholder="Select category" />
             </div>
           </TwoCol>
           <Button type="submit" variant="teal">

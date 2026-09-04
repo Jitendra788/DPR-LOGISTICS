@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { FileField, InputField, DropdownField, TextAreaField } from "@/components/ui/FormField";
+import { FileField, InputField, ComboboxField, TextAreaField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -116,12 +116,13 @@ export default function PartyCreationPage() {
               <InputField label="Enter Party Name" name="name" value={form.name ?? ""} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
               <TextAreaField label="Address" name="address" value={form.address ?? ""} onChange={(e) => setForm({ ...form, address: e.target.value })} />
               <InputField label="Contact No" name="contact" value={form.contact ?? ""} onChange={(e) => setForm({ ...form, contact: e.target.value })} />
-              <DropdownField
+              <ComboboxField
                 label="Party Type"
                 name="partyType"
                 value={form.partyType ?? "Consigner/Consignee"}
-                onChange={(e) => setForm({ ...form, partyType: e.target.value })}
+                onChange={(partyType) => setForm({ ...form, partyType })}
                 options={["Consigner/Consignee", "Broker", "Transporter"]}
+                placeholder="Select party type"
               />
             </div>
             <div>

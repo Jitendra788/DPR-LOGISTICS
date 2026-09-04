@@ -3,13 +3,16 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, ComboboxField, DropdownField, InputField, ManualNumberField, SelectField } from "@/components/ui/FormField";
+import { DateField, ComboboxField, DropdownField, InputField, ManualNumberField } from "@/components/ui/FormField";
+import { LR_TYPES, normalizeLrType } from "@/lib/lr-type";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
 import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { api, formToObject } from "@/lib/api-client";
 import { todayIso } from "@/lib/dates";
+import { lrNoEquals } from "@/lib/lr-no";
+import { autoLrFreight } from "@/lib/lr-totals";
 
 type Party = { name: string };
 type Booking = {
@@ -43,6 +46,9 @@ type Booking = {
   hamali: number;
   total: number;
   gst: number;
+  cgstAmt: number;
+  sgstAmt: number;
+  igstAmt: number;
   grandTotal: number;
   gstPaidBy: string;
   ewayBill: string;
@@ -96,6 +102,9 @@ function blankForm(lrNo = "") {
     other: 0,
     hamali: 0,
     gst: 0,
+    cgstAmt: 0,
+    sgstAmt: 0,
+    igstAmt: 0,
     gstPaidBy: "Consigner",
     ewayBill: "",
     validDate: todayIso(),
@@ -109,6 +118,8 @@ export default function RoadwaysLrPage() {
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState(blankForm());
   const [parties, setParties] = useState<Party[]>([]);
+  const [vehicles, setVehicles] = useState<{ vehNo: string }[]>([]);
+  const [stations, setStations] = useState<{ name: string }[]>([]);
   const [searchLr, setSearchLr] = useState("");
   const [printOpts, setPrintOpts] = useState({ consignor: true, lorry: false, consignee: false });
   const [email, setEmail] = useState("");
@@ -118,9 +129,35 @@ export default function RoadwaysLrPage() {
     [rows],
   );
 
+  function patchForm(patch: Partial<ReturnType<typeof blankForm>>) {
+    setForm((prev) => {
+      const next = { ...prev, ...patch };
+      const freight = autoLrFreight({
+        billAs: next.billAs,
+        rate: next.rate,
+        totalMeter: next.totalMeter,
+        chargedWeight: next.chargedWeight,
+      });
+      if (freight != null && ("rate" in patch || "totalMeter" in patch || "chargedWeight" in patch || "billAs" in patch)) {
+        next.freight = freight;
+      }
+      if ("cgstAmt" in patch || "sgstAmt" in patch || "igstAmt" in patch) {
+        next.gst = Number(((Number(next.cgstAmt) || 0) + (Number(next.sgstAmt) || 0) + (Number(next.igstAmt) || 0)).toFixed(2));
+      }
+      return next;
+    });
+  }
+
   useEffect(() => {
-    Promise.all([api<Party[]>("/api/parties"), api<{ value: string }>("/api/next-no?type=lr")]).then(([p, next]) => {
+    Promise.all([
+      api<Party[]>("/api/parties"),
+      api<{ value: string }>("/api/next-no?type=lr&source=ROADWAYS"),
+      api<{ vehNo: string }[]>("/api/vehicles"),
+      api<{ name: string }[]>("/api/stations"),
+    ]).then(([p, next, veh, st]) => {
       setParties(p);
+      setVehicles(veh);
+      setStations(st);
       setForm((f) => ({ ...f, lrNo: f.lrNo || next.value }));
     });
   }, []);
@@ -138,22 +175,34 @@ export default function RoadwaysLrPage() {
       (form.hamali || 0),
     [form],
   );
-  const grandTotal = total + (form.gst || 0);
+  const gstTotal = useMemo(
+    () => Number(((Number(form.cgstAmt) || 0) + (Number(form.sgstAmt) || 0) + (Number(form.igstAmt) || 0)).toFixed(2)),
+    [form.cgstAmt, form.sgstAmt, form.igstAmt],
+  );
+  const grandTotal = total + gstTotal;
 
   function load(row: Booking) {
     setEditId(row.id);
+    const cgst = Number(row.cgstAmt) || 0;
+    const sgst = Number(row.sgstAmt) || 0;
+    const igst = Number(row.igstAmt) || 0;
+    const gstSplit = cgst + sgst + igst;
     setForm({
       ...blankForm(),
       ...row,
       lrDate: row.lrDate || todayIso(),
       validDate: row.validDate || todayIso(),
+      cgstAmt: gstSplit > 0 ? cgst : Number(row.gst) || 0,
+      sgstAmt: gstSplit > 0 ? sgst : 0,
+      igstAmt: gstSplit > 0 ? igst : 0,
+      gst: gstSplit > 0 ? gstSplit : Number(row.gst) || 0,
     });
     setMessage({ type: "ok", text: `Loaded LR ${row.lrNo}` });
   }
 
   function search() {
     const found = rows.find(
-      (r) => r.lrNo.toLowerCase() === searchLr.trim().toLowerCase() && (r.source || "DPR") === "ROADWAYS",
+      (r) => lrNoEquals(r.lrNo, searchLr.trim()) && (r.source || "DPR") === "ROADWAYS",
     );
     if (!found) {
       setMessage({ type: "err", text: "LR not found" });
@@ -164,7 +213,7 @@ export default function RoadwaysLrPage() {
 
   async function resetAfterSave() {
     setEditId(null);
-    const next = await api<{ value: string }>("/api/next-no?type=lr");
+    const next = await api<{ value: string }>("/api/next-no?type=lr&source=ROADWAYS");
     setForm(blankForm(next.value));
     await reload();
   }
@@ -184,10 +233,14 @@ export default function RoadwaysLrPage() {
       barrier: form.barrier || 0,
       other: form.other || 0,
       hamali: form.hamali || 0,
-      gst: form.gst || 0,
+      gst: gstTotal,
+      cgstAmt: Number(form.cgstAmt) || 0,
+      sgstAmt: Number(form.sgstAmt) || 0,
+      igstAmt: Number(form.igstAmt) || 0,
       total,
       grandTotal,
       source: "ROADWAYS",
+      lrType: normalizeLrType(form.lrType),
     };
     const saved = await create(body);
     if (saved) await resetAfterSave();
@@ -195,7 +248,17 @@ export default function RoadwaysLrPage() {
 
   async function modifyLr() {
     if (!editId) return;
-    const saved = await update(editId, { ...form, total, grandTotal, source: "ROADWAYS" });
+    const saved = await update(editId, {
+      ...form,
+      gst: gstTotal,
+      cgstAmt: Number(form.cgstAmt) || 0,
+      sgstAmt: Number(form.sgstAmt) || 0,
+      igstAmt: Number(form.igstAmt) || 0,
+      total,
+      grandTotal,
+      source: "ROADWAYS",
+      lrType: normalizeLrType(form.lrType),
+    });
     if (saved) await resetAfterSave();
   }
 
@@ -210,7 +273,7 @@ export default function RoadwaysLrPage() {
     const copies = [printOpts.consignor ? "Consignor" : "", printOpts.lorry ? "Lorry" : "", printOpts.consignee ? "Consignee" : ""]
       .filter(Boolean)
       .join(",");
-    window.open(`/booking/lr/print?lrNo=${encodeURIComponent(form.lrNo)}&copies=${copies}`, "_blank");
+    window.open(`/roadways/lr/print?lrNo=${encodeURIComponent(form.lrNo)}&copies=${copies}`, "_blank");
   }
 
   async function emailLr() {
@@ -238,9 +301,9 @@ export default function RoadwaysLrPage() {
   return (
     <>
       <PageHeader
-        title="LR Booking"
-        subtitle="Fill all the fields"
-        crumbs={[{ label: "Home", href: "/dashboard" }, { label: "LR Booking" }]}
+        title="Roadways LR Booking"
+        subtitle="Delhi Punjab Roadways — same work flow as old site"
+        crumbs={[{ label: "Home", href: "/dashboard" }, { label: "DPR Roadways" }, { label: "L.R" }]}
       />
       <Flash message={message} />
       <AdminForm onSubmit={onSubmit}>
@@ -250,23 +313,44 @@ export default function RoadwaysLrPage() {
               <InputField label="Booking From" name="bookingFrom" value={form.bookingFrom} onChange={(e) => setForm({ ...form, bookingFrom: e.target.value })} />
               <InputField label="LR No" name="lrNo" value={form.lrNo} onChange={(e) => setForm({ ...form, lrNo: e.target.value })} required />
               <DateField label="LR Date" value={form.lrDate} onChange={(lrDate) => setForm({ ...form, lrDate })} />
-              <InputField label="From Station" name="fromStation" value={form.fromStation} onChange={(e) => setForm({ ...form, fromStation: e.target.value })} />
-              <InputField label="To Station" name="toStation" value={form.toStation} onChange={(e) => setForm({ ...form, toStation: e.target.value })} />
-              <InputField label="Veh.No" name="vehNo" value={form.vehNo} onChange={(e) => setForm({ ...form, vehNo: e.target.value })} />
-              <SelectField label="Delivery At" name="deliveryAt" value={form.deliveryAt} onChange={(e) => setForm({ ...form, deliveryAt: e.target.value })} options={["DOOR", "GODOWN"]} placeholder="" />
-              <SelectField label="Billing Party" name="billingParty" value={form.billingParty} onChange={(e) => setForm({ ...form, billingParty: e.target.value })} options={parties.map((p) => p.name)} />
-              <SelectField label="Consignor" name="consignor" value={form.consignor} onChange={(e) => setForm({ ...form, consignor: e.target.value })} options={parties.map((p) => p.name)} />
+              <ComboboxField
+                label="From Station"
+                name="fromStation"
+                value={form.fromStation}
+                onChange={(fromStation) => setForm({ ...form, fromStation })}
+                options={stations.map((s) => s.name)}
+                placeholder="Search or select station"
+              />
+              <ComboboxField
+                label="To Station"
+                name="toStation"
+                value={form.toStation}
+                onChange={(toStation) => setForm({ ...form, toStation })}
+                options={stations.map((s) => s.name)}
+                placeholder="Search or select station"
+              />
+              <ComboboxField
+                label="Veh.No"
+                name="vehNo"
+                value={form.vehNo}
+                onChange={(vehNo) => setForm({ ...form, vehNo })}
+                options={vehicles.map((v) => v.vehNo)}
+                placeholder="Search or select vehicle"
+              />
+              <ComboboxField label="Delivery At" name="deliveryAt" value={form.deliveryAt} onChange={(deliveryAt) => setForm({ ...form, deliveryAt })} options={["DOOR", "GODOWN"]} placeholder="Select delivery" />
+              <ComboboxField label="Billing Party" name="billingParty" value={form.billingParty} onChange={(billingParty) => setForm({ ...form, billingParty })} options={parties.map((p) => p.name)} placeholder="Search or select party" />
+              <ComboboxField label="Consignor" name="consignor" value={form.consignor} onChange={(consignor) => setForm({ ...form, consignor })} options={parties.map((p) => p.name)} placeholder="Search or select consignor" />
             </div>
             <div>
-              <InputField label="Consignee" name="consignee" value={form.consignee} onChange={(e) => setForm({ ...form, consignee: e.target.value })} />
+              <ComboboxField label="Consignee" name="consignee" value={form.consignee} onChange={(consignee) => setForm({ ...form, consignee })} options={parties.map((p) => p.name)} placeholder="Search or select consignee" />
               <InputField label="No Of Articles" name="articles" value={form.articles} onChange={(e) => setForm({ ...form, articles: e.target.value })} />
               <InputField label="particulars" name="particulars" value={form.particulars} onChange={(e) => setForm({ ...form, particulars: e.target.value })} />
               <InputField label="Inv.No.& Date" name="invNoDate" value={form.invNoDate} onChange={(e) => setForm({ ...form, invNoDate: e.target.value })} />
               <InputField label="Act.Weight" name="actWeight" value={form.actWeight} onChange={(e) => setForm({ ...form, actWeight: e.target.value })} />
-              <InputField label="Charged Weight" name="chargedWeight" value={form.chargedWeight} onChange={(e) => setForm({ ...form, chargedWeight: e.target.value })} />
-              <InputField label="Rate" name="rate" value={form.rate} onChange={(e) => setForm({ ...form, rate: e.target.value })} />
-              <DropdownField label="Bill As" name="billAs" value={form.billAs} onChange={(e) => setForm({ ...form, billAs: e.target.value })} options={["Weight", "Mtr", "Package"]} />
-              <InputField label="Total Meter" name="totalMeter" value={form.totalMeter} onChange={(e) => setForm({ ...form, totalMeter: e.target.value })} />
+              <InputField label="Charged Weight" name="chargedWeight" value={form.chargedWeight} onChange={(e) => patchForm({ chargedWeight: e.target.value })} />
+              <InputField label="Rate" name="rate" value={form.rate} onChange={(e) => patchForm({ rate: e.target.value })} />
+              <ComboboxField label="Bill As" name="billAs" value={form.billAs} onChange={(billAs) => patchForm({ billAs })} options={["Weight", "Mtr", "Package"]} placeholder="Select" />
+              <InputField label="Total Meter" name="totalMeter" value={form.totalMeter} onChange={(e) => patchForm({ totalMeter: e.target.value })} />
             </div>
           </TwoCol>
         </FormCard>
@@ -279,19 +363,23 @@ export default function RoadwaysLrPage() {
                   key={key}
                   label={chargeLabels[key]}
                   value={form[key]}
-                  onChange={(n) => setForm({ ...form, [key]: n })}
+                  onChange={(n) => patchForm({ [key]: n })}
+                  readOnly={key === "freight"}
                 />
               ))}
             </div>
             <div>
               <ManualNumberField label="Total" value={total} readOnly />
-              <ManualNumberField label="GST" value={form.gst} onChange={(gst) => setForm({ ...form, gst })} />
+              <ManualNumberField label="CGST" value={form.cgstAmt} onChange={(cgstAmt) => patchForm({ cgstAmt })} />
+              <ManualNumberField label="SGST" value={form.sgstAmt} onChange={(sgstAmt) => patchForm({ sgstAmt })} />
+              <ManualNumberField label="IGST" value={form.igstAmt} onChange={(igstAmt) => patchForm({ igstAmt })} />
+              <ManualNumberField label="GST Total" value={gstTotal} readOnly />
               <ManualNumberField label="Grand Total" value={grandTotal} readOnly />
-              <DropdownField label="GST Paid By" name="gstPaidBy" value={form.gstPaidBy} onChange={(e) => setForm({ ...form, gstPaidBy: e.target.value })} options={["Consigner", "Consignee", "Company", "Broker"]} />
-              <InputField label="E-Way Bill No" name="ewayBill" value={form.ewayBill} onChange={(e) => setForm({ ...form, ewayBill: e.target.value })} />
-              <DateField label="Valid Date" value={form.validDate} onChange={(validDate) => setForm({ ...form, validDate })} />
-              <DropdownField label="LR Type" name="lrType" value={form.lrType} onChange={(e) => setForm({ ...form, lrType: e.target.value })} options={["TBB", "ToPay", "Paid"]} />
-              <InputField label="Value Rs." name="valueRs" value={form.valueRs} onChange={(e) => setForm({ ...form, valueRs: e.target.value })} />
+              <ComboboxField label="GST Paid By" name="gstPaidBy" value={form.gstPaidBy} onChange={(gstPaidBy) => patchForm({ gstPaidBy })} options={["Consigner", "Consignee", "Company", "Broker"]} placeholder="Select" />
+              <InputField label="E-Way Bill No" name="ewayBill" value={form.ewayBill} onChange={(e) => patchForm({ ewayBill: e.target.value })} />
+              <DateField label="Valid Date" value={form.validDate} onChange={(validDate) => patchForm({ validDate })} />
+              <DropdownField label="LR Type" name="lrType" value={form.lrType} onChange={(e) => patchForm({ lrType: e.target.value })} options={[...LR_TYPES]} />
+              <InputField label="Value Rs." name="valueRs" value={form.valueRs} onChange={(e) => patchForm({ valueRs: e.target.value })} />
             </div>
           </TwoCol>
           <div className="mt-2 flex flex-wrap gap-2">

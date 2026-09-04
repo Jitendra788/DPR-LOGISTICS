@@ -7,6 +7,7 @@ import { api } from "@/lib/api-client";
 import { todayIso } from "@/lib/dates";
 import { SearchSelect } from "@/components/ui/SearchSelect";
 import { company } from "@/data/marketing/company";
+import { LR_TYPES, normalizeLrType } from "@/lib/lr-type";
 import "./public.css";
 
 type FormState = {
@@ -134,7 +135,7 @@ export default function CustomerBookingPage() {
     try {
       const saved = await api<{ lrNo: string }>("/api/public/booking", {
         method: "POST",
-        body: JSON.stringify({ ...form, total, grandTotal }),
+        body: JSON.stringify({ ...form, total, grandTotal, lrType: normalizeLrType(form.lrType) }),
       });
       setMessage({ type: "ok", text: `Booking saved. LR No ${saved.lrNo}` });
       window.open(`/customer-booking/print?lrNo=${encodeURIComponent(saved.lrNo)}`, "_blank");
@@ -231,7 +232,7 @@ export default function CustomerBookingPage() {
               <Select label="GST Paid By" value={form.gstPaidBy} onChange={(v) => set("gstPaidBy", v)} options={["Consigner", "Consignee", "Company", "Broker"]} />
               <Field label="E-Way Bill No" value={form.ewayBill} onChange={(v) => set("ewayBill", v)} />
               <Field label="Valid Date" type="date" value={form.validDate} onChange={(v) => set("validDate", v)} />
-              <Select label="LR Type" value={form.lrType} onChange={(v) => set("lrType", v)} options={["TBB", "ToPay", "Paid"]} />
+              <Select label="LR Type" value={form.lrType} onChange={(v) => set("lrType", v)} options={[...LR_TYPES]} />
               <Field label="Value Rs." value={form.valueRs} onChange={(v) => set("valueRs", v)} />
             </div>
           </section>

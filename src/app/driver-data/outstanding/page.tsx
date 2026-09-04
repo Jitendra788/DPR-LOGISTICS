@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { api, downloadCsv } from "@/lib/api-client";
 
-type Row = { sillNo: number; driverName: string; outstanding: number };
+type Row = { srNo: number; driverName: string; outstanding: number };
 
 export default function DriverOutstandingPage() {
   const [rows, setRows] = useState<Row[]>([]);
@@ -24,24 +24,28 @@ export default function DriverOutstandingPage() {
       vouchers.forEach((v) => {
         map[v.driverName] = (map[v.driverName] || 0) + (v.paymentType === "Dr" ? -v.amount : v.amount);
       });
-      setRows(Object.entries(map).map(([driverName, outstanding], i) => ({ sillNo: i + 1, driverName, outstanding })));
+      setRows(
+        Object.entries(map)
+          .sort((a, b) => a[0].localeCompare(b[0]))
+          .map(([driverName, outstanding], i) => ({ srNo: i + 1, driverName, outstanding })),
+      );
     });
   }, []);
 
   return (
     <>
-      <PageHeader title="Driver Outstanding" subtitle="Non Driver Outstanding" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Driver Outstanding" }]} />
+      <PageHeader title="Driver Outstanding" subtitle="View Driver Outstanding" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Driver Outstanding" }]} />
       <DataTable
         rows={rows}
         columns={[
-          { key: "sillNo", header: "Sill No" },
+          { key: "srNo", header: "Sr No" },
           { key: "driverName", header: "Driver Name" },
           { key: "outstanding", header: "Outstanding Rs." },
         ]}
       />
       <FormCard>
         <Button type="button" variant="teal" onClick={() => downloadCsv("driver-outstanding.csv", rows as unknown as Record<string, unknown>[])}>
-          Export to Excel
+          Export as Excel
         </Button>
       </FormCard>
     </>

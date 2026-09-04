@@ -1,0 +1,233 @@
+.lm-page {
+  background: #e8e8e8;
+  min-height: 100vh;
+  padding: 16px;
+}
+
+.lm-sheet {
+  width: 210mm;
+  max-width: 100%;
+  margin: 0 auto;
+  background: #fff;
+  color: #111;
+  border: 1.5px solid #111;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 1.35;
+  box-sizing: border-box;
+}
+
+.lm-head {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 8px;
+  padding: 10px 12px 8px;
+  border-bottom: 1.5px solid #111;
+  align-items: start;
+}
+
+.lm-logo {
+  width: 100px;
+  height: auto;
+  object-fit: contain;
+}
+
+.lm-head-main {
+  text-align: center;
+}
+
+.lm-bless {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lm-name {
+  margin: 0;
+  color: #c41e1e;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+.lm-tag {
+  margin: 2px 0 6px;
+  color: #c41e1e;
+  font-size: 14px;
+  font-style: italic;
+  font-family: Georgia, "Times New Roman", Times, serif;
+}
+
+.lm-addr {
+  margin: 0;
+  font-size: 12px;
+}
+
+.lm-pan {
+  margin: 4px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.lm-titlebar {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-bottom: 1.5px solid #111;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.lm-titlebar > div {
+  padding: 6px 10px;
+  border-right: 1.5px solid #111;
+}
+
+.lm-titlebar > div:last-child {
+  border-right: none;
+  text-align: right;
+}
+
+.lm-titlebar > div:nth-child(2) {
+  text-align: center;
+}
+
+.lm-body {
+  padding: 10px 12px;
+  border-bottom: 1.5px solid #111;
+  min-height: 150px;
+}
+
+.lm-line {
+  margin: 0 0 6px;
+}
+
+.lm-line strong {
+  font-weight: 700;
+}
+
+.lm-indent {
+  margin-left: 0;
+}
+
+.lm-money {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1.5px solid #111;
+}
+
+.lm-money-col {
+  padding: 8px 12px;
+}
+
+.lm-money-col:first-child {
+  border-right: 1.5px solid #111;
+}
+
+.lm-money-row {
+  margin: 0 0 6px;
+  font-weight: 600;
+}
+
+.lm-money-row:last-child {
+  margin-bottom: 0;
+}
+
+.lm-bank-sign {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  border-bottom: 1.5px solid #111;
+  min-height: 120px;
+}
+
+.lm-bank {
+  padding: 10px 12px;
+  border-right: 1.5px solid #111;
+}
+
+.lm-bank p {
+  margin: 0 0 4px;
+}
+
+.lm-sign {
+  padding: 10px 12px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.lm-sign-for {
+  margin: 0;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.lm-sign-space {
+  flex: 1;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1d4ed8;
+  font-family: "Segoe Script", "Brush Script MT", cursive;
+  font-size: 22px;
+  font-style: italic;
+}
+
+.lm-care {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lm-terms {
+  padding: 8px 12px 12px;
+}
+
+.lm-terms h3 {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.lm-terms ol {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.lm-terms li {
+  margin-bottom: 2px;
+}
+
+.lm-remark {
+  margin: 8px 0 0;
+  font-weight: 600;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 8mm;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  .lm-page {
+    background: #fff;
+    padding: 0;
+  }
+
+  .lm-sheet {
+    width: 100%;
+    border-width: 1.5px;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}

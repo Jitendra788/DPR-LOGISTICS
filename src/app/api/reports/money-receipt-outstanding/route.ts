@@ -4,6 +4,7 @@ import { billFreightAmount, billGrandTotal } from "@/lib/bill-totals";
 import { lrBillableAmount } from "@/lib/lr-totals";
 import { displayToIso } from "@/lib/dates";
 import { apiError } from "@/lib/handle-api-error";
+import { docSourceWhere, normalizeDocSource } from "@/lib/module-docs";
 
 function normalizeDate(value: string) {
   const trimmed = value.trim();
@@ -35,12 +36,32 @@ export async function GET(req: NextRequest) {
     const billNoFilter = searchParams.get("billNo") ?? "";
     const fromDate = normalizeDate(searchParams.get("fromDate") ?? "");
     const toDate = normalizeDate(searchParams.get("toDate") ?? "");
+    const sourceParam = searchParams.get("source");
+    const sourceFilter = sourceParam ? docSourceWhere(sourceParam) : undefined;
+    const receiptSource = sourceParam ? normalizeDocSource(sourceParam) : null;
 
     const [bills, receipts, lrs] = await Promise.all([
-    prisma.bill.findMany({ orderBy: { id: "desc" } }),
-    prisma.moneyReceipt.findMany(),
-    prisma.lrBooking.findMany({ where: { billNo: { not: "" } } }),
-  ]);
+      prisma.bill.findMany({
+        where: sourceFilter,
+        orderBy: { id: "desc" },
+      }),
+      prisma.moneyReceipt.findMany(
+        receiptSource
+          ? {
+              where:
+                receiptSource === "ROADWAYS"
+                  ? { source: "ROADWAYS" }
+                  : { OR: [{ source: "DPR" }, { source: "CUSTOMER" }, { source: "" }] },
+            }
+          : undefined,
+      ),
+      prisma.lrBooking.findMany({
+        where: {
+          billNo: { not: "" },
+          ...(sourceFilter ?? {}),
+        },
+      }),
+    ]);
 
     const lrSumByBill: Record<string, number> = {};
     lrs.forEach((row) => {
@@ -81,10 +102,12 @@ export async function GET(req: NextRequest) {
           outstanding,
           billAmount,
           paid,
+          source: b.source,
+          id: b.id,
         };
       })
       .filter((row) => row.outstanding > 0 && row.billAmount > 0)
-      .map((row, i) => ({ ...row, srNo: i + 1 }));
+      .map((row, i) => ({ ...row, srNo: row.id || i + 1 }));
 
     return NextResponse.json(rows);
   } catch (err) {

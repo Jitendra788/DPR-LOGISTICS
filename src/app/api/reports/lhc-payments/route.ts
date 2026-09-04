@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
 
   const rows = await prisma.lhcContract.findMany({
     where: {
-      ...(paid === "true" ? { paid: true } : {}),
+      ...(paid === "true" ? { OR: [{ paid: true }, { paidAmount: { gt: 0 } }] } : {}),
       ...(paid === "false" ? { paid: false } : {}),
     },
     orderBy: { id: "desc" },
@@ -40,8 +40,30 @@ export async function GET(req: NextRequest) {
     if (!matchesField(row.vehNo, vehNo)) return false;
     if (!matchesField(row.brokerName, brokerName)) return false;
     if (lhcNo.trim() && !row.challanNo.toLowerCase().includes(lhcNo.trim().toLowerCase())) return false;
+    if (paid === "true" && !row.paid && !(Number(row.paidAmount) > 0)) return false;
+    if (paid === "false" && (row.paid || lhcOutstandingBalance(row) <= 0)) return false;
     return true;
   });
 
   return NextResponse.json(filtered);
+}
+
+function lhcOutstandingBalance(row: {
+  paid: boolean;
+  balance: number;
+  lorryFreight: number;
+  totalAdvance: number;
+  paidAmount: number;
+  otherDed?: number;
+}) {
+  if (row.paid) return 0;
+  const bal = Number(row.balance);
+  if (Number.isFinite(bal) && bal > 0) return bal;
+  return Math.max(
+    0,
+    (Number(row.lorryFreight) || 0) -
+      (Number(row.totalAdvance) || 0) -
+      (Number(row.paidAmount) || 0) -
+      (Number(row.otherDed) || 0),
+  );
 }

@@ -80,13 +80,15 @@ export const navItems: NavItem[] = [
     children: [
       { label: "Booking Slip", href: "/roadways/booking-slip" },
       { label: "Booking Slip Payment", href: "/roadways/booking-slip-payment" },
-      { label: "Booking Slip Outstaning Report", href: "/roadways/booking-slip-outstanding" },
+      { label: "Booking Slip Outstanding Report", href: "/roadways/booking-slip-outstanding" },
       { label: "L.R", href: "/roadways/lr" },
       { label: "Bill Weightwise", href: "/roadways/bill-weightwise" },
       { label: "Bill Meterwise", href: "/roadways/bill-meterwise" },
       { label: "Search Bill", href: "/roadways/search-bill" },
       { label: "Money Reciept", href: "/roadways/money-receipt" },
-      { label: "Roadways Outstanding Report", href: "/roadways/outstanding" },
+      { label: "Billwise Outstanding Report", href: "/roadways/outstanding" },
+      { label: "Party Ledger", href: "/roadways/party-ledger" },
+      { label: "GST Summary Report", href: "/roadways/gst-summary" },
     ],
   },
   {

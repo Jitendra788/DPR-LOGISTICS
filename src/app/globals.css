@@ -39,36 +39,38 @@ body {
 }
 
 .form-group {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .form-group > span,
 .form-label {
   display: block;
-  margin-bottom: 4px;
-  font-size: 13px;
+  margin-bottom: 3px;
+  font-size: 12px;
   font-weight: 700;
+  letter-spacing: 0.01em;
   color: #334155;
 }
 
 .form-control {
   display: block;
   width: 100%;
-  height: 38px;
-  padding: 7px 12px;
-  font-size: 14px;
-  line-height: 1.4;
+  height: 36px;
+  padding: 6px 11px;
+  font-size: 13px;
+  line-height: 1.35;
   color: #0f172a;
-  background-color: #fff;
+  background-color: #f8fafc;
   border: 1px solid #d8e2ec;
-  border-radius: 10px;
+  border-radius: 9px;
   box-shadow: none;
   outline: none;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
 }
 
 .form-control:focus {
   border-color: #0f766e;
+  background-color: #fff;
   box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
 }
 
@@ -261,34 +263,34 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
 
 .box {
   position: relative;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
   background: #fff;
   border: 1px solid #e8eef3;
   border-top: 3px solid #0f766e;
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.035);
 }
 
 .box-body {
-  padding: 12px;
+  padding: 10px 12px;
   border-top: 0;
 }
 
 @media (min-width: 640px) {
   .box-body {
-    padding: 14px 16px;
+    padding: 12px 14px;
   }
 }
 
 .page-content {
-  padding: 12px 14px;
+  padding: 10px 12px;
   max-width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 @media (min-width: 640px) {
   .page-content {
-    padding: 16px 18px;
+    padding: 12px 16px;
   }
 }
 
@@ -297,7 +299,7 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 8px 14px;
+  padding: 7px 13px;
   margin-bottom: 0;
   font-size: 13px;
   font-weight: 700;
@@ -307,9 +309,9 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   vertical-align: middle;
   cursor: pointer;
   border: 1px solid transparent;
-  border-radius: 10px;
+  border-radius: 9px;
   text-decoration: none;
-  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.07);
   transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease, background 0.15s ease;
 }
 
@@ -415,18 +417,23 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
 
 .erp-dt th,
 .erp-dt td {
-  border: 1px solid #f4f4f4;
-  padding: 8px;
+  border: 1px solid #eef2f6;
+  padding: 6px 8px;
   text-align: left;
   color: #333;
+  font-size: 13px;
+  vertical-align: middle;
 }
 
 .erp-dt thead tr {
-  background: #f4f4f4;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
 }
 
 .erp-dt th {
   font-weight: 700;
+  font-size: 12px;
+  color: #334155;
+  white-space: nowrap;
 }
 
 .erp-dt tbody tr:nth-child(odd) {
@@ -434,13 +441,84 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
 }
 
 .erp-dt tbody tr:nth-child(even) {
-  background: #f9f9f9;
+  background: #fafbfc;
+}
+
+.erp-dt tbody tr:hover {
+  background: #f0fdfa;
 }
 
 .erp-dt-empty {
   text-align: center;
-  padding: 24px 8px;
-  color: #777;
+  padding: 16px 8px;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+/* GST Summary — dense bill-wise report like classic ERP */
+.erp-gst-summary th,
+.erp-gst-summary td {
+  padding: 5px 8px;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  border-bottom: 1px solid #e8eef3;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.erp-gst-summary thead tr {
+  background: #fff;
+}
+
+.erp-gst-summary th {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+  border-bottom: 1px solid #cbd5e1;
+}
+
+.erp-gst-summary tbody tr:nth-child(even) {
+  background: #fcfcfd;
+}
+
+.erp-gst-summary tbody tr:hover {
+  background: #f0fdfa;
+}
+
+.erp-gst-summary .text-right {
+  text-align: right;
+}
+
+/* Party ledger — Excel-style Cr / Dr report */
+.erp-party-ledger th,
+.erp-party-ledger td {
+  padding: 5px 8px;
+  border: 1px solid #cbd5e1;
+  vertical-align: middle;
+}
+
+.erp-party-ledger thead tr {
+  background: #f8fafc;
+}
+
+.erp-party-ledger th {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.erp-party-ledger tbody tr.is-foot {
+  background: #f1f5f9;
+  font-weight: 700;
+}
+
+.erp-party-ledger tbody tr.is-foot td {
+  border-top: 2px solid #94a3b8;
+}
+
+.erp-party-ledger .text-right {
+  text-align: right;
 }
 
 .erp-dt-meta {
@@ -532,19 +610,19 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
 .s2-control {
   display: flex;
   width: 100%;
-  height: 38px;
+  height: 36px;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 7px 12px;
+  padding: 6px 11px;
   border: 1px solid #d8e2ec;
-  border-radius: 10px;
-  background: #fff;
+  border-radius: 9px;
+  background: #f8fafc;
   color: #0f172a;
-  font-size: 14px;
+  font-size: 13px;
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
 }
 
 .s2-control:hover:not(:disabled) {
@@ -554,12 +632,22 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
 .s2.is-open .s2-control,
 .s2-control:focus {
   border-color: #0f766e;
+  background: #fff;
   box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
   outline: none;
 }
 
+.s2-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .s2-placeholder {
   color: #94a3b8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .s2-caret {
@@ -599,10 +687,6 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
 }
 
 .s2-menu {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
   z-index: 120;
   overflow: hidden;
   border: 1px solid #d8e2ec;
@@ -611,35 +695,74 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
 }
 
+.s2-menu-portal {
+  position: fixed;
+  z-index: 10050;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  animation: s2-pop 0.12s ease-out;
+}
+
+@keyframes s2-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.s2-menu-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-bottom: 1px solid #e8eef3;
+  background: #f8fafc;
+}
+
 .s2-search {
   display: block;
-  width: calc(100% - 16px);
+  flex: 1;
+  width: auto;
+  min-width: 0;
   height: 34px;
-  margin: 8px;
+  margin: 0;
   padding: 6px 10px;
   border: 1px solid #d8e2ec;
   border-radius: 8px;
   font-size: 13px;
   outline: none;
-  background: #f8fafc;
+  background: #fff;
 }
 
 .s2-search:focus {
   border-color: #0f766e;
-  background: #fff;
   box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+}
+
+.s2-count {
+  flex: 0 0 auto;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  white-space: nowrap;
 }
 
 .s2-list {
   max-height: 220px;
   overflow-y: auto;
-  padding: 0 0 6px;
+  padding: 4px 0 6px;
+  overscroll-behavior: contain;
 }
 
 .s2-opt {
   display: block;
   width: 100%;
-  padding: 8px 12px;
+  padding: 9px 12px;
   border: 0;
   background: #fff;
   color: #0f172a;
@@ -661,7 +784,7 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
 }
 
 .s2-empty {
-  padding: 12px;
+  padding: 14px 12px;
   color: #94a3b8;
   font-size: 13px;
 }

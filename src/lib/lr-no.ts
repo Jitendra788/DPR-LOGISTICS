@@ -1,9 +1,9 @@
 import { nextPadded, parseDocNumber } from "./doc-numbers";
 
-/** Display LR number without LR- prefix (e.g. LR-22463 → 22463). */
+/** Display LR number without decorative prefixes (LR- / RW-). */
 export function stripLrPrefix(lrNo: string) {
   const trimmed = lrNo.trim();
-  const stripped = trimmed.replace(/^LR[\s-]*/i, "").trim();
+  const stripped = trimmed.replace(/^(LR|RW)[\s-]*/i, "").trim();
   return stripped || trimmed;
 }
 

@@ -12,6 +12,7 @@ import {
   type SelectHTMLAttributes,
   type TextareaHTMLAttributes,
 } from "react";
+import { createPortal } from "react-dom";
 import { displayToIso, isoToDisplay } from "@/lib/dates";
 
 type FieldWrapProps = {
@@ -116,24 +117,39 @@ type ComboboxFieldProps = {
   disabled?: boolean;
 };
 
-/** Type to search + click to select from filtered list. */
+/** Type to search + click to select. Menu portals above all cards (no clipping). */
 export function ComboboxField({
   label,
   options,
   value,
   onChange,
-  placeholder = "Type to search or select",
+  placeholder = "Search or select",
   className = "",
   name,
   required,
   disabled,
 }: ComboboxFieldProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
   const listId = useId().replace(/:/g, "");
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
+  const [pos, setPos] = useState({
+    top: 0 as number | undefined,
+    bottom: undefined as number | undefined,
+    left: 0,
+    width: 280,
+    maxHeight: 320,
+    place: "bottom" as "bottom" | "top",
+  });
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -141,21 +157,53 @@ export function ComboboxField({
     return options.filter((option) => option.toLowerCase().includes(q));
   }, [options, query]);
 
-  useEffect(() => {
-    if (!open) return;
-    function onDoc(e: MouseEvent) {
-      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
-    }
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
-  }, [open]);
+  function placeMenu() {
+    const el = btnRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const gap = 6;
+    const preferred = Math.min(360, Math.max(220, window.innerHeight * 0.45));
+    const spaceBelow = window.innerHeight - rect.bottom - gap - 12;
+    const spaceAbove = rect.top - gap - 12;
+    const place: "bottom" | "top" = spaceBelow < 180 && spaceAbove > spaceBelow ? "top" : "bottom";
+    const maxHeight = Math.max(160, Math.min(preferred, place === "bottom" ? spaceBelow : spaceAbove));
+    const width = Math.max(rect.width, 240);
+    let left = rect.left;
+    if (left + width > window.innerWidth - 12) left = Math.max(12, window.innerWidth - width - 12);
+    if (left < 12) left = 12;
+    setPos({
+      top: place === "bottom" ? rect.bottom + gap : undefined,
+      bottom: place === "top" ? window.innerHeight - rect.top + gap : undefined,
+      left,
+      width,
+      maxHeight,
+      place,
+    });
+  }
 
   useEffect(() => {
     if (!open) return;
+    placeMenu();
     setQuery("");
     setActive(0);
     const t = window.setTimeout(() => searchRef.current?.focus(), 0);
-    return () => window.clearTimeout(t);
+    function onDoc(e: MouseEvent) {
+      const target = e.target as Node;
+      if (rootRef.current?.contains(target) || menuRef.current?.contains(target)) return;
+      setOpen(false);
+    }
+    function onReposition() {
+      placeMenu();
+    }
+    document.addEventListener("mousedown", onDoc);
+    window.addEventListener("resize", onReposition);
+    window.addEventListener("scroll", onReposition, true);
+    return () => {
+      window.clearTimeout(t);
+      document.removeEventListener("mousedown", onDoc);
+      window.removeEventListener("resize", onReposition);
+      window.removeEventListener("scroll", onReposition, true);
+    };
   }, [open]);
 
   function pick(option: string) {
@@ -165,7 +213,7 @@ export function ComboboxField({
 
   function onKeyDown(e: KeyboardEvent) {
     if (!open) {
-      if (e.key === "ArrowDown" || e.key === "Enter") {
+      if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         setOpen(true);
       }
@@ -193,39 +241,37 @@ export function ComboboxField({
     }
   }
 
-  return (
-    <div className={`form-group block ${className}`.trim()} ref={rootRef}>
-      <span className="form-label">{label}</span>
-      {name ? <input type="hidden" name={name} value={value} required={required} /> : null}
-      <div className={`s2${open ? " is-open" : ""}${disabled ? " is-disabled" : ""}`}>
-        <button
-          type="button"
-          className="s2-control"
-          disabled={disabled}
-          aria-haspopup="listbox"
-          aria-expanded={open}
-          aria-controls={listId}
-          onClick={() => !disabled && setOpen((v) => !v)}
-          onKeyDown={onKeyDown}
-        >
-          <span className={value ? "" : "s2-placeholder"}>{value || placeholder}</span>
-          <span className="s2-caret" aria-hidden />
-        </button>
-        {open ? (
-          <div className="s2-menu" role="presentation">
-            <input
-              ref={searchRef}
-              className="s2-search"
-              value={query}
-              placeholder="Search…"
-              aria-label={`Search ${label}`}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setActive(0);
-              }}
-              onKeyDown={onKeyDown}
-            />
-            <div className="s2-list" id={listId} role="listbox">
+  const menu =
+    open && mounted
+      ? createPortal(
+          <div
+            ref={menuRef}
+            className={`s2-menu s2-menu-portal${pos.place === "top" ? " is-top" : ""}`}
+            role="presentation"
+            style={{
+              top: pos.top,
+              bottom: pos.bottom,
+              left: pos.left,
+              width: pos.width,
+              maxHeight: pos.maxHeight,
+            }}
+          >
+            <div className="s2-menu-head">
+              <input
+                ref={searchRef}
+                className="s2-search"
+                value={query}
+                placeholder={`Search ${label.toLowerCase()}…`}
+                aria-label={`Search ${label}`}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setActive(0);
+                }}
+                onKeyDown={onKeyDown}
+              />
+              <span className="s2-count">{filtered.length}/{options.length}</span>
+            </div>
+            <div className="s2-list" id={listId} role="listbox" style={{ maxHeight: Math.max(120, pos.maxHeight - 58) }}>
               {filtered.length ? (
                 filtered.map((option, index) => (
                   <button
@@ -244,8 +290,31 @@ export function ComboboxField({
                 <div className="s2-empty">No match found</div>
               )}
             </div>
-          </div>
-        ) : null}
+          </div>,
+          document.body,
+        )
+      : null;
+
+  return (
+    <div className={`form-group block ${className}`.trim()} ref={rootRef}>
+      <span className="form-label">{label}</span>
+      {name ? <input type="hidden" name={name} value={value} required={required} /> : null}
+      <div className={`s2${open ? " is-open" : ""}${disabled ? " is-disabled" : ""}`}>
+        <button
+          ref={btnRef}
+          type="button"
+          className="s2-control"
+          disabled={disabled}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          aria-controls={listId}
+          onClick={() => !disabled && setOpen((v) => !v)}
+          onKeyDown={onKeyDown}
+        >
+          <span className={value ? "s2-value" : "s2-placeholder"}>{value || placeholder}</span>
+          <span className="s2-caret" aria-hidden />
+        </button>
+        {menu}
       </div>
     </div>
   );

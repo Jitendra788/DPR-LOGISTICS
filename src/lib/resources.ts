@@ -67,7 +67,7 @@ const RESOURCE_FIELDS: Record<ResourceKey, ReadonlySet<string>> = {
     "bookingFrom", "lrNo", "lrDate", "fromStation", "toStation", "vehNo", "deliveryAt", "billingParty",
     "consignor", "consignee", "articles", "particulars", "invNoDate", "actWeight", "chargedWeight", "rate",
     "billAs", "totalMeter", "freight", "serviceTax", "haltage", "insurance", "stCharges", "doorCollection",
-    "barrier", "other", "hamali", "total", "gst", "grandTotal", "gstPaidBy", "ewayBill", "validDate",
+    "barrier", "other", "hamali", "total", "gst", "cgstAmt", "sgstAmt", "igstAmt", "grandTotal", "gstPaidBy", "ewayBill", "validDate",
     "lrType", "valueRs", "billed", "billNo", "lhcNo", "podStatus", "source", "trackToken",
   ]),
   lhc: new Set([
@@ -75,7 +75,7 @@ const RESOURCE_FIELDS: Record<ResourceKey, ReadonlySet<string>> = {
     "ownerAadhar", "driverName", "driverMob", "driverPan", "driverAadhar", "licenceNo", "engineNo",
     "chassisNo", "insCompany", "policyNo", "policyExp", "allPermitNo", "allPermitExp", "fitnessExp",
     "brokerName", "brokerPan", "lorryFreight", "transfer", "cash", "dieselLtr", "fuel", "fuelVendor",
-    "totalAdvance", "balance", "lrNos", "paid", "paidDate", "paidAmount",
+    "totalAdvance", "balance", "lrNos", "paid", "paidDate", "paidAmount", "otherDed", "remark",
   ]),
   bills: new Set([
     "billNo", "partyName", "fromDate", "toDate", "fromStation", "toStation", "amount", "lrCount", "source",
@@ -103,8 +103,8 @@ const RESOURCE_FIELDS: Record<ResourceKey, ReadonlySet<string>> = {
   "driver-vouchers": new Set(["voucherNo", "date", "driverName", "amount", "particulars", "paymentType"]),
   slips: new Set([
     "slipNo", "date", "vehNo", "fromStation", "toStation", "partyName", "amount", "paid", "paidDate",
-    "paidAmount", "lorryNo", "receiptDate", "guaranteeWeight", "freight", "advance", "balance", "receiptNo",
-    "remark", "mailId",
+    "paidAmount", "tdsPct", "tdsAmt", "otherDed", "lorryNo", "receiptDate", "guaranteeWeight", "freight",
+    "advance", "balance", "receiptNo", "remark", "mailId",
   ]),
   tyres: new Set([
     "vehNo", "tyrePosition", "brand", "serialNo", "fitDate", "status", "tyreChangeAfterKm", "totalRunningOn",

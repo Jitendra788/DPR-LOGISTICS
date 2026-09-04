@@ -37,6 +37,36 @@ export function lrSubtotal(row: LrCharges) {
   return 0;
 }
 
+/** True when LR should bill under Meter-wise preparation. */
+export function isMeterBillAs(billAs?: string | null) {
+  const as = String(billAs ?? "")
+    .toLowerCase()
+    .replace(/\./g, "")
+    .trim();
+  return as === "mtr" || as === "meter" || as === "meters" || as === "metre" || as === "metres";
+}
+
+/** Auto freight: Rate × Total Meter (Mtr) or Rate × Charged Weight (Weight/Package). */
+export function autoLrFreight(input: {
+  billAs?: string | null;
+  rate?: string | number | null;
+  totalMeter?: string | number | null;
+  chargedWeight?: string | number | null;
+}) {
+  const rate = Number(String(input.rate ?? "").replace(/,/g, "").trim()) || 0;
+  if (rate <= 0) return null;
+
+  if (isMeterBillAs(input.billAs)) {
+    const meters = Number(String(input.totalMeter ?? "").replace(/,/g, "").trim()) || 0;
+    if (meters <= 0) return null;
+    return Number((rate * meters).toFixed(2));
+  }
+
+  const weight = Number(String(input.chargedWeight ?? "").replace(/,/g, "").trim()) || 0;
+  if (weight <= 0) return null;
+  return Number((rate * weight).toFixed(2));
+}
+
 /** Billable amount per LR — excludes LR GST (bill GST applied separately). */
 export function lrBillableAmount(row: LrCharges) {
   const subtotal = lrSubtotal(row);

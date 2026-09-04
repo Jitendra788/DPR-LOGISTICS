@@ -448,14 +448,14 @@
 
 /* ── Premium form cards (User Creation, master forms, etc.) ── */
 .erp-main .erp-form-card {
-  margin-bottom: 14px;
+  margin-bottom: 10px;
   border: 1px solid #e2e8f0;
   border-top: none;
-  border-radius: 14px;
+  border-radius: 12px;
   background: #fff;
   box-shadow:
     0 1px 2px rgba(15, 23, 42, 0.04),
-    0 6px 20px rgba(15, 23, 42, 0.05);
+    0 4px 14px rgba(15, 23, 42, 0.045);
   overflow: visible;
   transition: box-shadow 0.2s ease;
 }
@@ -463,15 +463,20 @@
 .erp-main .erp-form-card:hover {
   box-shadow:
     0 2px 4px rgba(15, 23, 42, 0.05),
-    0 10px 28px rgba(15, 118, 110, 0.08);
+    0 8px 22px rgba(15, 118, 110, 0.07);
+}
+
+/* Hide empty spacer cards used as layout fillers */
+.erp-main .erp-form-card.min-h-16:not(:has(.form-group, .erp-dt, table, button, input, select, textarea, a, p, h2, h3, label)) {
+  display: none;
 }
 
 .erp-form-card-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  padding: 12px 14px;
+  gap: 10px;
+  padding: 9px 12px;
   background: linear-gradient(180deg, #f8fbfc 0%, #fff 100%);
   border-bottom: 1px solid #e8eef3;
   border-top: 3px solid #0f766e;
@@ -479,7 +484,7 @@
 
 .erp-form-card-title {
   margin: 0;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: #0f172a;
@@ -487,25 +492,38 @@
 }
 
 .erp-form-card-sub {
-  margin: 4px 0 0;
-  font-size: 13px;
-  line-height: 1.5;
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
   color: #64748b;
 }
 
 .erp-main .erp-form-card-body {
-  padding: 14px;
+  padding: 10px 12px;
 }
 
 @media (min-width: 640px) {
   .erp-main .erp-form-card-body {
-    padding: 14px 16px 16px;
+    padding: 11px 14px 12px;
   }
+}
+
+.erp-main .erp-form-card-body:empty {
+  display: none;
+  padding: 0;
+}
+
+.erp-main .erp-form-card:has(> .erp-form-card-body:empty):not(:has(.erp-form-card-head)) {
+  display: none;
 }
 
 .erp-main .erp-form-card-body > .btn-admin,
 .erp-main .erp-form-card-body > button[type="submit"] {
-  margin-top: 8px;
+  margin-top: 6px;
+}
+
+.erp-two-col > .form-group:last-child {
+  margin-bottom: 0;
 }
 
 .erp-nav {
@@ -754,7 +772,7 @@
 }
 
 .erp-pagehead {
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .erp-crumbs {
@@ -762,8 +780,8 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 2px;
-  margin-bottom: 8px;
-  font-size: 13px;
+  margin-bottom: 4px;
+  font-size: 12px;
   color: #64748b;
 }
 
@@ -794,15 +812,16 @@
 
 .erp-page-title {
   margin: 0;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.03em;
   color: #0f172a;
+  line-height: 1.25;
 }
 
 .erp-page-sub {
-  margin: 4px 0 0;
-  font-size: 14px;
+  margin: 2px 0 0;
+  font-size: 13px;
   color: #64748b;
 }
 
@@ -813,11 +832,11 @@
 .erp-hero {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 16px;
-  padding: 18px 20px;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 14px 16px;
   border: 1px solid #d9efe9;
-  border-radius: 14px;
+  border-radius: 12px;
   background: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
   color: #fff;
 }

@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { calcBillTaxes } from "@/lib/bill-totals";
-import { lrBillableAmount } from "@/lib/lr-totals";
-import { nextPadded } from "@/lib/doc-numbers";
+import { lrBillableAmount, isMeterBillAs } from "@/lib/lr-totals";
 import { isUniqueViolation, userFacingError } from "@/lib/handle-api-error";
+import { docSourceWhere, nextModuleDoc, normalizeDocSource } from "@/lib/module-docs";
+import { isBillableLrType, normalizeLrType } from "@/lib/lr-type";
 
 export const dynamic = "force-dynamic";
 
@@ -52,6 +53,25 @@ export async function POST(req: NextRequest) {
       if (matched.length !== body.lrIds.length) {
         return NextResponse.json({ error: "Some selected LRs were not found" }, { status: 400 });
       }
+      const expected = normalizeDocSource(body.source);
+      const wrongModule = matched.filter((row) => normalizeDocSource(row.source) !== expected);
+      if (wrongModule.length) {
+        return NextResponse.json(
+          { error: `Selected LRs belong to another module (${expected === "ROADWAYS" ? "DPR" : "Roadways"})` },
+          { status: 400 },
+        );
+      }
+      const notTbb = matched.filter((row) => !isBillableLrType(row.lrType));
+      if (notTbb.length) {
+        return NextResponse.json(
+          {
+            error: `Only TBB LRs can be billed. Remove ${notTbb
+              .map((r) => `${r.lrNo} (${normalizeLrType(r.lrType)})`)
+              .join(", ")}`,
+          },
+          { status: 400 },
+        );
+      }
     } else {
       const sourceFilter =
         body.source === "ROADWAYS"
@@ -66,24 +86,39 @@ export async function POST(req: NextRequest) {
           billed: false,
           ...(body.fromStation ? { fromStation: body.fromStation } : {}),
           ...(body.toStation ? { toStation: body.toStation } : {}),
-          ...(body.billAs ? { billAs: body.billAs } : {}),
           ...sourceFilter,
         },
       });
 
       matched = lrs.filter((row) => {
+        if (!isBillableLrType(row.lrType)) return false;
         if (body.fromDate && row.lrDate && row.lrDate < body.fromDate) return false;
         if (body.toDate && row.lrDate && row.lrDate > body.toDate) return false;
+        if (body.billAs) {
+          if (isMeterBillAs(body.billAs)) {
+            if (!isMeterBillAs(row.billAs)) return false;
+          } else if ((row.billAs || "Weight").toLowerCase() !== body.billAs.toLowerCase()) {
+            return false;
+          }
+        }
         return true;
       });
     }
 
     if (!matched.length) {
-      return NextResponse.json({ error: "No unbilled LRs found for these filters" }, { status: 400 });
+      return NextResponse.json({ error: "No unbilled TBB LRs found for these filters" }, { status: 400 });
     }
 
-    const lastBills = await prisma.bill.findMany({ select: { billNo: true } });
-    let billNo = body.billNo?.trim() || nextPadded(lastBills.map((r) => r.billNo), 2);
+    const billSource = normalizeDocSource(body.source);
+    const lastBills = await prisma.bill.findMany({
+      where: docSourceWhere(billSource),
+      select: { billNo: true },
+    });
+    let billNo = body.billNo?.trim() || nextModuleDoc(
+      lastBills.map((r) => r.billNo),
+      2,
+      billSource,
+    );
     const lrAmount = matched.reduce((sum, row) => sum + lrBillableAmount(row), 0);
     const amount = Number(body.amount ?? lrAmount) || 0;
     const taxes = calcBillTaxes(
@@ -105,7 +140,7 @@ export async function POST(req: NextRequest) {
       toStation: body.toStation ?? "",
       amount,
       lrCount: matched.length,
-      source: body.source ?? "DPR",
+      source: billSource,
       poNo: body.poNo ?? "",
       billAt: body.billAt ?? "",
       billDate: body.billDate ?? body.toDate ?? "",
@@ -128,8 +163,15 @@ export async function POST(req: NextRequest) {
         break;
       } catch (err) {
         if (!isUniqueViolation(err, "billNo")) throw err;
-        const rows = await prisma.bill.findMany({ select: { billNo: true } });
-        billNo = nextPadded(rows.map((r) => r.billNo), 2);
+        const rows = await prisma.bill.findMany({
+          where: docSourceWhere(billSource),
+          select: { billNo: true },
+        });
+        billNo = nextModuleDoc(
+          rows.map((r) => r.billNo),
+          2,
+          billSource,
+        );
       }
     }
     if (!bill) {

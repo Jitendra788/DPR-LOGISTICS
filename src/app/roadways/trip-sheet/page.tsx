@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, DatalistField } from "@/components/ui/FormField";
+import { InputField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -38,7 +38,7 @@ export default function TripSheetPage() {
           <TwoCol>
             <div>
               <InputField label="Trip Date" type="date" value={form.tripDate} onChange={(e) => setForm({ ...form, tripDate: e.target.value })} />
-              <DatalistField label="Vehicle No" value={form.vehNo} onChange={(e) => setForm({ ...form, vehNo: e.target.value })} options={vehicles.map((v) => v.vehNo)} placeholder="Type or pick vehicle" listId="trip-veh" />
+              <ComboboxField label="Vehicle No" value={form.vehNo} onChange={(vehNo) => setForm({ ...form, vehNo })} options={vehicles.map((v) => v.vehNo)} placeholder="Search or select vehicle" />
               <InputField label="Driver Name" value={form.driverName} onChange={(e) => setForm({ ...form, driverName: e.target.value })} />
             </div>
             <div>

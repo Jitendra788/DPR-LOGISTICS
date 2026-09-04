@@ -11,6 +11,8 @@ export default function RoadwaysWeightwisePage() {
         variant="weight"
         source="ROADWAYS"
         searchHref="/roadways/search-bill"
+        moneyReceiptHref="/roadways/money-receipt"
+        printHref="/roadways/bills/print"
         crumb="Bill Weightwise"
       />
     </Suspense>

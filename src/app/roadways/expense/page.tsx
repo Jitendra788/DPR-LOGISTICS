@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, SelectField } from "@/components/ui/FormField";
+import { InputField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -38,8 +38,8 @@ export default function ExpenseEntryPage() {
           <TwoCol>
             <div>
               <InputField label="Date" type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
-              <SelectField label="Vehicle No" value={form.vehNo} onChange={(e) => setForm({ ...form, vehNo: e.target.value })} options={vehicles.map((v) => v.vehNo)} />
-              <SelectField label="Expense Type" value={form.expenseType} onChange={(e) => setForm({ ...form, expenseType: e.target.value })} options={["Diesel", "Toll", "RTO", "Repair", "Other"]} />
+              <ComboboxField label="Vehicle No" value={form.vehNo} onChange={(vehNo) => setForm({ ...form, vehNo })} options={vehicles.map((v) => v.vehNo)} placeholder="Search or select vehicle" />
+              <ComboboxField label="Expense Type" value={form.expenseType} onChange={(expenseType) => setForm({ ...form, expenseType })} options={["Diesel", "Toll", "RTO", "Repair", "Other"]} placeholder="Select expense type" />
             </div>
             <div>
               <InputField label="Amount" type="number" value={form.amount} onChange={(e) => setForm({ ...form, amount: Number(e.target.value) || 0 })} />

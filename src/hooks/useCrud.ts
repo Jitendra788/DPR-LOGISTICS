@@ -41,7 +41,10 @@ export function useCrud<T extends { id: number }>(resource: string) {
   }, [reload, setMessage]);
 
   async function withLock<R>(fn: () => Promise<R>): Promise<R | null> {
-    if (busyRef.current) return null;
+    if (busyRef.current) {
+      setMessage({ type: "err", text: "Please wait — previous save still running" });
+      return null;
+    }
     busyRef.current = true;
     setSaving(true);
     try {
@@ -56,7 +59,8 @@ export function useCrud<T extends { id: number }>(resource: string) {
     const key = bodyKey(resource, body);
     const now = Date.now();
     const last = recentCreates.get(key) ?? 0;
-    if (now - last < 4000) {
+    if (now - last < 2500) {
+      setMessage({ type: "err", text: "Already saved — wait a moment before saving again" });
       return null;
     }
     recentCreates.set(key, now);
@@ -80,6 +84,10 @@ export function useCrud<T extends { id: number }>(resource: string) {
   }
 
   async function update(id: number, body: unknown) {
+    if (!id || id <= 0) {
+      setMessage({ type: "err", text: "No record selected for update. Click Update in the table first." });
+      return null;
+    }
     return withLock(async () => {
       try {
         const saved = await api<T>(`/api/${resource}/${id}`, { method: "PUT", body: JSON.stringify(body) });
@@ -98,6 +106,10 @@ export function useCrud<T extends { id: number }>(resource: string) {
   }
 
   async function remove(id: number) {
+    if (!id || id <= 0) {
+      setMessage({ type: "err", text: "Invalid record id" });
+      return false;
+    }
     if (!confirm("Delete this record?")) return false;
     const result = await withLock(async () => {
       try {

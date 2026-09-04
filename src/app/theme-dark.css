@@ -277,12 +277,21 @@
   color: #e5e7eb;
 }
 
+[data-theme="dark"] .s2-menu-head {
+  background: #111827;
+  border-bottom-color: #334155;
+}
+
 [data-theme="dark"] .s2-placeholder {
   color: #94a3b8;
 }
 
+[data-theme="dark"] .s2-count {
+  color: #94a3b8;
+}
+
 [data-theme="dark"] .s2-search {
-  background: #111827;
+  background: #0f172a;
 }
 
 [data-theme="dark"] .s2-opt {

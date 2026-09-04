@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, DatalistField } from "@/components/ui/FormField";
+import { InputField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
 import { DataTable } from "@/components/ui/DataTable";
@@ -76,7 +76,7 @@ export function BillGenerateForm({
         <FormCard>
           <TwoCol>
             <div>
-              <DatalistField label="Billing Party" value={form.partyName} onChange={(e) => setForm({ ...form, partyName: e.target.value })} options={partyNames} placeholder="Type or pick party" listId="bill-gen-party" />
+              <ComboboxField label="Billing Party" value={form.partyName} onChange={(partyName) => setForm({ ...form, partyName })} options={partyNames} placeholder="Search or select party" />
               <InputField label="From Date" type="date" value={form.fromDate} onChange={(e) => setForm({ ...form, fromDate: e.target.value })} />
               <InputField label="To Date" type="date" value={form.toDate} onChange={(e) => setForm({ ...form, toDate: e.target.value })} />
             </div>

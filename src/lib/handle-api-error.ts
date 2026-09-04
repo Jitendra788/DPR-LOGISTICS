@@ -40,6 +40,9 @@ export function userFacingError(err: unknown, fallback = "Could not save. Please
   if (prismaCode(err) === "P2025") {
     return "Record not found. Refresh the page and try again.";
   }
+  if (prismaCode(err) === "P2003") {
+    return "Cannot delete — this record is linked to other data";
+  }
 
   const message = err instanceof Error ? err.message : "";
   if (!message) return fallback;

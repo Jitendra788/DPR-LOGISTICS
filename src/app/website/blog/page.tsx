@@ -3,7 +3,7 @@
 import { FormEvent, useRef, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, SelectField, TextAreaField } from "@/components/ui/FormField";
+import { InputField, ComboboxField, TextAreaField } from "@/components/ui/FormField";
 import { ImageUploadField } from "@/components/ui/ImageUploadField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
@@ -219,12 +219,12 @@ export default function WebsiteBlogPage() {
                 value={form.author ?? ""}
                 onChange={(e) => setForm({ ...form, author: e.target.value })}
               />
-              <SelectField
+              <ComboboxField
                 label="Published on website"
-                name="published"
                 value={form.published ? "Published (live)" : "Draft (hidden)"}
-                onChange={(e) => setForm({ ...form, published: e.target.value.startsWith("Published") })}
+                onChange={(v) => setForm({ ...form, published: v.startsWith("Published") })}
                 options={["Draft (hidden)", "Published (live)"]}
+                placeholder="Select"
               />
             </div>
           </TwoCol>

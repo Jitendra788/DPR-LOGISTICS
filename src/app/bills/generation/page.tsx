@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, DatalistField } from "@/components/ui/FormField";
+import { InputField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
 import { AdminForm } from "@/components/ui/AdminForm";
@@ -25,6 +25,7 @@ type Bill = {
 export default function BillGenerationPage() {
   const [parties, setParties] = useState<Party[]>([]);
   const partyNames = parties.map((p) => p.name).filter(Boolean);
+  const [stations, setStations] = useState<string[]>([]);
   const [bills, setBills] = useState<Bill[]>([]);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string; at?: number } | null>(null);
   const [form, setForm] = useState({
@@ -33,19 +34,24 @@ export default function BillGenerationPage() {
     toDate: new Date().toISOString().slice(0, 10),
     fromStation: "",
     toStation: "",
+    source: "DPR",
   });
 
   async function loadBills() {
-    setBills(await api<Bill[]>("/api/bills"));
+    const all = await api<(Bill & { source?: string })[]>("/api/bills");
+    setBills(all.filter((b) => (b.source || "DPR") !== "ROADWAYS"));
   }
 
   useEffect(() => {
-    Promise.all([api<Party[]>("/api/parties"), api<Bill[]>("/api/bills")]).then(
-      ([p, b]) => {
-        setParties(p);
-        setBills(b);
-      },
-    );
+    Promise.all([
+      api<Party[]>("/api/parties"),
+      api<(Bill & { source?: string })[]>("/api/bills"),
+      api<{ name: string }[]>("/api/stations"),
+    ]).then(([p, b, st]) => {
+      setParties(p);
+      setBills(b.filter((row) => (row.source || "DPR") !== "ROADWAYS"));
+      setStations(st.map((s) => s.name).filter(Boolean));
+    });
   }, []);
 
   async function onSubmit(e: FormEvent) {
@@ -62,6 +68,7 @@ export default function BillGenerationPage() {
         toDate: new Date().toISOString().slice(0, 10),
         fromStation: "",
         toStation: "",
+        source: "DPR",
       });
       await loadBills();
     } catch (err) {
@@ -81,13 +88,25 @@ export default function BillGenerationPage() {
         <FormCard>
           <TwoCol>
             <div>
-              <DatalistField label="Billing Party" value={form.partyName} onChange={(e) => setForm({ ...form, partyName: e.target.value })} options={partyNames} placeholder="Type or pick party" listId="bill-gen-party" />
+              <ComboboxField label="Billing Party" value={form.partyName} onChange={(partyName) => setForm({ ...form, partyName })} options={partyNames} placeholder="Search or select party" />
               <InputField label="From Date" type="date" value={form.fromDate} onChange={(e) => setForm({ ...form, fromDate: e.target.value })} />
               <InputField label="To Date" type="date" value={form.toDate} onChange={(e) => setForm({ ...form, toDate: e.target.value })} />
             </div>
             <div>
-              <InputField label="From Station" value={form.fromStation} onChange={(e) => setForm({ ...form, fromStation: e.target.value })} placeholder="Type station" />
-              <InputField label="To Station" value={form.toStation} onChange={(e) => setForm({ ...form, toStation: e.target.value })} placeholder="Type station" />
+              <ComboboxField
+                label="From Station"
+                value={form.fromStation}
+                onChange={(fromStation) => setForm({ ...form, fromStation })}
+                options={stations}
+                placeholder="Search or select station"
+              />
+              <ComboboxField
+                label="To Station"
+                value={form.toStation}
+                onChange={(toStation) => setForm({ ...form, toStation })}
+                options={stations}
+                placeholder="Search or select station"
+              />
             </div>
           </TwoCol>
           <div className="flex gap-2">

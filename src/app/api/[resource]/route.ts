@@ -55,6 +55,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     }
     return NextResponse.json(created);
   } catch (err) {
+    console.error(`POST /api/${resource} failed`, err);
     return NextResponse.json({ error: userFacingError(err, "Could not save. Please try again.") }, { status: 400 });
   }
 }

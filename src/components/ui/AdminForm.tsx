@@ -27,7 +27,10 @@ function setSubmitBusy(form: HTMLFormElement, busy: boolean) {
   });
 }
 
-/** Prevents double-submit across all admin forms (Save / Update). */
+/**
+ * Prevents double-submit on Save / Update.
+ * Does NOT disable the whole fieldset (disabled inputs are dropped from FormData).
+ */
 export function AdminForm({ onSubmit, children, className = "", noValidate }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
   const busyRef = useRef(false);
@@ -60,9 +63,7 @@ export function AdminForm({ onSubmit, children, className = "", noValidate }: Pr
       noValidate={noValidate}
       aria-busy={busy}
     >
-      <fieldset disabled={busy} className="erp-admin-fieldset">
-        {children}
-      </fieldset>
+      {children}
     </form>
   );
 }

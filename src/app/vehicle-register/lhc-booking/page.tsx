@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, InputField, SelectField } from "@/components/ui/FormField";
+import { DateField, InputField, ComboboxField, DatalistField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -13,6 +13,14 @@ import { api } from "@/lib/api-client";
 import { todayIso } from "@/lib/dates";
 
 type Vehicle = { vehNo: string };
+type Lhc = {
+  challanNo: string;
+  challanDate: string;
+  vehNo: string;
+  fromStation: string;
+  toStation: string;
+  lorryFreight: number;
+};
 type Row = {
   id: number;
   vehNo: string;
@@ -34,6 +42,7 @@ type Row = {
 export default function LhcWiseBookingPage() {
   const { rows, message, create, update, remove, setMessage } = useCrud<Row>("trips");
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [contracts, setContracts] = useState<Lhc[]>([]);
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState({
     vehNo: "",
@@ -62,8 +71,28 @@ export default function LhcWiseBookingPage() {
   }, [form.tyreChangeAfterKm, totalKm]);
 
   useEffect(() => {
-    api<Vehicle[]>("/api/fleet").then(setVehicles);
+    Promise.all([api<Vehicle[]>("/api/fleet"), api<Lhc[]>("/api/lhc")]).then(([v, l]) => {
+      setVehicles(v);
+      setContracts(l);
+    });
   }, []);
+
+  function applyLhc(lhcNo: string) {
+    const c = contracts.find((x) => x.challanNo === lhcNo);
+    if (!c) {
+      setForm((f) => ({ ...f, lhcNo }));
+      return;
+    }
+    setForm((f) => ({
+      ...f,
+      lhcNo: c.challanNo,
+      lhcDate: c.challanDate || f.lhcDate || todayIso(),
+      vehNo: c.vehNo || f.vehNo,
+      fromStation: c.fromStation || f.fromStation,
+      toStation: c.toStation || f.toStation,
+      lhcFreight: Number(c.lorryFreight) || f.lhcFreight,
+    }));
+  }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -94,21 +123,37 @@ export default function LhcWiseBookingPage() {
 
   return (
     <>
-      <PageHeader title="Vehicle LHC Booking" subtitle="Fill all the fields" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Self Vehicle Trans Entry" }]} />
+      <PageHeader
+        title="LHC Wise Booking Entry"
+        subtitle="Link self-vehicle trip with LHC contract (old site work flow)"
+        crumbs={[{ label: "Home", href: "/dashboard" }, { label: "LHC Wise Booking Entry" }]}
+      />
       <Flash message={message} />
       <AdminForm onSubmit={onSubmit}>
         <FormCard>
           <TwoCol>
             <div>
               <InputField label="Sr No." value={editId ?? rows.length + 1} readOnly />
-              <SelectField label="Enter Vehicle Number" value={form.vehNo} onChange={(e) => setForm({ ...form, vehNo: e.target.value })} options={vehicles.map((v) => v.vehNo)} />
+              <ComboboxField
+                label="Enter Vehicle Number"
+                value={form.vehNo}
+                onChange={(vehNo) => setForm({ ...form, vehNo })}
+                options={vehicles.map((v) => v.vehNo)}
+                placeholder="Search or select vehicle"
+              />
               <InputField label="From" value={form.fromStation} onChange={(e) => setForm({ ...form, fromStation: e.target.value })} />
               <InputField label="To" value={form.toStation} onChange={(e) => setForm({ ...form, toStation: e.target.value })} />
               <InputField label="Opening Meter" value={form.openingMeter} onChange={(e) => setForm({ ...form, openingMeter: e.target.value })} />
               <InputField label="Closing Meter" value={form.closingMeter} onChange={(e) => setForm({ ...form, closingMeter: e.target.value })} />
               <InputField label="Total KM" value={totalKm} readOnly />
               <DateField label="LHC Date" value={form.lhcDate} onChange={(lhcDate) => setForm({ ...form, lhcDate })} />
-              <InputField label="LHC No" value={form.lhcNo} onChange={(e) => setForm({ ...form, lhcNo: e.target.value })} />
+              <DatalistField
+                label="LHC No"
+                value={form.lhcNo}
+                onChange={(e) => applyLhc(e.target.value)}
+                options={contracts.map((c) => c.challanNo)}
+                placeholder="Type or pick LHC / challan"
+              />
               <InputField label="LHC Freight" value={form.lhcFreight} onChange={(e) => setForm({ ...form, lhcFreight: Number(e.target.value) || 0 })} />
             </div>
             <div>
@@ -119,7 +164,7 @@ export default function LhcWiseBookingPage() {
             </div>
           </TwoCol>
           <Button type="submit" variant="teal">
-            Save Data
+            {editId ? "Update Data" : "Save Data"}
           </Button>
         </FormCard>
       </AdminForm>
@@ -155,7 +200,15 @@ export default function LhcWiseBookingPage() {
               </Button>
             ),
           },
-          { key: "delete", header: "Delete", render: (row) => <Button type="button" size="sm" variant="danger" onClick={() => remove(row.id)}>Delete</Button> },
+          {
+            key: "delete",
+            header: "Delete",
+            render: (row) => (
+              <Button type="button" size="sm" variant="danger" onClick={() => remove(row.id)}>
+                Delete
+              </Button>
+            ),
+          },
           { key: "id", header: "Sr No" },
           { key: "vehNo", header: "Veh No" },
           { key: "totalKm", header: "Total KM" },

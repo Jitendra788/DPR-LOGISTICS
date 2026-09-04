@@ -139,8 +139,11 @@ model LrBooking {
   hamali         Float    @default(0)
   total          Float    @default(0)
   gst            Float    @default(0)
+  cgstAmt        Float    @default(0)
+  sgstAmt        Float    @default(0)
+  igstAmt        Float    @default(0)
   grandTotal     Float    @default(0)
-  gstPaidBy      String   @default("Consignor")
+  gstPaidBy      String   @default("Consigner")
   ewayBill       String   @default("")
   validDate      String   @default("")
   lrType         String   @default("TBB")
@@ -192,6 +195,8 @@ model LhcContract {
   paid         Boolean @default(false)
   paidDate     String  @default("")
   paidAmount   Float   @default(0)
+  otherDed     Float   @default(0)
+  remark       String  @default("")
 }
 
 model Bill {
@@ -354,6 +359,9 @@ model BookingSlip {
   paid             Boolean @default(false)
   paidDate         String  @default("")
   paidAmount       Float   @default(0)
+  tdsPct           Float   @default(0)
+  tdsAmt           Float   @default(0)
+  otherDed         Float   @default(0)
   lorryNo          String  @default("")
   receiptDate      String  @default("")
   guaranteeWeight  String  @default("")

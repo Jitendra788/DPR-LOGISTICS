@@ -3,7 +3,7 @@
 import { FormEvent, useRef, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, SelectField } from "@/components/ui/FormField";
+import { InputField, ComboboxField } from "@/components/ui/FormField";
 import { ImageUploadField } from "@/components/ui/ImageUploadField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
@@ -139,12 +139,12 @@ export default function WebsitePhotosPage() {
                 value={form.alt ?? ""}
                 onChange={(e) => setForm({ ...form, alt: e.target.value })}
               />
-              <SelectField
+              <ComboboxField
                 label="Use on"
-                name="category"
                 value={form.category ?? "gallery"}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                onChange={(category) => setForm({ ...form, category })}
                 options={["gallery", "blog-cover", "banner", "client-logo"]}
+                placeholder="Select use"
               />
             </div>
             <div>
@@ -155,12 +155,12 @@ export default function WebsitePhotosPage() {
                 value={form.sortOrder ?? 0}
                 onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) || 0 })}
               />
-              <SelectField
+              <ComboboxField
                 label="Show on website"
-                name="published"
                 value={form.published === false ? "Hidden" : "Published (visible)"}
-                onChange={(e) => setForm({ ...form, published: e.target.value.startsWith("Published") })}
+                onChange={(v) => setForm({ ...form, published: v.startsWith("Published") })}
                 options={["Published (visible)", "Hidden"]}
+                placeholder="Select"
               />
               <ImageUploadField
                 label="Picture"
@@ -183,9 +183,9 @@ export default function WebsitePhotosPage() {
             <TwoCol>
               <InputField label="Title" name="title" value={form.title ?? ""} onChange={(e) => setForm({ ...form, title: e.target.value })} />
               <InputField label="Alt text" name="alt" value={form.alt ?? ""} onChange={(e) => setForm({ ...form, alt: e.target.value })} />
-              <SelectField label="Category" name="category" value={form.category ?? "gallery"} onChange={(e) => setForm({ ...form, category: e.target.value })} options={["gallery", "blog-cover", "banner", "client-logo"]} />
+              <ComboboxField label="Category" value={form.category ?? "gallery"} onChange={(category) => setForm({ ...form, category })} options={["gallery", "blog-cover", "banner", "client-logo"]} placeholder="Select" />
               <InputField label="Sort order" name="sortOrder" type="number" value={form.sortOrder ?? 0} onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) || 0 })} />
-              <SelectField label="Published" name="published" value={form.published ? "Visible" : "Hidden"} onChange={(e) => setForm({ ...form, published: e.target.value === "Visible" })} options={["Visible", "Hidden"]} />
+              <ComboboxField label="Published" value={form.published ? "Visible" : "Hidden"} onChange={(v) => setForm({ ...form, published: v === "Visible" })} options={["Visible", "Hidden"]} placeholder="Select" />
             </TwoCol>
             <div className="mt-4 flex gap-2">
               <Button type="submit">Save changes</Button>

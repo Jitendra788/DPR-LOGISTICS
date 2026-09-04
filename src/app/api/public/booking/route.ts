@@ -1,16 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sanitize } from "@/lib/resources";
-import { nextPadded } from "@/lib/doc-numbers";
 import { createWithUniqueRetry } from "@/lib/unique-create";
 import { userFacingError } from "@/lib/handle-api-error";
 import { stripBookingTrackToken } from "@/services/trackingService";
+import { docSourceWhere, nextModuleDoc } from "@/lib/module-docs";
 
 export const dynamic = "force-dynamic";
 
 async function nextCustomerLrNo() {
-  const rows = await prisma.lrBooking.findMany({ select: { lrNo: true } });
-  return nextPadded(rows.map((r) => r.lrNo), 3);
+  const rows = await prisma.lrBooking.findMany({
+    where: docSourceWhere("CUSTOMER"),
+    select: { lrNo: true },
+  });
+  return nextModuleDoc(
+    rows.map((r) => r.lrNo),
+    3,
+    "CUSTOMER",
+  );
 }
 
 export async function GET(req: NextRequest) {

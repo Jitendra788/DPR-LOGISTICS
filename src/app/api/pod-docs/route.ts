@@ -39,5 +39,12 @@ export async function POST(req: NextRequest) {
       mimeType: file.type || "application/octet-stream",
     },
   });
+
+  // Mark LR POD as Received after first document upload
+  await prisma.lrBooking.updateMany({
+    where: { lrNo },
+    data: { podStatus: "Received" },
+  });
+
   return NextResponse.json(created);
 }

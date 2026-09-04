@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, SelectField } from "@/components/ui/FormField";
+import { InputField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -39,11 +39,11 @@ export default function DriverAdvancePage() {
             <div>
               <InputField label="Date" type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
               <InputField label="Driver Name" value={form.driverName} onChange={(e) => setForm({ ...form, driverName: e.target.value })} required />
-              <SelectField label="Vehicle No" value={form.vehNo} onChange={(e) => setForm({ ...form, vehNo: e.target.value })} options={vehicles.map((v) => v.vehNo)} />
+              <ComboboxField label="Vehicle No" value={form.vehNo} onChange={(vehNo) => setForm({ ...form, vehNo })} options={vehicles.map((v) => v.vehNo)} placeholder="Search or select vehicle" />
             </div>
             <div>
               <InputField label="Advance Amount" type="number" value={form.amount} onChange={(e) => setForm({ ...form, amount: Number(e.target.value) || 0 })} />
-              <SelectField label="Mode" value={form.mode} onChange={(e) => setForm({ ...form, mode: e.target.value })} options={["Cash", "Bank", "Diesel"]} />
+              <ComboboxField label="Mode" value={form.mode} onChange={(mode) => setForm({ ...form, mode })} options={["Cash", "Bank", "Diesel"]} placeholder="Select mode" />
               <InputField label="Remarks" value={form.remarks} onChange={(e) => setForm({ ...form, remarks: e.target.value })} />
             </div>
           </TwoCol>

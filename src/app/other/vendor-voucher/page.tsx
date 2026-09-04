@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, InputField, SelectField } from "@/components/ui/FormField";
+import { DateField, InputField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -60,13 +60,13 @@ export default function VendorVoucherPage() {
           <TwoCol>
             <div>
               <InputField label="Sl No" value={editId ?? sr} readOnly />
-              <SelectField label="Select Vendor" value={form.vendorName} onChange={(e) => setForm({ ...form, vendorName: e.target.value })} options={vendors.map((v) => v.name)} />
+              <ComboboxField label="Select Vendor" value={form.vendorName} onChange={(vendorName) => setForm({ ...form, vendorName })} options={vendors.map((v) => v.name)} placeholder="Search or select vendor" />
               <InputField label="Outstanding" value={outstanding.toFixed(2)} readOnly />
               <DateField label="Payment Date" value={form.date} onChange={(date) => setForm({ ...form, date })} />
             </div>
             <div>
               <InputField label="Payment Amount" value={form.amount || ""} onChange={(e) => setForm({ ...form, amount: Number(e.target.value) || 0 })} />
-              <SelectField label="Payment Type" value={form.paymentType} onChange={(e) => setForm({ ...form, paymentType: e.target.value })} options={["Cr", "Dr"]} placeholder="" />
+              <ComboboxField label="Payment Type" value={form.paymentType} onChange={(paymentType) => setForm({ ...form, paymentType })} options={["Cr", "Dr"]} placeholder="Select" />
               <InputField label="Narration" value={form.particulars} onChange={(e) => setForm({ ...form, particulars: e.target.value })} />
             </div>
           </TwoCol>

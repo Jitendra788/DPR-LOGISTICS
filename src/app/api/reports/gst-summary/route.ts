@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { billFreightAmount, calcBillTaxes } from "@/lib/bill-totals";
+import { billFreightAmount, calcBillTaxes, billGrandTotal } from "@/lib/bill-totals";
 import { isDatabaseConfigured, prisma } from "@/lib/prisma";
 import { apiError } from "@/lib/handle-api-error";
-import { lrBillableAmount, sumLrBillableAmount } from "@/lib/lr-totals";
+import { sumLrBillableAmount } from "@/lib/lr-totals";
 import { displayToIso } from "@/lib/dates";
 import { resetErpData } from "@/lib/reset-erp";
+import { docSourceWhere } from "@/lib/module-docs";
 
 export const dynamic = "force-dynamic";
 
@@ -18,24 +19,8 @@ function normalizeDate(value: string) {
   return trimmed;
 }
 
-function billTaxTotal(
-  bill: {
-    amount: number;
-    cgstPct: number;
-    cgstAmt: number;
-    sgstPct: number;
-    sgstAmt: number;
-    igstPct: number;
-    igstAmt: number;
-  },
-  lrSum: number,
-) {
-  const stored = (bill.cgstAmt || 0) + (bill.sgstAmt || 0) + (bill.igstAmt || 0);
-  if (stored > 0) return stored;
-
-  const freight = billFreightAmount(bill, lrSum);
-  const taxes = calcBillTaxes(freight, bill.cgstPct, bill.sgstPct, bill.igstPct);
-  return Number((taxes.cgstAmt + taxes.sgstAmt + taxes.igstAmt).toFixed(2));
+function billDateOf(bill: { billDate: string; fromDate: string; toDate: string; createdAt: Date }) {
+  return normalizeDate(bill.billDate || bill.toDate || bill.fromDate || bill.createdAt.toISOString().slice(0, 10));
 }
 
 export async function GET(req: NextRequest) {
@@ -64,50 +49,103 @@ export async function GET(req: NextRequest) {
 
     const fromDate = normalizeDate(searchParams.get("fromDate") ?? "");
     const toDate = normalizeDate(searchParams.get("toDate") ?? "");
+    const sourceParam = searchParams.get("source");
+    const sourceFilter = sourceParam ? docSourceWhere(sourceParam) : undefined;
 
-    const [lrs, bills] = await Promise.all([
-      prisma.lrBooking.findMany({ orderBy: { lrDate: "desc" } }),
-      prisma.bill.findMany(),
+    const [bills, parties, lrs] = await Promise.all([
+      prisma.bill.findMany({ where: sourceFilter, orderBy: { id: "asc" } }),
+      prisma.party.findMany({ select: { name: true, gst: true } }),
+      prisma.lrBooking.findMany({
+        where: { billed: true, billNo: { not: "" }, ...(sourceFilter ?? {}) },
+        select: {
+          billNo: true,
+          freight: true,
+          hamali: true,
+          other: true,
+          barrier: true,
+          doorCollection: true,
+          stCharges: true,
+          haltage: true,
+          insurance: true,
+          serviceTax: true,
+          total: true,
+          grandTotal: true,
+        },
+      }),
     ]);
 
-    const billByNo = Object.fromEntries(bills.map((bill) => [bill.billNo, bill]));
+    const gstByParty = new Map<string, string>();
+    for (const party of parties) {
+      const key = party.name.trim().toLowerCase();
+      if (!key) continue;
+      if (!gstByParty.has(key) && party.gst.trim()) gstByParty.set(key, party.gst.trim());
+    }
+
     const lrsByBill: Record<string, typeof lrs> = {};
-    lrs.forEach((lr) => {
-      if (!lr.billNo) return;
+    for (const lr of lrs) {
+      if (!lr.billNo) continue;
       (lrsByBill[lr.billNo] ??= []).push(lr);
-    });
+    }
 
-    const rows = lrs
-      .filter((lr) => {
-        const d = normalizeDate(lr.lrDate);
-        if (fromDate && d && d < fromDate) return false;
-        if (toDate && d && d > toDate) return false;
-        return true;
-      })
-      .map((lr) => {
-        const freight = lrBillableAmount(lr) || Number(lr.freight) || 0;
-        let gst = Number(lr.gst) || 0;
+    const rows = bills
+      .map((bill, index) => {
+        const date = billDateOf(bill);
+        const linked = lrsByBill[bill.billNo] ?? [];
+        const lrSum = sumLrBillableAmount(linked);
+        let beforeTax = billFreightAmount(bill, lrSum);
+        let cgstPct = Number(bill.cgstPct) || 0;
+        let sgstPct = Number(bill.sgstPct) || 0;
+        let igstPct = Number(bill.igstPct) || 0;
+        let cgstAmt = Number(bill.cgstAmt) || 0;
+        let sgstAmt = Number(bill.sgstAmt) || 0;
+        let igstAmt = Number(bill.igstAmt) || 0;
 
-        if (lr.billNo && billByNo[lr.billNo]) {
-          const bill = billByNo[lr.billNo]!;
-          const siblings = lrsByBill[lr.billNo] ?? [lr];
-          const lrSum = sumLrBillableAmount(siblings);
-          const billTax = billTaxTotal(bill, lrSum);
-          if (billTax > 0 && lrSum > 0) {
-            gst = Number(((billTax * freight) / lrSum).toFixed(2));
-          }
+        // Fill missing amount cells from % (and vice versa) so report matches bill entry
+        if (beforeTax > 0) {
+          if (cgstPct > 0 && cgstAmt <= 0) cgstAmt = Number(((beforeTax * cgstPct) / 100).toFixed(2));
+          if (sgstPct > 0 && sgstAmt <= 0) sgstAmt = Number(((beforeTax * sgstPct) / 100).toFixed(2));
+          if (igstPct > 0 && igstAmt <= 0) igstAmt = Number(((beforeTax * igstPct) / 100).toFixed(2));
+          if (!cgstPct && cgstAmt > 0) cgstPct = Number(((cgstAmt / beforeTax) * 100).toFixed(2));
+          if (!sgstPct && sgstAmt > 0) sgstPct = Number(((sgstAmt / beforeTax) * 100).toFixed(2));
+          if (!igstPct && igstAmt > 0) igstPct = Number(((igstAmt / beforeTax) * 100).toFixed(2));
+        } else if (cgstAmt + sgstAmt + igstAmt <= 0 && (cgstPct || sgstPct || igstPct)) {
+          const taxes = calcBillTaxes(beforeTax, cgstPct, sgstPct, igstPct);
+          cgstAmt = taxes.cgstAmt;
+          sgstAmt = taxes.sgstAmt;
+          igstAmt = taxes.igstAmt;
         }
 
+        const afterTax =
+          cgstAmt + sgstAmt + igstAmt > 0
+            ? Number((beforeTax + cgstAmt + sgstAmt + igstAmt).toFixed(2))
+            : billGrandTotal(bill, beforeTax);
+
         return {
-          lrNo: lr.lrNo,
-          lrDate: lr.lrDate,
-          billingParty: lr.billingParty,
-          freight,
-          gst,
-          grandTotal: Number((freight + gst).toFixed(2)),
-          gstPaidBy: lr.gstPaidBy,
-          billNo: lr.billNo,
+          srNo: index + 1,
+          billNo: bill.billNo,
+          billDate: date,
+          partyName: bill.partyName,
+          gstNo: gstByParty.get(bill.partyName.trim().toLowerCase()) ?? "",
+          beforeTax: Number(beforeTax.toFixed(2)),
+          cgstPct,
+          cgstAmt: Number(cgstAmt.toFixed(2)),
+          sgstPct,
+          sgstAmt: Number(sgstAmt.toFixed(2)),
+          igstPct,
+          igstAmt: Number(igstAmt.toFixed(2)),
+          afterTax,
+          _sortDate: date,
         };
+      })
+      .filter((row) => {
+        if (fromDate && row._sortDate && row._sortDate < fromDate) return false;
+        if (toDate && row._sortDate && row._sortDate > toDate) return false;
+        return true;
+      })
+      .sort((a, b) => a._sortDate.localeCompare(b._sortDate) || String(a.billNo).localeCompare(String(b.billNo)))
+      .map((row, i) => {
+        const { _sortDate: _, ...rest } = row;
+        return { ...rest, srNo: i + 1 };
       });
 
     return NextResponse.json(rows);

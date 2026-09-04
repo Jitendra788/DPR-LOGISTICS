@@ -4,7 +4,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard } from "@/components/ui/FormCard";
-import { SelectField } from "@/components/ui/FormField";
+import { ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -51,7 +51,7 @@ export default function MoneyReceiptReportPage() {
               Go To Party Ledger
             </Button>
           </div>
-          <SelectField label="Party Name" value={partyName} onChange={(e) => setPartyName(e.target.value)} options={parties.map((p) => p.name)} />
+          <ComboboxField label="Party Name" value={partyName} onChange={setPartyName} options={parties.map((p) => p.name)} placeholder="Search or select party" />
         </FormCard>
       </AdminForm>
       <FormCard>

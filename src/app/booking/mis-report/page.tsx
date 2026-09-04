@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, DatalistField, InputField } from "@/components/ui/FormField";
+import { DateField, ComboboxField, InputField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -28,6 +28,7 @@ type Booking = {
   grandTotal: number;
   billed: boolean;
   billNo: string;
+  lrType?: string;
 };
 
 export default function BookingMisReportPage() {
@@ -99,7 +100,7 @@ export default function BookingMisReportPage() {
               <Button type="submit">Show Datewise Report</Button>
             </div>
             <div>
-              <DatalistField label="Billing Party Name" value={filters.billingParty} onChange={(e) => setFilters({ ...filters, billingParty: e.target.value })} options={partyNames} placeholder="All parties" listId="mis-party" />
+              <ComboboxField label="Billing Party Name" value={filters.billingParty} onChange={(billingParty) => setFilters({ ...filters, billingParty })} options={partyNames} placeholder="Search or select party" />
               <InputField label="From Station" value={filters.fromStation} onChange={(e) => setFilters({ ...filters, fromStation: e.target.value })} placeholder="Type station" />
               <InputField label="To Station" value={filters.toStation} onChange={(e) => setFilters({ ...filters, toStation: e.target.value })} placeholder="Type station" />
             </div>
@@ -123,9 +124,18 @@ export default function BookingMisReportPage() {
           { key: "particulars", header: "Particulars" },
           { key: "chargedWeight", header: "Weight" },
           { key: "freight", header: "Freight" },
+          { key: "lrType", header: "Type", render: (row) => row.lrType || "TBB" },
           { key: "gst", header: "GST" },
           { key: "grandTotal", header: "Grand Total" },
-          { key: "billNo", header: "Bill No", render: (row) => row.billNo || (row.billed ? "Billed" : "—") },
+          {
+            key: "billNo",
+            header: "Bill No",
+            render: (row) => {
+              if (row.billNo) return row.billNo;
+              if ((row.lrType || "TBB") === "TBB") return row.billed ? "Billed" : "—";
+              return row.lrType || "TBB";
+            },
+          },
         ]}
       />
     </>

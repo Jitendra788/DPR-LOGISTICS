@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, SelectField } from "@/components/ui/FormField";
+import { InputField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -61,9 +61,9 @@ export default function UserCreationPage() {
             </div>
             <div>
               <InputField label="Email" name="email" type="email" value={form.email ?? ""} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-              <SelectField label="Role" name="role" value={form.role ?? ""} onChange={(e) => setForm({ ...form, role: e.target.value })} options={["Admin", "Booking", "Accounts", "Operator"]} />
-              <SelectField label="Branch" name="branch" value={form.branch ?? ""} onChange={(e) => setForm({ ...form, branch: e.target.value })} options={["DPR Logistics", "Delhi", "Punjab Roadways"]} />
-              <SelectField label="Status" name="status" value={form.status ?? "Active"} onChange={(e) => setForm({ ...form, status: e.target.value })} options={["Active", "Inactive"]} />
+              <ComboboxField label="Role" name="role" value={form.role ?? ""} onChange={(role) => setForm({ ...form, role })} options={["Admin", "Booking", "Accounts", "Operator"]} placeholder="Select role" />
+              <ComboboxField label="Branch" name="branch" value={form.branch ?? ""} onChange={(branch) => setForm({ ...form, branch })} options={["DPR Logistics", "Delhi", "Punjab Roadways"]} placeholder="Select branch" />
+              <ComboboxField label="Status" name="status" value={form.status ?? "Active"} onChange={(status) => setForm({ ...form, status })} options={["Active", "Inactive"]} placeholder="Select status" />
             </div>
           </TwoCol>
           <Button type="submit">{editId ? "Update User" : "Save Data"}</Button>

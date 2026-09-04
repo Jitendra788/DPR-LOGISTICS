@@ -11,7 +11,7 @@ import { api } from "@/lib/api-client";
 import { firstOfMonthIso, isoToDisplay, todayIso } from "@/lib/dates";
 
 type Party = { name: string };
-type BillOption = { billNo: string; partyName: string };
+type BillOption = { billNo: string; partyName: string; source?: string };
 type BillRow = {
   srNo: number;
   billNo: string;
@@ -159,9 +159,14 @@ export function MoneyReceiptSearch({
   const [billNoFilter, setBillNoFilter] = useState("");
   const partyNames = parties.map((p) => p.name).filter(Boolean);
   const billOptions = useMemo(() => {
-    const list = allBills.filter((b) => !partyName.trim() || b.partyName === partyName.trim());
+    const list = allBills.filter((b) => {
+      const billSource = b.source || "DPR";
+      if (source === "ROADWAYS" ? billSource !== "ROADWAYS" : billSource === "ROADWAYS") return false;
+      if (partyName.trim() && b.partyName !== partyName.trim()) return false;
+      return true;
+    });
     return list.map((b) => b.billNo).filter(Boolean);
-  }, [allBills, partyName]);
+  }, [allBills, partyName, source]);
   const [fromDate, setFromDate] = useState(firstOfMonthIso());
   const [toDate, setToDate] = useState(todayIso());
   const [rows, setRows] = useState<BillRow[]>([]);
@@ -238,6 +243,7 @@ export function MoneyReceiptSearch({
         ...(billNo ? { billNo } : {}),
         ...(fromDate ? { fromDate } : {}),
         ...(toDate ? { toDate } : {}),
+        ...(source ? { source } : {}),
       }).toString();
       const data = await api<BillRow[]>(`/api/reports/money-receipt-outstanding${qs ? `?${qs}` : ""}`);
       setRows(data);
@@ -273,12 +279,14 @@ export function MoneyReceiptSearch({
       return;
     }
     try {
+      const next = await api<{ value: string }>("/api/next-no?type=receipt");
       await api("/api/receipts", {
         method: "POST",
         body: JSON.stringify({
+          receiptNo: next.value,
           billNo: row.billNo,
           partyName: row.partyName,
-          date: row.date || todayIso(),
+          date: todayIso(),
           tdsPct: d.tdsPct,
           tdsAmt: d.tdsAmt,
           paidAmt: d.paidAmt,
@@ -288,7 +296,7 @@ export function MoneyReceiptSearch({
           source,
         }),
       });
-      setMessage({ type: "ok", text: `Receipt saved for bill ${row.billNo}` });
+      setMessage({ type: "ok", text: `Receipt ${next.value} saved for bill ${row.billNo}` });
       await searchBills();
     } catch (err) {
       setMessage({ type: "err", text: err instanceof Error ? err.message : "Save failed" });

@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, InputField, SelectField } from "@/components/ui/FormField";
+import { DateField, InputField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -44,7 +44,7 @@ export default function MaintenancePage() {
           <TwoCol>
             <div>
               <InputField label="Sr No." value={editId ?? rows.length + 1} readOnly />
-              <SelectField label="Enter Vehicle Number" value={form.vehNo} onChange={(e) => setForm({ ...form, vehNo: e.target.value })} options={vehicles.map((v) => v.vehNo)} />
+              <ComboboxField label="Enter Vehicle Number" value={form.vehNo} onChange={(vehNo) => setForm({ ...form, vehNo })} options={vehicles.map((v) => v.vehNo)} placeholder="Search or select vehicle" />
               <InputField label="Expense Name" value={form.expenseName} onChange={(e) => setForm({ ...form, expenseName: e.target.value })} />
             </div>
             <div>

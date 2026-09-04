@@ -6,6 +6,7 @@ export type MailPayload = {
   text: string;
   html?: string;
   replyTo?: string;
+  to?: string | string[];
 };
 
 function mailConfig() {
@@ -25,7 +26,8 @@ export function isMailConfigured() {
 }
 
 export async function sendMail(payload: MailPayload) {
-  const { host, port, user, pass, to, from } = mailConfig();
+  const { host, port, user, pass, to: defaultTo, from } = mailConfig();
+  const to = payload.to || defaultTo;
 
   if (!user || !pass) {
     throw new Error(
@@ -123,5 +125,66 @@ export function formatQuoteEmail(data: {
     subject: `[Quote] ${data.pickupLocation} → ${data.deliveryLocation} — ${data.referenceId}`,
     text,
     replyTo: data.email || undefined,
+  };
+}
+
+export function formatLrEmail(
+  lr: {
+    lrNo: string;
+    lrDate: string;
+    fromStation: string;
+    toStation: string;
+    billingParty: string;
+    consignor: string;
+    consignee: string;
+    vehNo: string;
+    grandTotal: number;
+    freight: number;
+  },
+  printUrl: string,
+) {
+  const text = [
+    "DPR Logistics — Lorry Receipt (LR)",
+    "",
+    `LR No: ${lr.lrNo}`,
+    `Date: ${lr.lrDate}`,
+    `From: ${lr.fromStation}`,
+    `To: ${lr.toStation}`,
+    `Vehicle: ${lr.vehNo}`,
+    `Billing Party: ${lr.billingParty}`,
+    `Consignor: ${lr.consignor}`,
+    `Consignee: ${lr.consignee}`,
+    `Freight: ${lr.freight}`,
+    `Grand Total: ${lr.grandTotal}`,
+    "",
+    `View / Print LR: ${printUrl}`,
+  ].join("\n");
+
+  return {
+    subject: `LR ${lr.lrNo} — DPR Logistics`,
+    text,
+    html: `<p>Please find LR details below.</p><pre style="font-family:inherit;white-space:pre-wrap">${escapeHtml(text)}</pre><p><a href="${printUrl}">Open LR print</a></p>`,
+  };
+}
+
+export function formatBillEmail(
+  bill: { billNo: string; billDate: string; partyName: string; amount: number },
+  printUrl: string,
+) {
+  const text = [
+    "DPR Logistics — Tax Invoice",
+    "",
+    `Bill No: ${bill.billNo}`,
+    `Date: ${bill.billDate}`,
+    `Party: ${bill.partyName}`,
+    `Amount: ${bill.amount}`,
+    "",
+    `View / Print Bill: ${printUrl}`,
+  ].join("\n");
+
+  return {
+    subject: `Bill ${bill.billNo} — DPR Logistics`,
+    text,
+    html: `<p>Please find bill details below.</p><pre style="font-family:inherit;white-space:pre-wrap">${escapeHtml(text)}</pre><p><a href="${printUrl}">Open bill print</a></p>`,
   };
 }
