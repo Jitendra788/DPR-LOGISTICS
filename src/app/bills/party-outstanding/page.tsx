@@ -36,10 +36,7 @@ export default function PartyOutstandingPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    api<Party[]>("/api/parties").then((p) => {
-      setParties(p);
-      setPartyName((n) => n || p[0]?.name || "");
-    });
+    api<Party[]>("/api/parties").then((p) => setParties(p));
   }, []);
 
   const total = useMemo(() => rows.reduce((s, r) => s + r.outstanding, 0), [rows]);
@@ -49,6 +46,7 @@ export default function PartyOutstandingPage() {
     setLoading(true);
     try {
       const qs = new URLSearchParams({ source: "DPR" });
+      // Empty party = all parties (old Partyoutstanding.aspx)
       if (partyName.trim()) qs.set("partyName", partyName.trim());
       if (billNo.trim()) qs.set("billNo", billNo.trim());
       if (fromDate) qs.set("fromDate", fromDate);
@@ -92,7 +90,7 @@ export default function PartyOutstandingPage() {
                 value={partyName}
                 onChange={setPartyName}
                 options={parties.map((p) => p.name)}
-                placeholder="Search or select party"
+                placeholder="All parties (or select one)"
               />
               <InputField label="Bill No" value={billNo} onChange={(e) => setBillNo(e.target.value)} placeholder="Optional filter" />
               <Button type="submit" variant="teal" disabled={loading}>

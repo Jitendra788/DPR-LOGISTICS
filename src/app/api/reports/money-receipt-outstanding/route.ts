@@ -90,6 +90,7 @@ export async function GET(req: NextRequest) {
       })
       .map((b) => {
         const lrSum = lrSumByBill[b.billNo] || 0;
+        // Old site: Bill Amount (freight) + CGST/SGST/IGST − (Paid + TDS + Other)
         const beforeTax = billFreightAmount(b, lrSum);
         const billAmount = billGrandTotal(b, beforeTax);
         const paid = paidByBill[b.billNo] || 0;

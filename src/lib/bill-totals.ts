@@ -10,16 +10,15 @@ type BillAmounts = {
   igstPct?: number;
 };
 
-/** Freight / subtotal before bill-level GST. */
+/** Freight / subtotal before bill-level GST.
+ * Bill.generate stores `amount` as before-tax freight — never subtract GST from it.
+ * LR sum is only a fallback when bill amount is missing.
+ */
 export function billFreightAmount(bill: BillAmounts, lrFreightSum = 0) {
+  const stored = Number(bill.amount) || 0;
+  if (stored > 0) return Number(stored.toFixed(2));
   if (lrFreightSum > 0) return Number(lrFreightSum.toFixed(2));
-
-  const tax = (bill.cgstAmt || 0) + (bill.sgstAmt || 0) + (bill.igstAmt || 0);
-  if (tax > 0) {
-    const derived = Number((bill.amount - tax).toFixed(2));
-    if (derived > 0) return derived;
-  }
-  return bill.amount;
+  return 0;
 }
 
 export { lrBillableAmount, sumLrBillableAmount, type LrCharges };

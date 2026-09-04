@@ -59,10 +59,7 @@ export function BillwiseOutstandingReport({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    api<Party[]>("/api/parties").then((p) => {
-      setParties(p);
-      setPartyName((n) => n || p[0]?.name || "");
-    });
+    api<Party[]>("/api/parties").then(setParties);
   }, []);
 
   const rows = useMemo(() => {
@@ -146,7 +143,7 @@ export function BillwiseOutstandingReport({
                 if (allRows) setFilterByParty(Boolean(name.trim()));
               }}
               options={parties.map((p) => p.name)}
-              placeholder="Search or select party"
+              placeholder="All parties (optional filter)"
             />
           </div>
         </FormCard>
