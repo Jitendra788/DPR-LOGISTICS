@@ -8,6 +8,10 @@ import { isBillableLrType, normalizeLrType } from "@/lib/lr-type";
 
 export const dynamic = "force-dynamic";
 
+function normParty(value?: string | null) {
+  return String(value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as {
     partyName?: string;
@@ -82,7 +86,6 @@ export async function POST(req: NextRequest) {
 
       const lrs = await prisma.lrBooking.findMany({
         where: {
-          billingParty: body.partyName,
           billed: false,
           ...(body.fromStation ? { fromStation: body.fromStation } : {}),
           ...(body.toStation ? { toStation: body.toStation } : {}),
@@ -90,7 +93,9 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      const partyKey = normParty(body.partyName);
       matched = lrs.filter((row) => {
+        if (normParty(row.billingParty) !== partyKey) return false;
         if (!isBillableLrType(row.lrType)) return false;
         if (body.fromDate && row.lrDate && row.lrDate < body.fromDate) return false;
         if (body.toDate && row.lrDate && row.lrDate > body.toDate) return false;

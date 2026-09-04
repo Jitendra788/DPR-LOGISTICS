@@ -206,6 +206,9 @@ function LrBookingInner() {
       grandTotal,
       source: "DPR",
       lrType: normalizeLrType(form.lrType),
+      billingParty: String(form.billingParty ?? "").trim(),
+      consignor: String(form.consignor ?? "").trim(),
+      consignee: String(form.consignee ?? "").trim(),
     };
     const saved = editId ? await update(editId, body) : await create(body);
     if (saved) {
@@ -378,7 +381,7 @@ function LrBookingInner() {
             <Button type="submit" disabled={!!editId}>
               Save LR
             </Button>
-            <Button type="button" variant="teal" disabled={!editId} onClick={() => editId && update(editId, { ...form, gst: gstTotal, cgstAmt: Number(form.cgstAmt) || 0, sgstAmt: Number(form.sgstAmt) || 0, igstAmt: Number(form.igstAmt) || 0, total, grandTotal, lrType: normalizeLrType(form.lrType) })}>
+            <Button type="button" variant="teal" disabled={!editId} onClick={() => editId && update(editId, { ...form, gst: gstTotal, cgstAmt: Number(form.cgstAmt) || 0, sgstAmt: Number(form.sgstAmt) || 0, igstAmt: Number(form.igstAmt) || 0, total, grandTotal, lrType: normalizeLrType(form.lrType), billingParty: String(form.billingParty ?? "").trim(), consignor: String(form.consignor ?? "").trim(), consignee: String(form.consignee ?? "").trim() })}>
               Update LR
             </Button>
             <Button type="button" variant="danger" disabled={!editId} onClick={() => editId && remove(editId).then((ok) => ok && setEditId(null))}>

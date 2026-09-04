@@ -241,6 +241,9 @@ export default function RoadwaysLrPage() {
       grandTotal,
       source: "ROADWAYS",
       lrType: normalizeLrType(form.lrType),
+      billingParty: String(form.billingParty ?? "").trim(),
+      consignor: String(form.consignor ?? "").trim(),
+      consignee: String(form.consignee ?? "").trim(),
     };
     const saved = await create(body);
     if (saved) await resetAfterSave();
@@ -258,6 +261,9 @@ export default function RoadwaysLrPage() {
       grandTotal,
       source: "ROADWAYS",
       lrType: normalizeLrType(form.lrType),
+      billingParty: String(form.billingParty ?? "").trim(),
+      consignor: String(form.consignor ?? "").trim(),
+      consignee: String(form.consignee ?? "").trim(),
     });
     if (saved) await resetAfterSave();
   }

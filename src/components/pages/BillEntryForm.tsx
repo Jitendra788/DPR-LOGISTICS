@@ -13,7 +13,7 @@ import { api } from "@/lib/api-client";
 import { isoToDisplay, todayIso } from "@/lib/dates";
 import { billFreightAmount, billGrandTotal, calcBillTaxes } from "@/lib/bill-totals";
 import { isMeterBillAs, lrBillableAmount } from "@/lib/lr-totals";
-import { isBillableLrType } from "@/lib/lr-type";
+import { isBillableLrType, normalizeLrType } from "@/lib/lr-type";
 
 type Party = { name: string };
 type LrRow = {
@@ -65,6 +65,17 @@ type Bill = {
   source: string;
 };
 
+function normParty(value?: string | null) {
+  return String(value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function matchesParty(rowParty: string, selected: string) {
+  const a = normParty(rowParty);
+  const b = normParty(selected);
+  if (!a || !b) return false;
+  return a === b;
+}
+
 function matchesBillAs(row: LrRow, variant: "weight" | "meter", billAs?: string) {
   if (billAs) {
     if (isMeterBillAs(billAs)) return isMeterBillAs(row.billAs);
@@ -75,8 +86,8 @@ function matchesBillAs(row: LrRow, variant: "weight" | "meter", billAs?: string)
 }
 
 function matchesSource(row: LrRow, source: string) {
-  if (source === "ROADWAYS") return row.source === "ROADWAYS";
-  return row.source !== "ROADWAYS";
+  if (source === "ROADWAYS") return (row.source || "DPR") === "ROADWAYS";
+  return (row.source || "DPR") !== "ROADWAYS";
 }
 
 export function BillEntryForm({
@@ -133,13 +144,38 @@ export function BillEntryForm({
     if (editId) return bookings.filter((row) => row.billNo === form.billNo);
     return bookings.filter(
       (row) =>
-        row.billingParty === form.partyName &&
+        matchesParty(row.billingParty, form.partyName) &&
         !row.billed &&
         isBillableLrType(row.lrType) &&
         matchesBillAs(row, variant, form.billAs) &&
         matchesSource(row, source),
     );
   }, [bookings, form.partyName, form.billNo, form.billAs, editId, variant, source]);
+
+  const emptyHint = useMemo(() => {
+    if (editId || !form.partyName || visibleLrs.length) return "";
+    const sameParty = bookings.filter((row) => matchesParty(row.billingParty, form.partyName) && matchesSource(row, source));
+    if (!sameParty.length) {
+      return `No LRs found for billing party "${form.partyName}". Check LR → Billing Party name (must match exactly, spaces ignored).`;
+    }
+    const unbilled = sameParty.filter((row) => !row.billed);
+    if (!unbilled.length) {
+      return `All LRs for "${form.partyName}" are already billed.`;
+    }
+    const tbb = unbilled.filter((row) => isBillableLrType(row.lrType));
+    if (!tbb.length) {
+      const types = [...new Set(unbilled.map((r) => normalizeLrType(r.lrType)))].join(", ");
+      return `Unbilled LRs for this party are ${types} — only TBB can be billed. Open LR and set LR Type = TBB, then Update.`;
+    }
+    const billAsOk = tbb.filter((row) => matchesBillAs(row, variant, form.billAs));
+    if (!billAsOk.length) {
+      const asList = [...new Set(tbb.map((r) => r.billAs || "Weight"))].join(", ");
+      return variant === "meter"
+        ? `This party has TBB LRs with Bill As: ${asList}. Open Meterwise only for Mtr LRs (or change Bill As).`
+        : `This party has TBB LRs with Bill As: ${asList}. Open Weightwise for Weight/Package (Meter LRs use Meterwise Bill).`;
+    }
+    return "No unbilled TBB LRs match the current filters.";
+  }, [bookings, editId, form.partyName, form.billAs, source, variant, visibleLrs.length]);
 
   useEffect(() => {
     Promise.all([
@@ -350,7 +386,7 @@ export function BillEntryForm({
               <div>
                 <ComboboxField
                   label="Bill As"
-                  value={form.billAs || "Weight"}
+                  value={form.billAs || "Mtr"}
                   onChange={(billAs) => setForm({ ...form, billAs, billAt: billAs })}
                   options={["Mtr", "Weight", "Package"]}
                   placeholder="Select"
@@ -465,9 +501,7 @@ export function BillEntryForm({
                 ]}
               />
               {!editId && !visibleLrs.length ? (
-                <p className="mt-2 text-sm text-[#a94442]">
-                  No unbilled TBB LRs for this party. (ToPay / Paid LRs are not billed — old site rule)
-                </p>
+                <p className="mt-2 text-sm text-[#a94442]">{emptyHint}</p>
               ) : null}
             </>
           ) : null}
