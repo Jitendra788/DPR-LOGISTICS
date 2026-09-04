@@ -153,7 +153,7 @@ async function buildFromLrTrip(trackingNumber: string): Promise<Built | null> {
   if (trip) {
     const history = await getLocationHistory(trip.id, 200);
     const payload = publicTripPayload(trip, history);
-    const customerToken = payload.customerTrackToken || "";
+    const customerToken = trip.customerTrackToken || "";
     trackUrl = customerToken ? `/track/${customerToken}` : null;
     live = {
       tripNo: payload.tripNo,
