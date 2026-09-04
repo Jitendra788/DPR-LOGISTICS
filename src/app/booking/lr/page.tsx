@@ -12,7 +12,6 @@ import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { api, formToObject } from "@/lib/api-client";
 import { lrNoEquals } from "@/lib/lr-no";
-import { autoLrFreight } from "@/lib/lr-totals";
 
 type Party = { id: number; name: string };
 type Booking = {
@@ -103,15 +102,6 @@ function LrBookingInner() {
   function patchForm(patch: Partial<Booking>) {
     setForm((prev) => {
       const next = { ...prev, ...patch };
-      const freight = autoLrFreight({
-        billAs: next.billAs,
-        rate: next.rate,
-        totalMeter: next.totalMeter,
-        chargedWeight: next.chargedWeight,
-      });
-      if (freight != null && ("rate" in patch || "totalMeter" in patch || "chargedWeight" in patch || "billAs" in patch)) {
-        next.freight = freight;
-      }
       const cgst = Number(next.cgstAmt) || 0;
       const sgst = Number(next.sgstAmt) || 0;
       const igst = Number(next.igstAmt) || 0;
@@ -359,7 +349,6 @@ function LrBookingInner() {
                   label={chargeLabels[key]}
                   value={form[key] ?? 0}
                   onChange={(n) => patchForm({ [key]: n })}
-                  readOnly={key === "freight"}
                 />
               ))}
             </div>
