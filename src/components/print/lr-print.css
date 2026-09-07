@@ -1,25 +1,27 @@
-/* Match old ASP LR: A4 portrait, pure white, pure black text */
+/* Match old ASP LR: 10×6 inch landscape form, pure white, pure black text */
 .lr-print-page {
   background: #ffffff;
-  padding: 0;
+  padding: 8px;
   margin: 0;
   color: #000000;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 13px;
-  line-height: 1.28;
+  font-size: 12px;
+  line-height: 1.25;
   -webkit-font-smoothing: none;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
 
 .lr-print-sheet {
-  width: 210mm;
+  width: 10in;
+  height: 6in;
   max-width: 100%;
   margin: 0 auto;
   background: #ffffff;
   color: #000000;
   border: 2px solid #000000;
   box-sizing: border-box;
+  overflow: hidden;
   page-break-after: always;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
@@ -38,10 +40,10 @@
 
 .lr-print-table > tbody > tr > td {
   border: 1px solid #000000;
-  padding: 4px 6px;
+  padding: 2px 4px;
   vertical-align: top;
   word-wrap: break-word;
-  font-size: 13px;
+  font-size: 11.5px;
   color: #000000;
   background: #ffffff;
 }
@@ -104,7 +106,7 @@
 
 .lr-print-charges-row > td {
   vertical-align: stretch;
-  height: 140px;
+  height: 110px;
 }
 
 .lr-freight-amt {
@@ -127,21 +129,21 @@
 
 .lr-print-title-red {
   font-family: "Times New Roman", Times, Georgia, serif;
-  font-size: 30px;
+  font-size: 26px;
   font-weight: 900;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.5px;
   color: #c00000;
-  line-height: 1.1;
+  line-height: 1.05;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
 
 .lr-print-subtitle-red {
   font-family: "Times New Roman", Times, Georgia, serif;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 800;
   color: #c00000;
-  margin: 2px 0 5px;
+  margin: 1px 0 3px;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
@@ -259,28 +261,28 @@
 
 .lr-print-footer-left {
   vertical-align: top !important;
-  font-size: 13px;
-  line-height: 1.7;
-  min-height: 110px;
+  font-size: 12px;
+  line-height: 1.55;
+  min-height: 78px;
   color: #000000;
   background: #ffffff !important;
 }
 
 .lr-print-sign {
   text-align: center;
-  min-height: 110px;
+  min-height: 78px;
   vertical-align: top !important;
-  padding-top: 6px !important;
-  font-size: 13px;
+  padding-top: 4px !important;
+  font-size: 12px;
   color: #000000;
   background: #ffffff !important;
 }
 
 .lr-print-stamp {
   display: block;
-  width: 82px;
+  width: 64px;
   height: auto;
-  margin: 6px auto 4px;
+  margin: 2px auto 2px;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
@@ -304,8 +306,8 @@
 
 @media print {
   @page {
-    size: A4 portrait;
-    margin: 6mm;
+    size: 10in 6in;
+    margin: 0.15in;
   }
 
   html,
@@ -323,9 +325,12 @@
 
   .lr-print-sheet {
     width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
     max-width: none !important;
-    margin: 0 0 6mm !important;
+    margin: 0 !important;
     border: 2px solid #000000;
+    overflow: visible;
   }
 
   .lr-print-title-red,
