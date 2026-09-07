@@ -351,7 +351,7 @@ export function BillTaxInvoice({
             </td>
             <td colSpan={colCount - Math.floor(colCount / 2)} className="bill-print-sign-cell bill-print-right">
               <div className="bill-print-bold">{forLabel}</div>
-              <img src={BRAND_STAMP} alt="stamp" className="bill-print-stamp" />
+              <img src={BRAND_STAMP} alt="DPR Logistics stamp" className="bill-print-stamp" />
             </td>
           </tr>
         </tbody>
