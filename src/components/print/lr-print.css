@@ -1,12 +1,12 @@
 .lr-print-page {
-  background: #cfcfcf;
-  padding: 12px;
+  background: #bdbdbd;
+  padding: 14px;
   color: #000;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 13px;
   line-height: 1.28;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }
 
 .lr-print-sheet {
@@ -14,10 +14,11 @@
   max-width: 210mm;
   margin: 0 auto 14px;
   background: #fff;
-  border: 2px solid #000;
+  border: 2.5px solid #000;
+  box-shadow: 0 0 0 1px #000;
   page-break-after: always;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }
 
 .lr-print-sheet:last-child {
@@ -32,7 +33,7 @@
 }
 
 .lr-print-table > tbody > tr > td {
-  border: 1px solid #000;
+  border: 1.25px solid #000;
   padding: 4px 6px;
   vertical-align: top;
   word-wrap: break-word;
@@ -51,7 +52,7 @@
 
 .lr-nested td {
   border: 1px solid #000;
-  padding: 3px 5px;
+  padding: 4px 5px;
   vertical-align: middle;
   font-size: 12.5px;
   overflow: hidden;
@@ -62,11 +63,16 @@
   white-space: nowrap;
   overflow: hidden;
   padding-right: 4px;
-  font-weight: 700;
+  font-weight: 800;
+  background: #f3f3f3;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }
 
 .lr-nested td.lr-print-veh {
   padding-left: 6px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
   word-break: break-word;
 }
 
@@ -88,7 +94,7 @@
 
 .lr-print-charges-row > td {
   vertical-align: stretch;
-  height: 140px;
+  height: 145px;
 }
 
 .lr-freight-amt {
@@ -112,114 +118,138 @@
 
 .lr-print-title-red {
   font-family: "Times New Roman", Times, Georgia, serif;
-  font-size: 30px;
+  font-size: 34px;
   font-weight: 900;
-  letter-spacing: 0.5px;
-  color: #c00000;
-  line-height: 1.1;
+  letter-spacing: 1px;
+  color: #b00000;
+  line-height: 1.05;
+  text-shadow:
+    0.6px 0.6px 0 #5a0000,
+    1.2px 1.2px 0 rgba(0, 0, 0, 0.18);
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
 
 .lr-print-subtitle-red {
   font-family: "Times New Roman", Times, Georgia, serif;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 800;
-  font-style: italic;
-  color: #c00000;
-  margin: 2px 0 5px;
+  color: #b00000;
+  margin: 3px 0 6px;
+  text-shadow: 0.4px 0.4px 0 rgba(90, 0, 0, 0.35);
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
 
 .lr-print-blessings {
   font-family: "Times New Roman", Times, serif;
-  font-size: 12.5px;
+  font-size: 13px;
   font-weight: 700;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 
 .lr-print-header-mid {
-  padding-top: 6px;
-  padding-bottom: 6px;
+  padding-top: 7px;
+  padding-bottom: 7px;
   font-size: 12.5px;
+}
+
+.lr-print-header-mid .lr-print-contact {
+  font-weight: 700;
+  font-size: 12.5px;
+  line-height: 1.35;
 }
 
 .lr-print-copy {
   font-size: 12.5px;
   font-weight: 700;
   text-align: center;
-  line-height: 1.4;
+  line-height: 1.45;
   vertical-align: middle !important;
-  background: #fff;
+  background: linear-gradient(#fff, #f5f5f5);
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }
 
 .lr-print-copy-label {
   text-decoration: underline;
-  margin: 4px 0;
-  font-size: 13px;
+  margin: 5px 0;
+  font-size: 13.5px;
+  font-weight: 900;
 }
 
 .lr-print-logo-cell {
   text-align: center;
   vertical-align: middle !important;
-  width: 118px;
-  padding: 4px !important;
+  width: 124px;
+  padding: 5px !important;
+  background: #fafafa;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }
 
 .lr-print-logo {
-  width: 104px;
+  width: 110px;
   height: auto;
-  max-height: 82px;
+  max-height: 88px;
   object-fit: contain;
   display: block;
   margin: 0 auto;
+  filter: contrast(1.08) saturate(1.12);
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
 
 .lr-print-note {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 900;
-  letter-spacing: 0.5px;
-  margin-top: 6px;
+  letter-spacing: 0.8px;
+  margin-top: 8px;
+  color: #111;
 }
 
 .lr-print-label {
-  font-weight: 700;
+  font-weight: 800;
   white-space: nowrap;
   font-size: 12.5px;
 }
 
 .lr-print-value {
   min-height: 20px;
-  font-size: 13px;
+  font-size: 13.5px;
+  font-weight: 700;
 }
 
 .lr-print-section {
-  font-weight: 800;
+  font-weight: 900;
   margin: -4px -6px 6px;
-  padding: 4px 6px;
+  padding: 5px 6px;
   font-size: 13px;
-  background: #e8e8e8 !important;
-  border-bottom: 1px solid #000;
+  letter-spacing: 0.2px;
+  background: linear-gradient(#ececec, #d8d8d8) !important;
+  border-bottom: 1.5px solid #000;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
 
 .lr-print-party-cell {
-  min-height: 58px;
+  min-height: 62px;
   font-size: 13px;
   padding-top: 0 !important;
+  line-height: 1.4;
 }
 
 .lr-print-gst-pan {
   text-align: center;
   font-weight: 900;
-  font-size: 14.5px;
-  color: #c00000;
-  padding: 7px !important;
-  background: #fff;
+  font-size: 15.5px;
+  letter-spacing: 0.4px;
+  color: #b00000;
+  padding: 8px !important;
+  background: linear-gradient(#fff8f8, #ffe8e8) !important;
+  border-top: 2px solid #000 !important;
+  border-bottom: 2px solid #000 !important;
+  text-shadow: 0.3px 0.3px 0 rgba(120, 0, 0, 0.25);
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
@@ -227,46 +257,54 @@
 .lr-print-footer-left {
   vertical-align: top !important;
   font-size: 13px;
-  line-height: 1.7;
-  min-height: 110px;
+  line-height: 1.75;
+  min-height: 118px;
+  font-weight: 600;
 }
 
 .lr-print-sign {
   text-align: center;
-  min-height: 110px;
+  min-height: 118px;
   vertical-align: top !important;
   padding-top: 6px !important;
-  font-size: 13px;
+  font-size: 13.5px;
+  background: linear-gradient(#fff, #f7f7f7);
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }
 
 .lr-print-stamp {
   display: block;
-  width: 82px;
+  width: 92px;
   height: auto;
-  margin: 6px auto 4px;
+  margin: 4px auto 2px;
+  filter: contrast(1.05) saturate(1.2);
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
 
 .lr-print-care {
-  margin-top: 6px;
-  font-weight: 800;
+  margin-top: 4px;
+  font-weight: 900;
   font-size: 12.5px;
-  border-top: 1px solid #000;
+  border-top: 1.5px solid #000;
   padding-top: 5px;
 }
 
 .lr-print-articles-head > td {
-  background: #fff !important;
-  font-weight: 800;
-  padding-top: 5px !important;
-  padding-bottom: 5px !important;
+  background: linear-gradient(#efefef, #dcdcdc) !important;
+  font-weight: 900;
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+  font-size: 12.5px;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }
 
 @media print {
   @page {
     size: A4 portrait;
-    margin: 6mm;
+    margin: 5mm;
   }
 
   body {
@@ -282,7 +320,8 @@
   .lr-print-sheet {
     max-width: none;
     margin: 0 0 8mm;
-    border: 2px solid #000;
+    border: 2.5px solid #000;
+    box-shadow: none;
   }
 
   .lr-print-title-red,
@@ -290,7 +329,12 @@
   .lr-print-gst-pan,
   .lr-print-logo,
   .lr-print-stamp,
-  .lr-print-section {
+  .lr-print-section,
+  .lr-print-copy,
+  .lr-print-sign,
+  .lr-print-logo-cell,
+  .lr-print-articles-head > td,
+  .lr-nested td.lr-print-label {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }

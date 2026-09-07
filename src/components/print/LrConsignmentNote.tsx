@@ -165,8 +165,8 @@ export function LrConsignmentNote({
               <div className="lr-print-blessings">{company.blessings}</div>
               <div className="lr-print-title-red">{company.name}</div>
               <div className="lr-print-subtitle-red">{company.tagline}</div>
-              <div>{company.address}</div>
-              <div>
+              <div className="lr-print-contact">{company.address}</div>
+              <div className="lr-print-contact">
                 E-mail : {company.email} Mob. : {company.phones}
               </div>
             </td>
