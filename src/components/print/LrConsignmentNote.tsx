@@ -138,7 +138,7 @@ export function LrConsignmentNote({
               <div>{company.jurisdiction}</div>
               <div className="lr-print-copy-label">({copyLabel})</div>
               <div>At Owner&apos;s Risk</div>
-              <div>Cargo is insured by Customer</div>
+              <div>Carrgo is insured by Customer</div>
               <div className="lr-print-note">CONSIGNMENT NOTE</div>
             </td>
           </tr>
@@ -217,25 +217,22 @@ export function LrConsignmentNote({
               <table className="lr-charges-col">
                 <tbody>
                   <tr>
-                    <td className="lr-print-label">Act Weight</td>
+                    <td className="lr-print-label lr-print-center">Act Weight</td>
+                  </tr>
+                  <tr>
                     <td className="lr-print-center">{booking.actWeight}</td>
                   </tr>
                   <tr>
-                    <td className="lr-print-label">Chg.Wt.</td>
+                    <td className="lr-print-label lr-print-center">Chg.Wt.</td>
+                  </tr>
+                  <tr>
                     <td className="lr-print-center">{booking.chargedWeight}</td>
                   </tr>
                   <tr>
-                    <td className="lr-print-label">Meter</td>
-                    <td className="lr-print-center">{booking.totalMeter}</td>
+                    <td className="lr-print-label lr-print-center">Meter</td>
                   </tr>
                   <tr>
-                    <td colSpan={2}>&nbsp;</td>
-                  </tr>
-                  <tr>
-                    <td colSpan={2}>&nbsp;</td>
-                  </tr>
-                  <tr>
-                    <td colSpan={2}>&nbsp;</td>
+                    <td className="lr-print-center">{booking.totalMeter || ""}</td>
                   </tr>
                 </tbody>
               </table>
@@ -295,16 +292,16 @@ export function LrConsignmentNote({
                     <td className="lr-print-center">Consignor</td>
                   </tr>
                   <tr>
+                    <td>&nbsp;</td>
+                  </tr>
+                  <tr>
                     <td className="lr-print-center">Consignee</td>
                   </tr>
                   <tr>
+                    <td>&nbsp;</td>
+                  </tr>
+                  <tr>
                     <td className="lr-print-center">DPRL</td>
-                  </tr>
-                  <tr>
-                    <td>&nbsp;</td>
-                  </tr>
-                  <tr>
-                    <td>&nbsp;</td>
                   </tr>
                   <tr>
                     <td>&nbsp;</td>

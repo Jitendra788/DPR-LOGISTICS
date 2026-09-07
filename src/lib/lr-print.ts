@@ -2,13 +2,13 @@ export const lrPrintCompany = {
   name: "DPR LOGISTICS",
   tagline: "Fleet Owners & Transport Contractors",
   address: "Shree Mahalaxmi Petrol Pump 5 Star MIDC Road, Kagal Dist.Kolhapur 416216",
-  email: "dprlogistics2142@gmail.com",
-  phones: "9356259949 / 9371662142",
+  email: "dprkolhapur@gmail.com",
+  phones: "9371662142, 9326862142, 9356259949",
   jurisdiction: "Subject To Kolhapur Jurisdiction",
-  customerCare: "9356259949 / 9371662142",
+  customerCare: "9356259949",
   companyGst: "27BNLPK2073C1Z5",
   companyPan: "BNLPK2073C",
-  blessings: "|| Shree Ganesh Prasanna || Shri Mahalaxmi Prasanna ||",
+  blessings: "|| Shree Ganesh Prasanna || Shri Mahalaxmi Prasanna||",
 } as const;
 
 export function formatPrintDate(value: string) {
