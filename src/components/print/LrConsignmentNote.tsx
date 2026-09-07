@@ -184,14 +184,17 @@ export function LrConsignmentNote({
           <tr>
             <td colSpan={4} className="lr-print-party-cell">
               <div className="lr-print-section">Consignor Details</div>
-              <div>
-                <span className="lr-print-label">Party Name :</span> {consignor.name}
+              <div className="lr-print-party-line">
+                <span className="lr-print-label">Party Name :</span>{" "}
+                <span className="lr-print-party-val">{consignor.name}</span>
               </div>
-              <div>
-                <span className="lr-print-label">Address :</span> {consignor.address}
+              <div className="lr-print-party-line">
+                <span className="lr-print-label">Address :</span>{" "}
+                <span className="lr-print-party-val">{consignor.address}</span>
               </div>
-              <div>
-                <span className="lr-print-label">GST No. :</span> {consignor.gst}
+              <div className="lr-print-party-line">
+                <span className="lr-print-label">GST No. :</span>{" "}
+                <span className="lr-print-party-val">{consignor.gst}</span>
               </div>
             </td>
             <td colSpan={3} className="lr-print-no-pad">
@@ -230,14 +233,17 @@ export function LrConsignmentNote({
           <tr>
             <td colSpan={7} className="lr-print-party-cell">
               <div className="lr-print-section">Consignee Details</div>
-              <div>
-                <span className="lr-print-label">Consignee Name :</span> {consignee.name}
+              <div className="lr-print-party-line">
+                <span className="lr-print-label">Consignee Name :</span>{" "}
+                <span className="lr-print-party-val">{consignee.name}</span>
               </div>
-              <div>
-                <span className="lr-print-label">Address :</span> {consignee.address}
+              <div className="lr-print-party-line">
+                <span className="lr-print-label">Address :</span>{" "}
+                <span className="lr-print-party-val">{consignee.address}</span>
               </div>
-              <div>
-                <span className="lr-print-label">GST No. :</span> {consignee.gst}
+              <div className="lr-print-party-line">
+                <span className="lr-print-label">GST No. :</span>{" "}
+                <span className="lr-print-party-val">{consignee.gst}</span>
               </div>
             </td>
           </tr>
