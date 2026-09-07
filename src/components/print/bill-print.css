@@ -105,9 +105,9 @@
 }
 
 .bill-print-logo {
-  width: 96px;
+  width: 118px;
   height: auto;
-  max-height: 78px;
+  max-height: 96px;
   object-fit: contain;
 }
 
@@ -121,7 +121,7 @@
 }
 
 .bill-print-sign-cell {
-  height: 78px;
+  height: 110px;
   vertical-align: top !important;
   padding-top: 6px !important;
   padding-bottom: 6px !important;
@@ -129,9 +129,9 @@
 
 .bill-print-stamp {
   display: block;
-  width: 78px;
+  width: 120px;
   height: auto;
-  margin: 4px 0 0 auto;
+  margin: 6px 0 0 auto;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }

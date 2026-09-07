@@ -79,6 +79,17 @@ function partyLine(party: LrPrintParty | undefined, fallbackName: string) {
   };
 }
 
+/** Legacy print style: 6TN → 6 TN, 18TN32FEET → 18 TN 32 FEET */
+function formatWeightDisplay(value?: string) {
+  const v = String(value ?? "").trim();
+  if (!v) return "";
+  return v
+    .replace(/(\d)\s*([A-Za-z])/g, "$1 $2")
+    .replace(/([A-Za-z])\s*(\d)/g, "$1 $2")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export function LrConsignmentNote({
   booking,
   copyLabel,
@@ -220,13 +231,13 @@ export function LrConsignmentNote({
                     <td className="lr-print-label lr-print-center">Act Weight</td>
                   </tr>
                   <tr>
-                    <td className="lr-print-center">{booking.actWeight}</td>
+                    <td className="lr-print-center">{formatWeightDisplay(booking.actWeight)}</td>
                   </tr>
                   <tr>
                     <td className="lr-print-label lr-print-center">Chg.Wt.</td>
                   </tr>
                   <tr>
-                    <td className="lr-print-center">{booking.chargedWeight}</td>
+                    <td className="lr-print-center">{formatWeightDisplay(booking.chargedWeight)}</td>
                   </tr>
                   <tr>
                     <td className="lr-print-label lr-print-center">Meter</td>
@@ -324,7 +335,7 @@ export function LrConsignmentNote({
               <span className="lr-print-label">Value Rs.</span> {booking.valueRs}
             </td>
             <td colSpan={3} className="lr-print-sign">
-              <div className="lr-print-bold">For {company.name}</div>
+              <div className="lr-print-bold">For DPR LOGISTICS</div>
               <img src={BRAND_STAMP} alt="DPR Logistics stamp" className="lr-print-stamp" />
             </td>
           </tr>
@@ -338,7 +349,9 @@ export function LrConsignmentNote({
               <span className="lr-print-label">Valid Date</span> {formatPrintDate(booking.validDate || "")}
             </td>
             <td colSpan={2} className="lr-print-bold lr-print-center">
-              Customer Care No : {company.customerCare}
+              Customer Care No :
+              <br />
+              {company.customerCare}
             </td>
           </tr>
         </tbody>

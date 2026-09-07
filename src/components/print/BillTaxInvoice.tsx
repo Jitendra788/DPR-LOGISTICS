@@ -50,10 +50,20 @@ export type BillPrintData = {
 export type BillPrintVariant = "weight" | "meter";
 
 function lrWeight(row: BillPrintLr) {
-  const w = row.chargedWeight || row.actWeight || "";
+  const w = formatWeightCell(row.chargedWeight || row.actWeight || "");
   const p = row.particulars || "";
   if (w && p && w !== p) return `${w} ${p}`.trim();
   return w || p || "";
+}
+
+function formatWeightCell(value: string) {
+  const v = String(value ?? "").trim();
+  if (!v) return "";
+  return v
+    .replace(/(\d)\s*([A-Za-z])/g, "$1 $2")
+    .replace(/([A-Za-z])\s*(\d)/g, "$1 $2")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 function lrLineFreight(row: BillPrintLr) {
