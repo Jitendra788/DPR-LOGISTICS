@@ -320,6 +320,8 @@ export function formatBillEmail(
     `Grand Total: ${grand}`,
     "",
     `Print Bill: ${printUrl}`,
+    "",
+    "A printable Bill HTML file is attached.",
   ].join("\n");
 
   const logoAtt = logoInlineAttachment();
@@ -371,11 +373,12 @@ export function formatBillEmail(
               <a href="${escapeHtml(printUrl)}" style="display:inline-block;background:#0f766e;color:#ffffff;text-decoration:none;font-weight:700;font-size:14px;padding:12px 22px;border-radius:8px;">
                 Open &amp; Print Bill
               </a>
+              <div style="font-size:12px;color:#64748b;margin-top:10px;">A printable Bill file is also attached to this email.</div>
             </td>
           </tr>
           <tr>
             <td style="background:#f8fafc;padding:14px 24px;font-size:11px;color:#64748b;border-top:1px solid #e2e8f0;">
-              DPR Logistics · Customer Care
+              ${escapeHtml(company.address)} · ${escapeHtml([company.phone, company.phoneAlt].filter(Boolean).join(" / "))} · ${escapeHtml(company.email)}
             </td>
           </tr>
         </table>
@@ -385,10 +388,59 @@ export function formatBillEmail(
 </body>
 </html>`;
 
+  const printDoc = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Bill ${escapeHtml(bill.billNo)} — DPR Logistics</title>
+<style>
+  body{font-family:Arial,Helvetica,sans-serif;color:#111;margin:24px;background:#fff;}
+  .sheet{max-width:800px;margin:0 auto;border:2px solid #0f766e;padding:18px 20px;}
+  .brand{font-size:22px;font-weight:800;color:#0f766e;}
+  .tag{font-size:12px;color:#475569;margin-top:2px;}
+  h1{margin:14px 0 4px;font-size:16px;}
+  table{width:100%;border-collapse:collapse;margin-top:8px;}
+  th,td{border:1px solid #cbd5e1;padding:8px 10px;font-size:13px;vertical-align:top;}
+  th{background:#f0fdfa;text-align:left;width:30%;color:#0f766e;}
+  .totals{margin-top:12px;text-align:right;font-size:15px;}
+  .totals strong{color:#0f766e;font-size:18px;}
+  @media print{body{margin:0}.sheet{border:0;padding:0}}
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <img src="${escapeHtml(PUBLIC_LOGO_URL)}" alt="DPR Logistics" style="max-height:64px;max-width:160px;display:block;margin-bottom:8px;" />
+    <div class="brand">DPR Logistics</div>
+    <div class="tag">${escapeHtml(company.tagline)}</div>
+    <h1>Tax Invoice — ${escapeHtml(bill.billNo)}</h1>
+    <div class="tag">Date: ${escapeHtml(date)}</div>
+    <table>
+      <tr><th>Bill No</th><td>${escapeHtml(bill.billNo)}</td></tr>
+      <tr><th>Party</th><td>${escapeHtml(bill.partyName || "—")}</td></tr>
+      ${bill.cgstAmt ? `<tr><th>CGST</th><td>₹ ${escapeHtml(money(bill.cgstAmt))}</td></tr>` : ""}
+      ${bill.sgstAmt ? `<tr><th>SGST</th><td>₹ ${escapeHtml(money(bill.sgstAmt))}</td></tr>` : ""}
+      ${bill.igstAmt ? `<tr><th>IGST</th><td>₹ ${escapeHtml(money(bill.igstAmt))}</td></tr>` : ""}
+      <tr><th>Grand Total</th><td><strong>₹ ${escapeHtml(money(grand))}</strong></td></tr>
+    </table>
+    <div class="totals">Grand Total: <strong>₹ ${escapeHtml(money(grand))}</strong></div>
+  </div>
+  <script>window.addEventListener('load',function(){setTimeout(function(){window.print()},200)});</script>
+</body>
+</html>`;
+
+  const safeName = String(bill.billNo).replace(/[^\w.-]+/g, "_");
+
   return {
     subject: `Bill ${bill.billNo} — DPR Logistics`,
     text,
     html,
-    attachments: logoAtt ? [logoAtt] : [],
+    attachments: [
+      ...(logoAtt ? [logoAtt] : []),
+      {
+        filename: `Bill-${safeName}.html`,
+        content: printDoc,
+        contentType: "text/html; charset=utf-8",
+      },
+    ],
   };
 }

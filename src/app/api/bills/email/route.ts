@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { formatBillEmail, isMailConfigured, sendMail } from "@/lib/mail";
 import { apiError } from "@/lib/handle-api-error";
 import { BRAND_LOGO_HEADER } from "@/lib/brand";
+import { createBillPrintShareToken } from "@/lib/lr-email";
 
 function siteOrigin(req: NextRequest) {
   const host = req.headers.get("x-forwarded-host") || req.headers.get("host");
@@ -35,7 +36,8 @@ export async function POST(req: NextRequest) {
     }
 
     const origin = siteOrigin(req);
-    const printUrl = `${origin}/bills/print?billNo=${encodeURIComponent(bill.billNo)}`;
+    const share = createBillPrintShareToken(bill.billNo);
+    const printUrl = `${origin}/bills/print?billNo=${encodeURIComponent(bill.billNo)}&share=${encodeURIComponent(share)}`;
     const grandTotal =
       (Number(bill.amount) || 0) +
       (Number(bill.cgstAmt) || 0) +

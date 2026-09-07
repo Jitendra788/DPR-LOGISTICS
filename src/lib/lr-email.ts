@@ -46,13 +46,8 @@ function fromB64url(input: string) {
   return Buffer.from(input.replace(/-/g, "+").replace(/_/g, "/") + pad, "base64").toString("utf8");
 }
 
-/** Signed share token so email recipients can open / print without login. */
-export function createLrPrintShareToken(lrNo: string, maxAgeSec = 60 * 60 * 24 * 60) {
-  const payload = JSON.stringify({
-    lrNo: String(lrNo).trim(),
-    exp: Math.floor(Date.now() / 1000) + maxAgeSec,
-  });
-  const payloadB64 = b64url(payload);
+function signSharePayload(payloadObj: Record<string, unknown>) {
+  const payloadB64 = b64url(JSON.stringify(payloadObj));
   const sig = createHmac("sha256", shareSecret())
     .update(payloadB64)
     .digest("base64")
@@ -62,26 +57,54 @@ export function createLrPrintShareToken(lrNo: string, maxAgeSec = 60 * 60 * 24 *
   return `${payloadB64}.${sig}`;
 }
 
-export function verifyLrPrintShareToken(raw: string | null | undefined, expectedLrNo?: string) {
-  if (!raw?.trim()) return false;
+function readSignedShare(raw: string | null | undefined): Record<string, unknown> | null {
+  if (!raw?.trim()) return null;
   const [payloadB64, sig] = raw.split(".");
-  if (!payloadB64 || !sig) return false;
+  if (!payloadB64 || !sig) return null;
   const expected = createHmac("sha256", shareSecret())
     .update(payloadB64)
     .digest("base64")
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
     .replace(/=+$/g, "");
-  if (expected !== sig) return false;
+  if (expected !== sig) return null;
   try {
-    const payload = JSON.parse(fromB64url(payloadB64)) as { lrNo?: string; exp?: number };
-    if (!payload.lrNo || !payload.exp) return false;
-    if (payload.exp < Math.floor(Date.now() / 1000)) return false;
-    if (expectedLrNo && String(payload.lrNo).trim() !== String(expectedLrNo).trim()) return false;
-    return true;
+    const payload = JSON.parse(fromB64url(payloadB64)) as Record<string, unknown>;
+    const exp = Number(payload.exp);
+    if (!exp || exp < Math.floor(Date.now() / 1000)) return null;
+    return payload;
   } catch {
-    return false;
+    return null;
   }
+}
+
+/** Signed share token so email recipients can open / print without login. */
+export function createLrPrintShareToken(lrNo: string, maxAgeSec = 60 * 60 * 24 * 60) {
+  return signSharePayload({
+    lrNo: String(lrNo).trim(),
+    exp: Math.floor(Date.now() / 1000) + maxAgeSec,
+  });
+}
+
+export function verifyLrPrintShareToken(raw: string | null | undefined, expectedLrNo?: string) {
+  const payload = readSignedShare(raw);
+  if (!payload?.lrNo) return false;
+  if (expectedLrNo && String(payload.lrNo).trim() !== String(expectedLrNo).trim()) return false;
+  return true;
+}
+
+export function createBillPrintShareToken(billNo: string, maxAgeSec = 60 * 60 * 24 * 60) {
+  return signSharePayload({
+    billNo: String(billNo).trim(),
+    exp: Math.floor(Date.now() / 1000) + maxAgeSec,
+  });
+}
+
+export function verifyBillPrintShareToken(raw: string | null | undefined, expectedBillNo?: string) {
+  const payload = readSignedShare(raw);
+  if (!payload?.billNo) return false;
+  if (expectedBillNo && String(payload.billNo).trim() !== String(expectedBillNo).trim()) return false;
+  return true;
 }
 
 function escapeHtml(value: string) {

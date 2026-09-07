@@ -9,16 +9,25 @@ import "@/components/print/bill-print.css";
 function PrintInner() {
   const params = useSearchParams();
   const billNo = params.get("billNo") ?? "";
+  const share = params.get("share") ?? "";
   const [data, setData] = useState<BillPrintData | null>(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!billNo) return;
+    if (!billNo) {
+      setError("Bill number missing.");
+      return;
+    }
+    let cancelled = false;
+    const qs = new URLSearchParams({ billNo });
+    if (share) qs.set("share", share);
     api<{
       bill: BillPrintData & { poNo: string; partyName: string; billDate: string; billNo: string };
       party: { address: string; gst: string } | null;
       lrs: BillPrintData["lrs"];
-    }>(`/api/bills/print-data?billNo=${encodeURIComponent(billNo)}`)
+    }>(`/api/bills/print-data?${qs.toString()}`)
       .then((res) => {
+        if (cancelled) return;
         setData({
           billNo: res.bill.billNo,
           billDate: res.bill.billDate,
@@ -38,9 +47,15 @@ function PrintInner() {
         });
         setTimeout(() => window.print(), 50);
       })
-      .catch(() => setData(null));
-  }, [billNo]);
+      .catch((err) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : "Unable to load bill");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [billNo, share]);
 
+  if (error) return <p className="p-8">{error}</p>;
   if (!billNo) return <p className="p-8">Bill number missing.</p>;
   if (!data) return <p className="p-8">Loading bill…</p>;
 
