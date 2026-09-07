@@ -69,6 +69,14 @@ type Props = {
   company?: LrPrintCompany;
   /** Hide company logo (e.g. email / customer share print). */
   hideLogo?: boolean;
+  /** Override header logo (Roadways uses /roadways-logo.png). */
+  logoSrc?: string;
+  /** Override stamp image. */
+  stampSrc?: string;
+  /** Signature block label, e.g. For DELHI PUNJAB ROADWAYS. */
+  signFor?: string;
+  /** GST paid-by third row label (DPRL / DPR / Roadways). */
+  gstPartyLabel?: string;
 };
 
 function partyLine(party: LrPrintParty | undefined, fallbackName: string) {
@@ -97,6 +105,10 @@ export function LrConsignmentNote({
   consigneeParty,
   company = lrPrintCompany,
   hideLogo = false,
+  logoSrc = BRAND_LOGO_HEADER,
+  stampSrc = BRAND_STAMP,
+  signFor,
+  gstPartyLabel = "DPRL",
 }: Props) {
   const consignor = partyLine(consignorParty, booking.consignor);
   const consignee = partyLine(consigneeParty, booking.consignee);
@@ -111,6 +123,15 @@ export function LrConsignmentNote({
       : type === "ToPay"
         ? "Freight To Pay"
         : "To be bill for GST at";
+  const forLabel = signFor || `For ${company.name.toUpperCase().includes("ROADWAYS") ? "DELHI PUNJAB ROADWAYS" : "DPR LOGISTICS"}`;
+  const taxBar =
+    company.companyGst && company.companyPan
+      ? `GST : ${company.companyGst} / PAN No. ${company.companyPan}`
+      : company.companyGst
+        ? `GST : ${company.companyGst}`
+        : company.companyPan
+          ? `PAN No. ${company.companyPan}`
+          : "";
 
   return (
     <section className="lr-print-sheet">
@@ -133,7 +154,7 @@ export function LrConsignmentNote({
                   {company.name}
                 </div>
               ) : (
-                <img src={BRAND_LOGO_HEADER} alt={company.name} className="lr-print-logo" />
+                <img src={logoSrc} alt={company.name} className="lr-print-logo" />
               )}
             </td>
             <td colSpan={4} className="lr-print-center lr-print-header-mid">
@@ -312,7 +333,7 @@ export function LrConsignmentNote({
                     <td>&nbsp;</td>
                   </tr>
                   <tr>
-                    <td className="lr-print-center">DPRL</td>
+                    <td className="lr-print-center">{gstPartyLabel}</td>
                   </tr>
                   <tr>
                     <td>&nbsp;</td>
@@ -325,7 +346,7 @@ export function LrConsignmentNote({
           {/* GST / PAN — red */}
           <tr>
             <td colSpan={7} className="lr-print-gst-pan">
-              GST : {company.companyGst} / PAN No. {company.companyPan}
+              {taxBar}
             </td>
           </tr>
 
@@ -335,8 +356,8 @@ export function LrConsignmentNote({
               <span className="lr-print-label">Value Rs.</span> {booking.valueRs}
             </td>
             <td colSpan={3} className="lr-print-sign">
-              <div className="lr-print-bold">For DPR LOGISTICS</div>
-              <img src={BRAND_STAMP} alt="DPR Logistics stamp" className="lr-print-stamp" />
+              <div className="lr-print-bold">{forLabel}</div>
+              <img src={stampSrc} alt={`${company.name} stamp`} className="lr-print-stamp" />
             </td>
           </tr>
 

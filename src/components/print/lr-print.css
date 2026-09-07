@@ -146,9 +146,9 @@
 }
 
 .lr-print-logo {
-  width: 92px;
+  width: 100px;
   height: auto;
-  max-height: 72px;
+  max-height: 78px;
   object-fit: contain;
   display: block;
   margin: 0 auto;

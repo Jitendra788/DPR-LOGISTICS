@@ -9,7 +9,7 @@
   max-width: 100%;
   margin: 0 auto;
   background: #fff;
-  color: #111;
+  color: #000;
   border: 2px solid #000;
   font-family: "Times New Roman", Times, Georgia, serif;
   font-size: 14px;
@@ -24,7 +24,7 @@
 }
 
 .lm-table > tbody > tr > td {
-  border: 1.5px solid #000;
+  border: 2px solid #000;
   vertical-align: top;
   padding: 6px 8px;
 }
@@ -57,7 +57,7 @@
 }
 
 .lm-name {
-  color: #b00000;
+  color: #c00000;
   font-size: 26px;
   font-weight: 800;
   letter-spacing: 0.5px;
@@ -67,7 +67,7 @@
 }
 
 .lm-tag {
-  color: #b00000;
+  color: #c00000;
   font-size: 15px;
   font-style: italic;
   font-weight: 700;
@@ -168,7 +168,7 @@
 
 .lm-stamp {
   display: block;
-  width: 70px;
+  width: 88px;
   height: auto;
   margin: 4px auto;
   -webkit-print-color-adjust: exact;

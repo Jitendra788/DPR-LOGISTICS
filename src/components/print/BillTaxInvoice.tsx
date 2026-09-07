@@ -1,4 +1,4 @@
-import { BRAND_LOGO_HEADER, BRAND_STAMP } from "@/lib/brand";
+import { BRAND_LOGO_HEADER, BRAND_STAMP, ROADWAYS_LOGO, ROADWAYS_STAMP } from "@/lib/brand";
 import { amountInWordsIndian } from "@/lib/amount-words";
 import { formatPrintDate, formatPrintMoney, lrPrintCompany } from "@/lib/lr-print";
 import { stripLrPrefix } from "@/lib/lr-no";
@@ -109,18 +109,17 @@ export function BillTaxInvoice({
   const freightTotal = data.lrs.reduce((s, r) => s + lrLineFreight(r), 0) || data.freight;
   const isMeter = variant === "meter";
   const colCount = isMeter ? 16 : 17;
-  const forLabel = company.name.toUpperCase().includes("DELHI PUNJAB")
-    ? "For Delhi Punjab Roadways"
-    : "For DPR Logistics";
-  const bankName = company.name.toUpperCase().includes("DELHI PUNJAB")
+  const isRoadways = company.name.toUpperCase().includes("DELHI PUNJAB");
+  const forLabel = isRoadways ? "For Delhi Punjab Roadways" : "For DPR Logistics";
+  const bankName = isRoadways
     ? "Bank of India(Delhi Punjab Roadways)"
     : "ICICI Bank (DPR Logistics)";
-  const bankAcct = company.name.toUpperCase().includes("DELHI PUNJAB")
-    ? "094920110000555"
-    : "635805500736";
-  const bankIfsc = company.name.toUpperCase().includes("DELHI PUNJAB") ? "BKID0000949" : "ICIC0006358";
+  const bankAcct = isRoadways ? "094920110000555" : "635805500736";
+  const bankIfsc = isRoadways ? "BKID0000949" : "ICIC0006358";
   const leftCols = isMeter ? 10 : 11;
   const rightCols = colCount - leftCols;
+  const logoSrc = isRoadways ? ROADWAYS_LOGO : BRAND_LOGO_HEADER;
+  const stampSrc = isRoadways ? ROADWAYS_STAMP : BRAND_STAMP;
 
   return (
     <section className="bill-print-sheet">
@@ -128,7 +127,9 @@ export function BillTaxInvoice({
         <tbody>
           <tr>
             <td colSpan={colCount} className="bill-print-center bill-print-bold bill-print-bless">
-              || Shri Ganesh Prasanna ||
+              {isRoadways
+                ? "|| Shree Ganesh Prasanna || Shri Mahalaxmi Prasanna ||"
+                : "|| Shri Ganesh Prasanna ||"}
             </td>
           </tr>
           <tr>
@@ -138,7 +139,7 @@ export function BillTaxInvoice({
                   {company.name}
                 </div>
               ) : (
-                <img src={BRAND_LOGO_HEADER} alt={company.name} className="bill-print-logo" />
+                <img src={logoSrc} alt={company.name} className="bill-print-logo" />
               )}
             </td>
             <td colSpan={colCount - 2} className="bill-print-center">
@@ -351,7 +352,7 @@ export function BillTaxInvoice({
             </td>
             <td colSpan={colCount - Math.floor(colCount / 2)} className="bill-print-sign-cell bill-print-right">
               <div className="bill-print-bold">{forLabel}</div>
-              <img src={BRAND_STAMP} alt="DPR Logistics stamp" className="bill-print-stamp" />
+              <img src={stampSrc} alt={`${company.name} stamp`} className="bill-print-stamp" />
             </td>
           </tr>
         </tbody>

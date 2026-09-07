@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { LrConsignmentNote, type LrPrintBooking } from "@/components/print/LrConsignmentNote";
 import { api } from "@/lib/api-client";
+import { ROADWAYS_LOGO, ROADWAYS_STAMP } from "@/lib/brand";
 import { roadwaysPrintCompany } from "@/lib/roadways-print";
 
 type Party = { name: string; address: string; gst: string };
@@ -80,6 +81,10 @@ function PrintInner() {
           consignorParty={consignorParty}
           consigneeParty={consigneeParty}
           company={roadwaysLrCompany}
+          logoSrc={ROADWAYS_LOGO}
+          stampSrc={ROADWAYS_STAMP}
+          signFor="For DELHI PUNJAB ROADWAYS"
+          gstPartyLabel="DPR"
         />
       ))}
     </div>
