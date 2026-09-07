@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { LoadingMemo } from "@/components/print/LoadingMemo";
 import { api } from "@/lib/api-client";
 import { isoToDisplay } from "@/lib/dates";
+import { printWhenReady } from "@/lib/print-when-ready";
 import type { LoadingMemoData } from "@/lib/roadways-print";
 import "@/components/print/loading-memo.css";
 
@@ -55,9 +56,13 @@ function PrintInner() {
         balance: row.balance,
         remark: row.remark,
       });
-      setTimeout(() => window.print(), 400);
     });
   }, [id]);
+
+  useEffect(() => {
+    if (!data) return;
+    printWhenReady(150);
+  }, [data]);
 
   if (!id) return <p className="p-8">Slip id missing.</p>;
   if (!data) return <p className="p-8">Loading Loading Memo…</p>;
