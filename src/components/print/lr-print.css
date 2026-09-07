@@ -15,18 +15,20 @@
 .lr-print-sheet {
   width: 10in;
   max-width: 100%;
-  margin: 0 auto;
+  margin: 0 auto 12px;
   background: #ffffff;
   color: #000000;
   border: 2px solid #000000;
   box-sizing: border-box;
   page-break-after: always;
+  break-after: page;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
 
 .lr-print-sheet:last-child {
   page-break-after: auto;
+  break-after: auto;
   margin-bottom: 0;
 }
 
@@ -268,9 +270,10 @@
 
 .lr-print-sign {
   text-align: center;
-  min-height: 78px;
+  min-height: 72px;
   vertical-align: top !important;
   padding-top: 4px !important;
+  padding-bottom: 4px !important;
   font-size: 12px;
   color: #000000;
   background: #ffffff !important;
@@ -286,12 +289,13 @@
 }
 
 .lr-print-care {
-  margin-top: 6px;
+  text-align: center;
+  vertical-align: middle !important;
   font-weight: 800;
-  font-size: 12.5px;
-  border-top: 1px solid #000000;
-  padding-top: 5px;
+  font-size: 12px;
+  padding: 4px 6px !important;
   color: #000000;
+  background: #ffffff !important;
 }
 
 .lr-print-articles-head > td {
@@ -329,6 +333,13 @@
     margin: 0 !important;
     border: 2px solid #000000;
     overflow: visible;
+    page-break-after: always !important;
+    break-after: page !important;
+  }
+
+  .lr-print-sheet:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
   }
 
   .lr-print-title-red,

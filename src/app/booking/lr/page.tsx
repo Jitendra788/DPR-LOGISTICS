@@ -90,7 +90,7 @@ function LrBookingInner() {
   const [parties, setParties] = useState<Party[]>([]);
   const partyNames = useMemo(() => parties.map((p) => p.name).filter(Boolean), [parties]);
   const [searchLr, setSearchLr] = useState("");
-  const [printOpts, setPrintOpts] = useState({ consignor: true, lorry: false, consignee: false });
+  const [printOpts, setPrintOpts] = useState({ consignor: true, lorry: true, consignee: true });
   const [email, setEmail] = useState("");
   const [emailSending, setEmailSending] = useState(false);
   const [lastShare, setLastShare] = useState<{ lrNo: string; url: string } | null>(null);
@@ -240,8 +240,11 @@ function LrBookingInner() {
     if (!form.lrNo) return;
     const copies = [printOpts.consignor ? "Consignor" : "", printOpts.lorry ? "Lorry" : "", printOpts.consignee ? "Consignee" : ""]
       .filter(Boolean)
-      .join(",");
-    window.open(`/booking/lr/print?lrNo=${encodeURIComponent(form.lrNo)}&copies=${copies}`, "_blank");
+      .join(",") || "Consignor,Lorry,Consignee";
+    window.open(
+      `/booking/lr/print?lrNo=${encodeURIComponent(form.lrNo)}&copies=${encodeURIComponent(copies)}`,
+      "_blank",
+    );
   }
 
   async function emailLr() {
@@ -251,7 +254,7 @@ function LrBookingInner() {
     }
     const copies = [printOpts.consignor ? "Consignor" : "", printOpts.lorry ? "Lorry" : "", printOpts.consignee ? "Consignee" : ""]
       .filter(Boolean)
-      .join(",");
+      .join(",") || "Consignor,Lorry,Consignee";
     setEmailSending(true);
     try {
       const res = await api<{ message: string }>("/api/bookings/email", {

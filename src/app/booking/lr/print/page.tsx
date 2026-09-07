@@ -17,7 +17,11 @@ function PrintInner() {
   const params = useSearchParams();
   const lrNo = params.get("lrNo") ?? "";
   const share = params.get("share") ?? "";
-  const copies = (params.get("copies") || "Consignor").split(",").filter(Boolean);
+  const copiesParam = params.get("copies") || "Consignor,Lorry,Consignee";
+  const copies = copiesParam
+    .split(",")
+    .map((c) => c.trim())
+    .filter(Boolean);
   const [row, setRow] = useState<LrPrintBooking | null>(null);
   const [consignorParty, setConsignorParty] = useState<Party | undefined>();
   const [consigneeParty, setConsigneeParty] = useState<Party | undefined>();
@@ -42,7 +46,7 @@ function PrintInner() {
         setConsignorParty(res.consignorParty ?? undefined);
         setConsigneeParty(res.consigneeParty ?? undefined);
         requestAnimationFrame(() => {
-          setTimeout(() => window.print(), 50);
+          setTimeout(() => window.print(), copies.length > 1 ? 250 : 80);
         });
       })
       .catch((err) => {
@@ -51,7 +55,7 @@ function PrintInner() {
     return () => {
       cancelled = true;
     };
-  }, [lrNo, share]);
+  }, [lrNo, share, copies.length]);
 
   if (error) return <p className="p-8">{error}</p>;
   if (!row) return <p className="p-8">Loading LR…</p>;

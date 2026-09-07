@@ -119,7 +119,7 @@ export default function RoadwaysLrPage() {
   const [vehicles, setVehicles] = useState<{ vehNo: string }[]>([]);
   const [stations, setStations] = useState<{ name: string }[]>([]);
   const [searchLr, setSearchLr] = useState("");
-  const [printOpts, setPrintOpts] = useState({ consignor: true, lorry: false, consignee: false });
+  const [printOpts, setPrintOpts] = useState({ consignor: true, lorry: true, consignee: true });
   const [email, setEmail] = useState("");
   const [emailSending, setEmailSending] = useState(false);
   const lrOptions = useMemo(
@@ -268,8 +268,11 @@ export default function RoadwaysLrPage() {
     if (!form.lrNo) return;
     const copies = [printOpts.consignor ? "Consignor" : "", printOpts.lorry ? "Lorry" : "", printOpts.consignee ? "Consignee" : ""]
       .filter(Boolean)
-      .join(",");
-    window.open(`/roadways/lr/print?lrNo=${encodeURIComponent(form.lrNo)}&copies=${copies}`, "_blank");
+      .join(",") || "Consignor,Lorry,Consignee";
+    window.open(
+      `/roadways/lr/print?lrNo=${encodeURIComponent(form.lrNo)}&copies=${encodeURIComponent(copies)}`,
+      "_blank",
+    );
   }
 
   async function emailLr() {
@@ -279,7 +282,7 @@ export default function RoadwaysLrPage() {
     }
     const copies = [printOpts.consignor ? "Consignor" : "", printOpts.lorry ? "Lorry" : "", printOpts.consignee ? "Consignee" : ""]
       .filter(Boolean)
-      .join(",");
+      .join(",") || "Consignor,Lorry,Consignee";
     setEmailSending(true);
     try {
       const res = await api<{ message: string }>("/api/bookings/email", {
