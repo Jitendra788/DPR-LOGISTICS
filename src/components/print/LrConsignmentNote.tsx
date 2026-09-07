@@ -191,6 +191,12 @@ export function LrConsignmentNote({
             </td>
             <td colSpan={3} className="lr-print-no-pad">
               <table className="lr-nested">
+                <colgroup>
+                  <col style={{ width: "30%" }} />
+                  <col style={{ width: "26%" }} />
+                  <col style={{ width: "16%" }} />
+                  <col style={{ width: "28%" }} />
+                </colgroup>
                 <tbody>
                   <tr>
                     <td className="lr-print-label">Lr No</td>
@@ -200,7 +206,9 @@ export function LrConsignmentNote({
                   </tr>
                   <tr>
                     <td className="lr-print-label">Vehicle No.</td>
-                    <td colSpan={3}>{booking.vehNo}</td>
+                    <td colSpan={3} className="lr-print-veh">
+                      {booking.vehNo}
+                    </td>
                   </tr>
                   <tr>
                     <td className="lr-print-label">From</td>

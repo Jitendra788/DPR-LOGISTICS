@@ -50,6 +50,21 @@
   padding: 3px 5px;
   vertical-align: middle;
   font-size: 13px;
+  overflow: hidden;
+  word-wrap: break-word;
+}
+
+.lr-nested td.lr-print-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+  padding-right: 4px;
+  width: 30%;
+}
+
+.lr-nested td.lr-print-veh {
+  padding-left: 6px;
+  word-break: break-all;
 }
 
 /* Weight / Rate / Freight / GST — same 6-row line height */
