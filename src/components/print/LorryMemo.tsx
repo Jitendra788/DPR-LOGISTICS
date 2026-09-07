@@ -1,5 +1,5 @@
 import { BRAND_LOGO_HEADER, BRAND_STAMP } from "@/lib/brand";
-import { formatPrintDate, formatPrintMoney, lrPrintCompany } from "@/lib/lr-print";
+import { formatPrintDate, lrPrintCompany } from "@/lib/lr-print";
 import { stripLrPrefix } from "@/lib/lr-no";
 import "./lorry-memo.css";
 
@@ -50,7 +50,9 @@ type Props = {
 };
 
 function money(value: number) {
-  return formatPrintMoney(value);
+  const num = Number(value) || 0;
+  if (Number.isInteger(num)) return String(num);
+  return num.toFixed(2).replace(/\.?0+$/, "");
 }
 
 function Field({ label, value }: { label: string; value: string }) {
