@@ -8,7 +8,7 @@ export const lrPrintCompany = {
   customerCare: "9356259949",
   companyGst: "27BNLPK2073C1Z5",
   companyPan: "BNLPK2073C",
-  blessings: "|| Shree Ganesh Prasanna || Shri Mahalaxmi Prasanna||",
+  blessings: "|| Shree Ganesh Prasanna || Shri Mahalaxmi Prasanna ||",
 } as const;
 
 export function formatPrintDate(value: string) {

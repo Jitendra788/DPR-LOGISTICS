@@ -152,7 +152,7 @@ export function LrConsignmentNote({
         </colgroup>
         <tbody>
           {/* Header */}
-          <tr>
+          <tr className="lr-print-header-row">
             <td className="lr-print-logo-cell">
               {hideLogo ? (
                 <div className="lr-print-title-red" style={{ fontSize: 14 }}>
