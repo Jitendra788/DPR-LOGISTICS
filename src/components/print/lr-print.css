@@ -27,65 +27,117 @@
   table-layout: fixed;
 }
 
-.lr-print-table td,
-.lr-print-table th {
+.lr-print-table > tbody > tr > td {
   border: 2px solid #000;
   padding: 3px 5px;
   vertical-align: top;
   word-wrap: break-word;
 }
 
-.lr-print-table .lr-nested td,
-.lr-print-table .lr-nested th {
+.lr-print-no-pad {
+  padding: 0 !important;
+}
+
+.lr-nested {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.lr-nested td {
   border: 1px solid #000;
   padding: 2px 4px;
+  vertical-align: middle;
+}
+
+.lr-nested-fill {
+  height: 100%;
+}
+
+.lr-nested-fill td:first-child {
+  width: 58%;
+}
+
+.lr-nested-fill tr {
+  height: 18px;
 }
 
 .lr-print-center {
   text-align: center;
 }
 
+.lr-print-right {
+  text-align: right;
+}
+
 .lr-print-bold {
   font-weight: 700;
 }
 
-.lr-print-title {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
+.lr-print-title-red {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: #c00000;
+  line-height: 1.15;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
-.lr-print-subtitle {
-  font-size: 11px;
+.lr-print-subtitle-red {
+  font-size: 12px;
   font-weight: 700;
+  color: #c00000;
+  margin: 1px 0 3px;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.lr-print-blessings {
+  font-size: 10px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.lr-print-header-mid {
+  padding-top: 4px;
+  padding-bottom: 4px;
 }
 
 .lr-print-copy {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  text-align: right;
+  text-align: center;
+  line-height: 1.35;
+  vertical-align: middle !important;
+}
+
+.lr-print-copy-label {
+  text-decoration: underline;
+  margin: 4px 0;
 }
 
 .lr-print-logo-cell {
   text-align: center;
-  vertical-align: middle;
+  vertical-align: middle !important;
   width: 100px;
-  padding: 4px;
+  padding: 4px !important;
 }
 
 .lr-print-logo {
   width: 92px;
   height: auto;
-  max-height: 72px;
+  max-height: 78px;
   object-fit: contain;
   display: block;
   margin: 0 auto;
 }
 
 .lr-print-note {
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 1px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin-top: 6px;
 }
 
 .lr-print-label {
@@ -94,20 +146,35 @@
 }
 
 .lr-print-value {
-  min-height: 14px;
+  min-height: 18px;
 }
 
 .lr-print-section {
   font-weight: 700;
   text-decoration: underline;
+  margin-bottom: 2px;
 }
 
-.lr-print-charges td {
-  height: 22px;
+.lr-print-party-cell {
+  min-height: 52px;
 }
 
-.lr-print-footer {
-  min-height: 28px;
+.lr-print-gst-pan {
+  text-align: center;
+  font-weight: 800;
+  font-size: 12px;
+  color: #c00000;
+  padding: 5px !important;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.lr-print-sign {
+  text-align: right;
+  min-height: 48px;
+  vertical-align: top !important;
+  padding-top: 6px !important;
+  padding-right: 10px !important;
 }
 
 @media print {
@@ -130,8 +197,12 @@
     max-width: none;
     margin: 0 0 8mm;
     box-shadow: none;
+    border: 2px solid #000;
   }
 
+  .lr-print-title-red,
+  .lr-print-subtitle-red,
+  .lr-print-gst-pan,
   .lr-print-logo {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;

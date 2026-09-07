@@ -1,5 +1,6 @@
 import { BRAND_LOGO_HEADER } from "@/lib/brand";
 import { formatPrintDate, formatPrintMoney, lrPrintCompany } from "@/lib/lr-print";
+import { stripLrPrefix } from "@/lib/lr-no";
 import { normalizeLrType } from "@/lib/lr-type";
 import "./lr-print.css";
 
@@ -78,6 +79,17 @@ function partyLine(party: LrPrintParty | undefined, fallbackName: string) {
   };
 }
 
+function gstPaidMark(gstPaidBy: string | undefined, option: string) {
+  const raw = String(gstPaidBy || "").trim().toLowerCase();
+  const opt = option.toLowerCase();
+  if (!raw) return "";
+  if (opt === "dprl" && (raw.includes("dpr") || raw === "self" || raw.includes("transporter"))) {
+    return "✓";
+  }
+  if (raw.includes(opt) || raw === opt) return "✓";
+  return "";
+}
+
 export function LrConsignmentNote({
   booking,
   copyLabel,
@@ -88,73 +100,91 @@ export function LrConsignmentNote({
 }: Props) {
   const consignor = partyLine(consignorParty, booking.consignor);
   const consignee = partyLine(consigneeParty, booking.consignee);
-  const total = booking.total ?? booking.freight + (booking.serviceTax || 0) + (booking.haltage || 0) + (booking.insurance || 0) + (booking.stCharges || 0) + (booking.doorCollection || 0) + (booking.barrier || 0) + (booking.other || 0) + (booking.hamali || 0);
-  const grandTotal = booking.grandTotal ?? total + (booking.gst || 0);
-  const handlingLabel = copyLabel.toLowerCase().includes("lorry") || copyLabel.toLowerCase().includes("lory") ? "Handling" : "Halting";
+  const total =
+    booking.total ??
+    booking.freight +
+      (booking.serviceTax || 0) +
+      (booking.haltage || 0) +
+      (booking.insurance || 0) +
+      (booking.stCharges || 0) +
+      (booking.doorCollection || 0) +
+      (booking.barrier || 0) +
+      (booking.other || 0) +
+      (booking.hamali || 0);
+  const handlingLabel =
+    copyLabel.toLowerCase().includes("lorry") || copyLabel.toLowerCase().includes("lory")
+      ? "Handling"
+      : "Halting";
   const type = normalizeLrType(booking.lrType);
-  const freightHead =
-    type === "Paid" ? "Freight Paid" : type === "ToPay" ? "Freight To Pay" : `Freight To be bill for GST at ${booking.gstPaidBy || "Consignor"}`;
+  const gstHead =
+    type === "Paid"
+      ? "Freight Paid"
+      : type === "ToPay"
+        ? "Freight To Pay"
+        : "To be bill for GST at";
 
   return (
     <section className="lr-print-sheet">
       <table className="lr-print-table">
+        <colgroup>
+          <col style={{ width: "12%" }} />
+          <col style={{ width: "28%" }} />
+          <col style={{ width: "12%" }} />
+          <col style={{ width: "14%" }} />
+          <col style={{ width: "12%" }} />
+          <col style={{ width: "10%" }} />
+          <col style={{ width: "12%" }} />
+        </colgroup>
         <tbody>
+          {/* Header */}
           <tr>
-            <td colSpan={8} className="lr-print-center lr-print-bold">
-              {company.blessings}
-            </td>
-          </tr>
-          <tr>
-            <td colSpan={2} className="lr-print-logo-cell">
+            <td className="lr-print-logo-cell">
               {hideLogo ? (
-                <div className="lr-print-title" style={{ fontSize: 16 }}>
+                <div className="lr-print-title-red" style={{ fontSize: 14 }}>
                   {company.name}
                 </div>
               ) : (
                 <img src={BRAND_LOGO_HEADER} alt={company.name} className="lr-print-logo" />
               )}
             </td>
-            <td colSpan={3} className="lr-print-center">
-              <div className="lr-print-title">{company.name}</div>
-              <div className="lr-print-subtitle">{company.tagline}</div>
+            <td colSpan={4} className="lr-print-center lr-print-header-mid">
+              <div className="lr-print-blessings">{company.blessings}</div>
+              <div className="lr-print-title-red">{company.name}</div>
+              <div className="lr-print-subtitle-red">{company.tagline}</div>
               <div>{company.address}</div>
               <div>
                 E-mail : {company.email} Mob. : {company.phones}
               </div>
             </td>
-            <td colSpan={3} className="lr-print-copy">
-              ({copyLabel})
-              <br />
-              <br />
-              At Owner&apos;s Risk
-              <br />
-              Cargo is insured by Customer
-            </td>
-          </tr>
-          <tr>
-            <td colSpan={8} className="lr-print-center lr-print-bold">
-              {company.jurisdiction}
-            </td>
-          </tr>
-          <tr>
-            <td colSpan={8} className="lr-print-center lr-print-note">
-              CONSIGNMENT NOTE
+            <td colSpan={2} className="lr-print-copy">
+              <div>{company.jurisdiction}</div>
+              <div className="lr-print-copy-label">({copyLabel})</div>
+              <div>At Owner&apos;s Risk</div>
+              <div>Cargo is insured by Customer</div>
+              <div className="lr-print-note">CONSIGNMENT NOTE</div>
             </td>
           </tr>
 
+          {/* Consignor + LR meta */}
           <tr>
-            <td colSpan={4}>
+            <td colSpan={4} className="lr-print-party-cell">
               <div className="lr-print-section">Consignor Details</div>
-              <div><span className="lr-print-label">Party Name :</span> {consignor.name}</div>
-              <div><span className="lr-print-label">Address :</span> {consignor.address}</div>
-              <div><span className="lr-print-label">GST No. :</span> {consignor.gst}</div>
+              <div>
+                <span className="lr-print-label">Party Name :</span> {consignor.name}
+              </div>
+              <div>
+                <span className="lr-print-label">Address :</span> {consignor.address}
+              </div>
+              <div>
+                <span className="lr-print-label">GST No. :</span> {consignor.gst}
+              </div>
             </td>
-            <td colSpan={4}>
-              <table className="lr-print-table lr-nested">
+            <td colSpan={3} className="lr-print-no-pad">
+              <table className="lr-nested">
                 <tbody>
                   <tr>
                     <td className="lr-print-label">Lr No</td>
-                    <td>{booking.lrNo}</td>
+                    <td className="lr-print-bold">{stripLrPrefix(booking.lrNo)}</td>
                     <td className="lr-print-label">Date</td>
                     <td>{formatPrintDate(booking.lrDate)}</td>
                   </tr>
@@ -170,79 +200,150 @@ export function LrConsignmentNote({
                   </tr>
                 </tbody>
               </table>
-              <div className="lr-print-section" style={{ marginTop: 4 }}>
-                Consignee Details
-              </div>
-              <div><span className="lr-print-label">Consignee Name :</span> {consignee.name}</div>
-              <div><span className="lr-print-label">Address :</span> {consignee.address}</div>
-              <div><span className="lr-print-label">GST No. :</span> {consignee.gst}</div>
             </td>
           </tr>
 
+          {/* Consignee full width */}
+          <tr>
+            <td colSpan={7} className="lr-print-party-cell">
+              <div className="lr-print-section">Consignee Details</div>
+              <div>
+                <span className="lr-print-label">Consignee Name :</span> {consignee.name}
+              </div>
+              <div>
+                <span className="lr-print-label">Address :</span> {consignee.address}
+              </div>
+              <div>
+                <span className="lr-print-label">GST No. :</span> {consignee.gst}
+              </div>
+            </td>
+          </tr>
+
+          {/* Articles header */}
           <tr className="lr-print-bold lr-print-center">
-            <td>No.Of Articles</td>
-            <td>Description</td>
-            <td colSpan={2}>Said To Contents</td>
+            <td>No.Of Articales</td>
+            <td>Description Said To Contents</td>
             <td>Inv.No. &amp; Date</td>
             <td>Weight</td>
             <td>Rate Per KG</td>
-            <td>{freightHead}</td>
+            <td>Freight</td>
+            <td>{gstHead}</td>
           </tr>
+
+          {/* Articles body — nested weight / rate / freight / gst columns */}
           <tr>
-            <td className="lr-print-value">{booking.articles}</td>
+            <td className="lr-print-center lr-print-value lr-print-bold">{booking.articles}</td>
             <td className="lr-print-value">{booking.particulars}</td>
-            <td colSpan={2} className="lr-print-value">{booking.particulars}</td>
-            <td className="lr-print-value">{booking.invNoDate}</td>
-            <td className="lr-print-value">{booking.actWeight || booking.chargedWeight}</td>
-            <td className="lr-print-value">{booking.rate}</td>
-            <td className="lr-print-value" />
-          </tr>
-
-          <tr className="lr-print-charges lr-print-bold">
-            <td>Act Weight<br />{booking.actWeight}</td>
-            <td>Freight Rs<br />&nbsp;</td>
-            <td>Ser.Tax<br />{formatPrintMoney(booking.serviceTax || 0)}</td>
-            <td>Chg.Wt.<br />{booking.chargedWeight}</td>
-            <td>{handlingLabel}<br />{formatPrintMoney(booking.haltage || 0)}</td>
-            <td>Consignee<br />{consignee.name}</td>
-            <td>Meter<br />{booking.totalMeter}</td>
-            <td>Insurance<br />{formatPrintMoney(booking.insurance || 0)}</td>
-          </tr>
-          <tr className="lr-print-charges lr-print-bold">
-            <td>{booking.billAs || "Weight"}</td>
-            <td>St.Charges<br />{formatPrintMoney(booking.stCharges || 0)}</td>
-            <td>Door Coll.<br />{formatPrintMoney(booking.doorCollection || 0)}</td>
-            <td>Barrier<br />{formatPrintMoney(booking.barrier || 0)}</td>
-            <td>Other<br />{formatPrintMoney(booking.other || 0)}</td>
-            <td>Hamali<br />{formatPrintMoney(booking.hamali || 0)}</td>
-            <td>LR Type<br /><strong>{type}</strong></td>
-            <td>Total Amt.<br />{formatPrintMoney(total)}</td>
-          </tr>
-
-          <tr>
-            <td colSpan={3}>
-              <span className="lr-print-label">GST :</span> {company.companyGst} / PAN No. {company.companyPan}
+            <td className="lr-print-center lr-print-value">{booking.invNoDate}</td>
+            <td className="lr-print-no-pad">
+              <table className="lr-nested lr-nested-fill">
+                <tbody>
+                  <tr>
+                    <td className="lr-print-label">Act Weight</td>
+                    <td>{booking.actWeight}</td>
+                  </tr>
+                  <tr>
+                    <td className="lr-print-label">Chg.Wt.</td>
+                    <td>{booking.chargedWeight}</td>
+                  </tr>
+                  <tr>
+                    <td className="lr-print-label">Meter</td>
+                    <td>{booking.totalMeter}</td>
+                  </tr>
+                </tbody>
+              </table>
             </td>
-            <td colSpan={2}>
+            <td className="lr-print-no-pad">
+              <table className="lr-nested lr-nested-fill">
+                <tbody>
+                  <tr>
+                    <td className="lr-print-label">Freight Rs</td>
+                  </tr>
+                  <tr>
+                    <td className="lr-print-label">Ser.Tax</td>
+                  </tr>
+                  <tr>
+                    <td className="lr-print-label">{handlingLabel}</td>
+                  </tr>
+                  <tr>
+                    <td className="lr-print-label">Insurance</td>
+                  </tr>
+                  <tr>
+                    <td className="lr-print-label">St.Charges</td>
+                  </tr>
+                  <tr>
+                    <td className="lr-print-label">Total Amt.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+            <td className="lr-print-no-pad">
+              <table className="lr-nested lr-nested-fill">
+                <tbody>
+                  <tr>
+                    <td className="lr-print-right">&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td className="lr-print-right">{formatPrintMoney(booking.serviceTax || 0)}</td>
+                  </tr>
+                  <tr>
+                    <td className="lr-print-right">{formatPrintMoney(booking.haltage || 0)}</td>
+                  </tr>
+                  <tr>
+                    <td className="lr-print-right">{formatPrintMoney(booking.insurance || 0)}</td>
+                  </tr>
+                  <tr>
+                    <td className="lr-print-right">{formatPrintMoney(booking.stCharges || 0)}</td>
+                  </tr>
+                  <tr>
+                    <td className="lr-print-right lr-print-bold">{formatPrintMoney(total)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+            <td className="lr-print-no-pad">
+              <table className="lr-nested lr-nested-fill">
+                <tbody>
+                  <tr>
+                    <td>Consignor {gstPaidMark(booking.gstPaidBy, "Consignor")}</td>
+                  </tr>
+                  <tr>
+                    <td>Consignee {gstPaidMark(booking.gstPaidBy, "Consignee")}</td>
+                  </tr>
+                  <tr>
+                    <td>DPRL {gstPaidMark(booking.gstPaidBy, "DPRL")}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+
+          {/* GST / PAN — red */}
+          <tr>
+            <td colSpan={7} className="lr-print-gst-pan">
+              GST : {company.companyGst} / PAN No. {company.companyPan}
+            </td>
+          </tr>
+
+          {/* Value + signature */}
+          <tr>
+            <td colSpan={4}>
               <span className="lr-print-label">Value Rs.</span> {booking.valueRs}
             </td>
-            <td colSpan={3}>
-              <span className="lr-print-label">Grand Total :</span> {formatPrintMoney(grandTotal)}
-            </td>
-          </tr>
-          <tr>
-            <td colSpan={4}>
-              <span className="lr-print-label">Eway Bill No.</span> {booking.ewayBill}
-            </td>
-            <td colSpan={4}>
-              <span className="lr-print-label">Valid Date</span> {formatPrintDate(booking.validDate || "")}
-            </td>
-          </tr>
-          <tr className="lr-print-footer">
-            <td colSpan={4} className="lr-print-bold">
+            <td colSpan={3} className="lr-print-bold lr-print-sign">
               For {company.name}
             </td>
-            <td colSpan={4} className="lr-print-bold lr-print-center">
+          </tr>
+
+          {/* Eway / Valid / Care */}
+          <tr>
+            <td colSpan={3}>
+              <span className="lr-print-label">Eway Bill No.</span> {booking.ewayBill}
+            </td>
+            <td colSpan={2}>
+              <span className="lr-print-label">Valid Date</span> {formatPrintDate(booking.validDate || "")}
+            </td>
+            <td colSpan={2} className="lr-print-bold lr-print-center">
               Customer Care No : {company.customerCare}
             </td>
           </tr>
