@@ -246,11 +246,11 @@
   background: #ffffff !important;
 }
 
-.lr-print-gst-pan {
+.lr-print-table > tbody > tr > td.lr-print-gst-pan {
   text-align: center;
   font-weight: 900;
   font-size: 14.5px;
-  color: #c00000;
+  color: #c00000 !important;
   padding: 7px !important;
   background: #ffffff !important;
   -webkit-print-color-adjust: exact !important;
@@ -329,8 +329,18 @@
   }
 
   .lr-print-title-red,
-  .lr-print-subtitle-red,
-  .lr-print-gst-pan,
+  .lr-print-subtitle-red {
+    color: #c00000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .lr-print-table > tbody > tr > td.lr-print-gst-pan {
+    color: #c00000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
   .lr-print-logo,
   .lr-print-stamp {
     -webkit-print-color-adjust: exact !important;
