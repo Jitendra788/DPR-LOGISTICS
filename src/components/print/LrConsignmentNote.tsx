@@ -362,10 +362,10 @@ export function LrConsignmentNote({
             </td>
           </tr>
 
-          {/* GST / PAN — red */}
-          <tr>
+          {/* GST / PAN — full-width red bar above Value Rs. (old ASP place) */}
+          <tr className="lr-print-gst-row">
             <td colSpan={7} className="lr-print-gst-pan">
-              {taxBar}
+              {taxBar || "GST :  / PAN No. "}
             </td>
           </tr>
 

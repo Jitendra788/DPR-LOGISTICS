@@ -149,7 +149,7 @@
 
 .lr-print-charges-row > td {
   vertical-align: middle;
-  height: 108px;
+  height: 96px;
   border: 2.5px solid #000000 !important;
 }
 
@@ -331,12 +331,17 @@
 }
 
 .lr-print-table > tbody > tr > td.lr-print-gst-pan {
-  text-align: center;
-  font-weight: 900;
-  font-size: 12.5px;
-  color: #c00000 !important;
-  padding: 4px !important;
+  text-align: left !important;
+  vertical-align: middle !important;
+  font-weight: 900 !important;
+  font-size: 14.5px !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  color: #8b0000 !important;
+  padding: 7px 8px !important;
+  letter-spacing: 0.2px;
   background: #ffffff !important;
+  border-top: 2.5px solid #000000 !important;
+  border-bottom: 2.5px solid #000000 !important;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
@@ -346,6 +351,7 @@
   font-size: 11px;
   line-height: 1.4;
   min-height: 0;
+  padding: 5px 8px !important;
   color: #000000;
   background: #ffffff !important;
 }
@@ -363,7 +369,7 @@
 
 .lr-print-stamp {
   display: block;
-  width: 52px;
+  width: 48px;
   height: auto;
   margin: 1px auto 1px;
   -webkit-print-color-adjust: exact !important;
@@ -515,7 +521,13 @@
   }
 
   .lr-print-table > tbody > tr > td.lr-print-gst-pan {
-    color: #c00000 !important;
+    text-align: left !important;
+    font-size: 14.5px !important;
+    font-weight: 900 !important;
+    color: #8b0000 !important;
+    padding: 7px 8px !important;
+    border-top: 2.5px solid #000000 !important;
+    border-bottom: 2.5px solid #000000 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
