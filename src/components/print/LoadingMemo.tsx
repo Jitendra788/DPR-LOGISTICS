@@ -115,9 +115,11 @@ export function LoadingMemo({ data }: { data: LoadingMemoData }) {
               <div>Branch : {c.bank.branch}</div>
             </td>
             <td colSpan={2} className="lm-sign">
-              <div className="lm-sign-for">For {c.name}</div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={ROADWAYS_SIGNATURE} alt="Authorised signature" className="lm-signature" />
+              <div className="lm-sign-top">
+                <div className="lm-sign-for">For {c.name}</div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={ROADWAYS_SIGNATURE} alt="Authorised signature" className="lm-signature" />
+              </div>
               <div className="lm-care">Customer Care No : {c.customerCare}</div>
             </td>
           </tr>
