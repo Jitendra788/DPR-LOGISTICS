@@ -59,9 +59,6 @@ export function LoadingMemo({ data }: { data: LoadingMemoData }) {
           <tr className="lm-titlebar">
             <td className="lm-tb-left">
               <div className="lm-tb-title">Loading Memo</div>
-              <div>
-                Slip No. <strong>{data.slipNo || "____"}</strong>
-              </div>
             </td>
             <td className="lm-tb-owner" colSpan={2}>
               Owner Risk
@@ -74,21 +71,23 @@ export function LoadingMemo({ data }: { data: LoadingMemoData }) {
           <tr>
             <td colSpan={4} className="lm-body">
               <p>
+                Slip No. <strong>{data.slipNo || "____"}</strong>
+              </p>
+              <p>
                 To,
                 <br />
                 <strong>{partyLabel}</strong>
               </p>
-              <p>Dear Sir,</p>
-              <p>With reference to your telephonic message we hereby send</p>
+              <p>Dear Sir, With reference to your telephonic message we hereby send</p>
               <p>
                 Lorry No. <strong>{data.lorryNo || "____________"}</strong>
               </p>
               <p>As per following Conditions</p>
               <p>
-                From <strong>{data.fromStation || "____________"}</strong>
+                From <strong>{(data.fromStation || "____________").toUpperCase()}</strong>
               </p>
               <p>
-                To <strong>{data.toStation || "____________"}</strong>
+                To <strong>{(data.toStation || "____________").toUpperCase()}</strong>
               </p>
             </td>
           </tr>
