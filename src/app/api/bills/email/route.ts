@@ -36,12 +36,22 @@ export async function POST(req: NextRequest) {
 
     const origin = siteOrigin(req);
     const printUrl = `${origin}/bills/print?billNo=${encodeURIComponent(bill.billNo)}`;
+    const grandTotal =
+      (Number(bill.amount) || 0) +
+      (Number(bill.cgstAmt) || 0) +
+      (Number(bill.sgstAmt) || 0) +
+      (Number(bill.igstAmt) || 0);
+
     const payload = formatBillEmail(
       {
         billNo: bill.billNo,
         billDate: bill.billDate || bill.fromDate,
         partyName: bill.partyName,
         amount: bill.amount,
+        cgstAmt: bill.cgstAmt,
+        sgstAmt: bill.sgstAmt,
+        igstAmt: bill.igstAmt,
+        grandTotal,
       },
       printUrl,
       `${origin}${BRAND_LOGO_HEADER}`,

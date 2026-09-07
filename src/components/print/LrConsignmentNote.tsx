@@ -195,12 +195,12 @@ export function LrConsignmentNote({
             <td className="lr-print-value">{booking.invNoDate}</td>
             <td className="lr-print-value">{booking.actWeight || booking.chargedWeight}</td>
             <td className="lr-print-value">{booking.rate}</td>
-            <td className="lr-print-value">{formatPrintMoney(booking.freight)}</td>
+            <td className="lr-print-value" />
           </tr>
 
           <tr className="lr-print-charges lr-print-bold">
             <td>Act Weight<br />{booking.actWeight}</td>
-            <td>Freight Rs<br />{formatPrintMoney(booking.freight)}</td>
+            <td>Freight Rs<br />&nbsp;</td>
             <td>Ser.Tax<br />{formatPrintMoney(booking.serviceTax || 0)}</td>
             <td>Chg.Wt.<br />{booking.chargedWeight}</td>
             <td>{handlingLabel}<br />{formatPrintMoney(booking.haltage || 0)}</td>

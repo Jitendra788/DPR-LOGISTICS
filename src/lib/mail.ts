@@ -289,35 +289,106 @@ export function formatLrEmail(
 }
 
 export function formatBillEmail(
-  bill: { billNo: string; billDate: string; partyName: string; amount: number },
+  bill: {
+    billNo: string;
+    billDate: string;
+    partyName: string;
+    amount: number;
+    cgstAmt?: number;
+    sgstAmt?: number;
+    igstAmt?: number;
+    grandTotal?: number;
+  },
   printUrl: string,
   _logoUrl = "",
 ) {
+  const grand = Number(bill.grandTotal ?? bill.amount) || 0;
+  const money = (n: number) =>
+    (Number(n) || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 });
+  const date = bill.billDate || "";
+  const message =
+    "Dear Sir/Madam, please find your Tax Invoice from DPR Logistics. Keep this for your records. For any query, call our customer care. Thank you for choosing DPR Logistics.";
+
   const text = [
     "DPR Logistics — Tax Invoice",
     "",
-    `Bill No: ${bill.billNo}`,
-    `Date: ${bill.billDate}`,
-    `Party: ${bill.partyName}`,
-    `Amount: ${bill.amount}`,
+    message,
     "",
-    `View / Print Bill: ${printUrl}`,
+    `Bill No: ${bill.billNo}`,
+    `Date: ${date}`,
+    `Party: ${bill.partyName}`,
+    `Grand Total: ${grand}`,
+    "",
+    `Print Bill: ${printUrl}`,
   ].join("\n");
 
   const logoAtt = logoInlineAttachment();
-  const logo = logoAtt
-    ? `<img src="cid:${LOGO_CID}" alt="DPR Logistics" width="140" style="display:block;max-width:140px;height:auto;margin:0 auto 12px;background:#fff;padding:8px;border-radius:8px;" />`
-    : `<img src="${escapeHtml(PUBLIC_LOGO_URL)}" alt="DPR Logistics" width="140" style="display:block;max-width:140px;height:auto;margin:0 auto 12px;background:#fff;padding:8px;border-radius:8px;" />`;
+  const logoSrc = logoAtt ? `cid:${LOGO_CID}` : PUBLIC_LOGO_URL;
+
+  function row(label: string, value: string) {
+    if (!value) return "";
+    return `<tr>
+      <td style="padding:8px 12px;border-bottom:1px solid #e8eef3;color:#64748b;width:38%;font-size:13px;">${escapeHtml(label)}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #e8eef3;color:#0f172a;font-size:13px;font-weight:600;">${escapeHtml(value)}</td>
+    </tr>`;
+  }
+
+  const html = `<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:Arial,Helvetica,sans-serif;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f1f5f9;padding:24px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;">
+          <tr>
+            <td style="background:linear-gradient(135deg,#0f766e,#115e59);padding:22px 24px;color:#fff;text-align:center;">
+              <img src="${escapeHtml(logoSrc)}" alt="DPR Logistics" width="140" style="display:block;max-width:140px;height:auto;margin:0 auto 12px;background:#fff;padding:8px;border-radius:8px;" />
+              <div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.85;">DPR LOGISTICS</div>
+              <div style="font-size:22px;font-weight:800;margin-top:4px;">Tax Invoice</div>
+              <div style="font-size:13px;opacity:.9;margin-top:4px;">Bill No ${escapeHtml(bill.billNo)} · ${escapeHtml(date)}</div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:18px 24px 6px;font-size:14px;line-height:1.55;color:#334155;">
+              ${escapeHtml(message)}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:12px 24px 8px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border:1px solid #e8eef3;border-radius:10px;overflow:hidden;">
+                ${row("Bill No", bill.billNo)}
+                ${row("Date", date)}
+                ${row("Party", bill.partyName || "—")}
+                ${row("CGST", bill.cgstAmt ? `₹ ${money(bill.cgstAmt)}` : "")}
+                ${row("SGST", bill.sgstAmt ? `₹ ${money(bill.sgstAmt)}` : "")}
+                ${row("IGST", bill.igstAmt ? `₹ ${money(bill.igstAmt)}` : "")}
+                ${row("Grand Total", `₹ ${money(grand)}`)}
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:8px 24px 24px;" align="center">
+              <a href="${escapeHtml(printUrl)}" style="display:inline-block;background:#0f766e;color:#ffffff;text-decoration:none;font-weight:700;font-size:14px;padding:12px 22px;border-radius:8px;">
+                Open &amp; Print Bill
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#f8fafc;padding:14px 24px;font-size:11px;color:#64748b;border-top:1px solid #e2e8f0;">
+              DPR Logistics · Customer Care
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
 
   return {
     subject: `Bill ${bill.billNo} — DPR Logistics`,
     text,
-    html: `<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;padding:16px;">
-      ${logo}
-      <p>Please find bill details below.</p>
-      <pre style="font-family:inherit;white-space:pre-wrap">${escapeHtml(text)}</pre>
-      <p><a href="${escapeHtml(printUrl)}" style="display:inline-block;background:#0f766e;color:#fff;text-decoration:none;font-weight:700;padding:10px 16px;border-radius:8px;">Open &amp; Print Bill</a></p>
-    </div>`,
+    html,
     attachments: logoAtt ? [logoAtt] : [],
   };
 }
