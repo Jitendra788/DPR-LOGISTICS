@@ -2,7 +2,7 @@ export const roadwaysPrintCompany = {
   name: "DELHI PUNJAB ROADWAYS",
   tagline: "Fleet Owners & Transport Contractors",
   blessings: "|| Shree Ganesh Prasanna || Shri Mahalaxmi Prasanna ||",
-  address: "Shree Mahalaxmi Petrol Pump 5 Star MIDC Road, Kagal Dist. Kolhapur 416216",
+  address: "Shree Mahalaxmi Petrol Pump 5 Star MIDC Road, Kagal Dist.Kolhapur 416216",
   email: "dprkolhapur@gmail.com",
   phones: "9371662142, 9326862142, 9356259949",
   pan: "NCSPS3662D",

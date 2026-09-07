@@ -48,9 +48,8 @@ export function LoadingMemo({ data }: { data: LoadingMemoData }) {
               <div className="lm-bless">{c.blessings}</div>
               <div className="lm-name">{c.name}</div>
               <div className="lm-tag">{c.tagline}</div>
-              <div className="lm-addr">{c.address}</div>
               <div className="lm-addr">
-                E-mail : {c.email} Mob. : {c.phones}
+                {c.address} E-mail : {c.email} Mob. : {c.phones}
               </div>
               <div className="lm-pan">PAN No. {c.pan}</div>
             </td>
