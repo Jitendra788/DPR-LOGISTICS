@@ -197,32 +197,32 @@ export function LrConsignmentNote({
                 <span className="lr-print-party-val">{consignor.gst}</span>
               </div>
             </td>
-            <td colSpan={3} className="lr-print-no-pad">
-              <table className="lr-nested">
+            <td colSpan={3} className="lr-print-no-pad lr-print-meta-cell">
+              <table className="lr-nested lr-meta-box">
                 <colgroup>
-                  <col style={{ width: "32%" }} />
-                  <col style={{ width: "24%" }} />
-                  <col style={{ width: "14%" }} />
-                  <col style={{ width: "30%" }} />
+                  <col style={{ width: "38%" }} />
+                  <col style={{ width: "62%" }} />
                 </colgroup>
                 <tbody>
                   <tr>
                     <td className="lr-print-label">Lr No</td>
                     <td className="lr-print-bold">{stripLrPrefix(booking.lrNo)}</td>
+                  </tr>
+                  <tr>
                     <td className="lr-print-label">Date</td>
-                    <td>{formatPrintDate(booking.lrDate)}</td>
+                    <td className="lr-print-bold">{formatPrintDate(booking.lrDate)}</td>
                   </tr>
                   <tr>
                     <td className="lr-print-label">Vehicle No.</td>
-                    <td colSpan={3} className="lr-print-veh">
-                      {booking.vehNo}
-                    </td>
+                    <td className="lr-print-veh">{booking.vehNo}</td>
                   </tr>
                   <tr>
                     <td className="lr-print-label">From</td>
-                    <td>{booking.fromStation}</td>
+                    <td className="lr-print-bold">{booking.fromStation}</td>
+                  </tr>
+                  <tr>
                     <td className="lr-print-label">To</td>
-                    <td>{booking.toStation}</td>
+                    <td className="lr-print-bold">{booking.toStation}</td>
                   </tr>
                 </tbody>
               </table>
