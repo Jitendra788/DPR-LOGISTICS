@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { LrConsignmentNote, type LrPrintBooking } from "@/components/print/LrConsignmentNote";
 import { api } from "@/lib/api-client";
 import { ROADWAYS_LOGO, ROADWAYS_STAMP } from "@/lib/brand";
+import { printWhenReady } from "@/lib/print-when-ready";
 import { roadwaysPrintCompany } from "@/lib/roadways-print";
 
 type Party = { name: string; address: string; gst: string };
@@ -60,9 +61,6 @@ function PrintInner() {
         setRow(res.booking);
         setConsignorParty(res.consignorParty ?? undefined);
         setConsigneeParty(res.consigneeParty ?? undefined);
-        requestAnimationFrame(() => {
-          setTimeout(() => window.print(), copies.length > 1 ? 250 : 80);
-        });
       })
       .catch((err) => {
         if (!cancelled) setError(err instanceof Error ? err.message : "Unable to load Roadways LR");
@@ -70,7 +68,12 @@ function PrintInner() {
     return () => {
       cancelled = true;
     };
-  }, [lrNo, share, copies.length]);
+  }, [lrNo, share]);
+
+  useEffect(() => {
+    if (!row) return;
+    printWhenReady(copies.length > 1 ? 180 : 100);
+  }, [row, copies.length]);
 
   if (error) return <p className="p-8">{error}</p>;
   if (!row) return <p className="p-8">Loading Roadways LR…</p>;

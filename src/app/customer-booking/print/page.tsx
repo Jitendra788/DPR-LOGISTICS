@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { LrConsignmentNote, type LrPrintBooking } from "@/components/print/LrConsignmentNote";
 import { api } from "@/lib/api-client";
+import { printWhenReady } from "@/lib/print-when-ready";
 
 type Party = { name: string; address: string; gst: string };
 
@@ -31,10 +32,14 @@ function PrintInner() {
       .then(([data, partyRows]) => {
         setRow(data);
         setParties(partyRows);
-        setTimeout(() => window.print(), 500);
       })
       .catch((err) => setError(err instanceof Error ? err.message : "Not found"));
   }, [lrNo]);
+
+  useEffect(() => {
+    if (!row) return;
+    printWhenReady(200);
+  }, [row]);
 
   const consignorParty = useMemo(() => (row ? findParty(parties, row.consignor) : undefined), [parties, row]);
   const consigneeParty = useMemo(() => (row ? findParty(parties, row.consignee) : undefined), [parties, row]);
@@ -59,7 +64,7 @@ function PrintInner() {
 
 export default function CustomerBookingPrintPage() {
   return (
-    <Suspense fallback={<p className="p-8">Loading...</p>}>
+    <Suspense fallback={<p className="p-8">Loading…</p>}>
       <PrintInner />
     </Suspense>
   );

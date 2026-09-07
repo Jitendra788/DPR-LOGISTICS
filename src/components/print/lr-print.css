@@ -1,68 +1,97 @@
-/* Match old ASP LR: 10×6 inch landscape form, pure white, pure black text */
+/* Old ASP LR: 10×6 in landscape — each copy = exactly one page, continuous borders */
 .lr-print-page {
   background: #ffffff;
-  padding: 8px;
+  padding: 0;
   margin: 0;
   color: #000000;
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 12px;
-  line-height: 1.25;
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 11px;
+  line-height: 1.2;
   -webkit-font-smoothing: none;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
 
-.lr-print-sheet {
-  width: 10in;
-  max-width: 100%;
-  margin: 0 auto 12px;
-  background: #ffffff;
-  color: #000000;
-  border: 2px solid #000000;
-  box-sizing: border-box;
-  page-break-after: always;
-  break-after: page;
-  -webkit-print-color-adjust: exact !important;
-  print-color-adjust: exact !important;
+.lr-print-page,
+.lr-print-page *:not(.lr-print-title-red):not(.lr-print-subtitle-red):not(.lr-print-blessings) {
+  font-family: Arial, Helvetica, sans-serif !important;
 }
 
-.lr-print-sheet:last-child {
+/* One physical print page per copy */
+.lr-print-copy-page {
+  display: block;
+  width: 10in;
+  max-width: 100%;
+  margin: 0 auto 10px;
+  page-break-after: always;
+  break-after: page;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+}
+
+.lr-print-copy-page:last-child {
   page-break-after: auto;
   break-after: auto;
   margin-bottom: 0;
 }
 
+.lr-print-sheet {
+  display: block;
+  width: 100%;
+  height: 5.7in;
+  max-height: 5.7in;
+  margin: 0;
+  background: #ffffff;
+  color: #000000;
+  border: 1.5px solid #000000;
+  box-sizing: border-box;
+  overflow: hidden;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
 .lr-print-table {
   width: 100%;
+  height: 100%;
   border-collapse: collapse;
   table-layout: fixed;
 }
 
 .lr-print-table > tbody > tr > td {
   border: 1px solid #000000;
-  padding: 2px 4px;
+  padding: 1px 3px;
   vertical-align: top;
   word-wrap: break-word;
-  font-size: 11.5px;
+  overflow-wrap: break-word;
+  font-size: 10.5px;
   color: #000000;
   background: #ffffff;
 }
 
 .lr-print-no-pad {
   padding: 0 !important;
+  overflow: hidden;
 }
 
-.lr-nested {
-  width: 100%;
+.lr-nested,
+.lr-charges-col {
   border-collapse: collapse;
   table-layout: fixed;
+  /* Overlap parent cell border so outer edge is one continuous line */
+  margin: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
 }
 
-.lr-nested td {
+.lr-nested td,
+.lr-charges-col td {
   border: 1px solid #000000;
-  padding: 4px 5px;
+  padding: 2px 4px;
   vertical-align: middle;
-  font-size: 12.5px;
+  font-size: 11px;
   overflow: hidden;
   word-wrap: break-word;
   color: #000000;
@@ -72,41 +101,31 @@
 .lr-nested td.lr-print-label {
   white-space: nowrap;
   overflow: hidden;
-  padding-right: 4px;
+  text-overflow: clip;
+  padding-right: 3px;
   font-weight: 700;
   color: #000000;
   background: #ffffff;
 }
 
 .lr-nested td.lr-print-veh {
-  padding-left: 6px;
+  padding-left: 4px;
   font-weight: 800;
-  letter-spacing: 0.2px;
+  letter-spacing: 0.15px;
   word-break: break-word;
   color: #000000;
 }
 
-.lr-charges-col {
-  width: 100%;
-  height: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-
 .lr-charges-col td {
-  border: 1px solid #000000;
-  padding: 3px 5px;
-  vertical-align: middle;
-  height: 22px;
-  line-height: 1.25;
-  font-size: 12.5px;
-  color: #000000;
-  background: #ffffff;
+  height: 18px;
+  line-height: 1.15;
+  padding: 1px 3px;
+  font-size: 11px;
 }
 
 .lr-print-charges-row > td {
   vertical-align: stretch;
-  height: 110px;
+  height: 92px;
 }
 
 .lr-freight-amt {
@@ -128,54 +147,54 @@
 }
 
 .lr-print-title-red {
-  font-family: "Times New Roman", Times, Georgia, serif;
-  font-size: 26px;
+  font-family: "Times New Roman", Times, Georgia, serif !important;
+  font-size: 22px;
   font-weight: 900;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
   color: #c00000;
-  line-height: 1.05;
+  line-height: 1.02;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
 
 .lr-print-subtitle-red {
-  font-family: "Times New Roman", Times, Georgia, serif;
-  font-size: 13px;
+  font-family: "Times New Roman", Times, Georgia, serif !important;
+  font-size: 11.5px;
   font-weight: 800;
   color: #c00000;
-  margin: 1px 0 3px;
+  margin: 0 0 2px;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
 
 .lr-print-blessings {
-  font-family: "Times New Roman", Times, serif;
-  font-size: 12.5px;
+  font-family: "Times New Roman", Times, serif !important;
+  font-size: 11px;
   font-weight: 700;
-  margin-bottom: 3px;
+  margin-bottom: 1px;
   color: #000000;
 }
 
 .lr-print-header-mid {
-  padding-top: 6px;
-  padding-bottom: 6px;
-  font-size: 12.5px;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  font-size: 11px;
   color: #000000;
   background: #ffffff !important;
 }
 
 .lr-print-header-mid .lr-print-contact {
   font-weight: 700;
-  font-size: 12.5px;
-  line-height: 1.35;
+  font-size: 10.5px;
+  line-height: 1.25;
   color: #000000;
 }
 
 .lr-print-copy {
-  font-size: 12.5px;
+  font-size: 10.5px;
   font-weight: 700;
   text-align: center;
-  line-height: 1.4;
+  line-height: 1.25;
   vertical-align: middle !important;
   color: #000000;
   background: #ffffff !important;
@@ -183,8 +202,8 @@
 
 .lr-print-copy-label {
   text-decoration: underline;
-  margin: 4px 0;
-  font-size: 13px;
+  margin: 2px 0;
+  font-size: 11.5px;
   font-weight: 800;
   color: #000000;
 }
@@ -192,15 +211,15 @@
 .lr-print-logo-cell {
   text-align: center;
   vertical-align: middle !important;
-  width: 120px;
-  padding: 4px !important;
+  width: 96px;
+  padding: 2px !important;
   background: #ffffff !important;
 }
 
 .lr-print-logo {
-  width: 104px;
+  width: 86px;
   height: auto;
-  max-height: 82px;
+  max-height: 64px;
   object-fit: contain;
   display: block;
   margin: 0 auto;
@@ -209,41 +228,43 @@
 }
 
 .lr-print-note {
-  font-size: 15px;
+  font-size: 12.5px;
   font-weight: 900;
-  letter-spacing: 0.5px;
-  margin-top: 6px;
+  letter-spacing: 0.3px;
+  margin-top: 3px;
   color: #000000;
 }
 
 .lr-print-label {
   font-weight: 700;
   white-space: nowrap;
-  font-size: 12.5px;
+  font-size: 11px;
   color: #000000;
 }
 
 .lr-print-value {
-  min-height: 20px;
-  font-size: 13px;
+  min-height: 14px;
+  font-size: 11.5px;
   font-weight: 700;
   color: #000000;
 }
 
 .lr-print-section {
   font-weight: 800;
-  margin: -4px -6px 6px;
-  padding: 4px 6px;
-  font-size: 13px;
+  margin: 0 0 3px;
+  padding: 2px 0;
+  font-size: 11.5px;
   color: #000000;
   background: #ffffff !important;
   border-bottom: 1px solid #000000;
 }
 
 .lr-print-party-cell {
-  min-height: 58px;
-  font-size: 13px;
-  padding-top: 0 !important;
+  min-height: 0;
+  font-size: 11px;
+  line-height: 1.3;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
   color: #000000;
   background: #ffffff !important;
 }
@@ -251,9 +272,9 @@
 .lr-print-table > tbody > tr > td.lr-print-gst-pan {
   text-align: center;
   font-weight: 900;
-  font-size: 14.5px;
+  font-size: 12.5px;
   color: #c00000 !important;
-  padding: 7px !important;
+  padding: 4px !important;
   background: #ffffff !important;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
@@ -261,29 +282,29 @@
 
 .lr-print-footer-left {
   vertical-align: top !important;
-  font-size: 12px;
-  line-height: 1.55;
-  min-height: 78px;
+  font-size: 11px;
+  line-height: 1.4;
+  min-height: 0;
   color: #000000;
   background: #ffffff !important;
 }
 
 .lr-print-sign {
   text-align: center;
-  min-height: 72px;
+  min-height: 0;
   vertical-align: top !important;
-  padding-top: 4px !important;
-  padding-bottom: 4px !important;
-  font-size: 12px;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  font-size: 11px;
   color: #000000;
   background: #ffffff !important;
 }
 
 .lr-print-stamp {
   display: block;
-  width: 64px;
+  width: 52px;
   height: auto;
-  margin: 2px auto 2px;
+  margin: 1px auto 1px;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
@@ -292,8 +313,8 @@
   text-align: center;
   vertical-align: middle !important;
   font-weight: 800;
-  font-size: 12px;
-  padding: 4px 6px !important;
+  font-size: 11px;
+  padding: 2px 4px !important;
   color: #000000;
   background: #ffffff !important;
 }
@@ -301,15 +322,16 @@
 .lr-print-articles-head > td {
   background: #ffffff !important;
   font-weight: 800;
-  padding-top: 5px !important;
-  padding-bottom: 5px !important;
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
+  font-size: 10.5px !important;
   color: #000000 !important;
 }
 
 @media print {
   @page {
     size: 10in 6in;
-    margin: 0.15in;
+    margin: 0.12in;
   }
 
   html,
@@ -317,29 +339,43 @@
     background: #ffffff !important;
     color: #000000 !important;
     margin: 0 !important;
+    padding: 0 !important;
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
   }
 
   .lr-print-page {
     background: #ffffff !important;
     padding: 0 !important;
+    margin: 0 !important;
     width: 100% !important;
+  }
+
+  .lr-print-copy-page {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .lr-print-copy-page:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
   }
 
   .lr-print-sheet {
     width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-width: none !important;
+    height: 5.76in !important;
+    max-height: 5.76in !important;
     margin: 0 !important;
-    border: 2px solid #000000;
-    overflow: visible;
-    page-break-after: always !important;
-    break-after: page !important;
-  }
-
-  .lr-print-sheet:last-child {
-    page-break-after: auto !important;
-    break-after: auto !important;
+    border: 1.5px solid #000000;
+    overflow: hidden !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 
   .lr-print-title-red,

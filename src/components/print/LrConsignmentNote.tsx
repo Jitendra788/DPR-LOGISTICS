@@ -138,7 +138,8 @@ export function LrConsignmentNote({
           : "";
 
   return (
-    <section className="lr-print-sheet">
+    <div className="lr-print-copy-page">
+      <section className="lr-print-sheet">
       <table className="lr-print-table">
         <colgroup>
           <col style={{ width: "12%" }} />
@@ -390,5 +391,6 @@ export function LrConsignmentNote({
         </tbody>
       </table>
     </section>
+    </div>
   );
 }
