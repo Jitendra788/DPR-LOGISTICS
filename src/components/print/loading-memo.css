@@ -57,23 +57,25 @@
 }
 
 .lm-name {
+  font-family: "Times New Roman", Times, Georgia, serif;
   color: #c00000;
-  font-size: 26px;
-  font-weight: 800;
+  font-size: 28px;
+  font-weight: 900;
   letter-spacing: 0.5px;
-  line-height: 1.15;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
+  line-height: 1.12;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }
 
 .lm-tag {
+  font-family: "Times New Roman", Times, Georgia, serif;
   color: #c00000;
   font-size: 15px;
   font-style: italic;
-  font-weight: 700;
+  font-weight: 800;
   margin: 2px 0 6px;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }
 
 .lm-addr {

@@ -49,21 +49,12 @@ export type BillPrintData = {
 
 export type BillPrintVariant = "weight" | "meter";
 
+/** Old bill prints keep weight compact: 18TN32FEET / 7 TN 32 FEET as stored. */
 function lrWeight(row: BillPrintLr) {
-  const w = formatWeightCell(row.chargedWeight || row.actWeight || "");
-  const p = row.particulars || "";
-  if (w && p && w !== p) return `${w} ${p}`.trim();
+  const w = String(row.chargedWeight || row.actWeight || "").trim();
+  const p = String(row.particulars || "").trim();
+  if (w && p && w.toUpperCase() !== p.toUpperCase()) return `${w} ${p}`.replace(/\s+/g, " ").trim();
   return w || p || "";
-}
-
-function formatWeightCell(value: string) {
-  const v = String(value ?? "").trim();
-  if (!v) return "";
-  return v
-    .replace(/(\d)\s*([A-Za-z])/g, "$1 $2")
-    .replace(/([A-Za-z])\s*(\d)/g, "$1 $2")
-    .replace(/\s+/g, " ")
-    .trim();
 }
 
 function lrLineFreight(row: BillPrintLr) {
@@ -99,6 +90,45 @@ type Props = {
   docTitle?: string;
 };
 
+const WEIGHT_COLS = [
+  "3%",
+  "7%",
+  "6%",
+  "8%",
+  "4%",
+  "9%",
+  "9%",
+  "6%",
+  "5%",
+  "5%",
+  "5%",
+  "5%",
+  "5%",
+  "5%",
+  "5%",
+  "5%",
+  "8%",
+] as const;
+
+const METER_COLS = [
+  "3%",
+  "7%",
+  "6%",
+  "10%",
+  "10%",
+  "6%",
+  "5%",
+  "5%",
+  "5%",
+  "5%",
+  "6%",
+  "6%",
+  "5%",
+  "5%",
+  "5%",
+  "11%",
+] as const;
+
 export function BillTaxInvoice({
   data,
   variant = "weight",
@@ -120,16 +150,20 @@ export function BillTaxInvoice({
   const rightCols = colCount - leftCols;
   const logoSrc = isRoadways ? ROADWAYS_LOGO : BRAND_LOGO_HEADER;
   const stampSrc = isRoadways ? ROADWAYS_STAMP : BRAND_STAMP;
+  const colWidths = isMeter ? METER_COLS : WEIGHT_COLS;
 
   return (
     <section className="bill-print-sheet">
       <table className="bill-print-table">
+        <colgroup>
+          {colWidths.map((w, i) => (
+            <col key={`${w}-${i}`} style={{ width: w }} />
+          ))}
+        </colgroup>
         <tbody>
           <tr>
             <td colSpan={colCount} className="bill-print-center bill-print-bold bill-print-bless">
-              {isRoadways
-                ? "|| Shree Ganesh Prasanna || Shri Mahalaxmi Prasanna ||"
-                : "|| Shri Ganesh Prasanna ||"}
+              || Shri Ganesh Prasanna ||
             </td>
           </tr>
           <tr>
@@ -139,14 +173,15 @@ export function BillTaxInvoice({
                   {company.name}
                 </div>
               ) : (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img src={logoSrc} alt={company.name} className="bill-print-logo" />
               )}
             </td>
             <td colSpan={colCount - 2} className="bill-print-center">
               <div className="bill-print-title-red">{company.name}</div>
               <div className="bill-print-subtitle-red">{company.tagline}</div>
-              <div>
-                {company.address} E-mail : {company.email} Mob. :{" "}
+              <div className="bill-print-addr">
+                {company.address} E-mail : {company.email}. Mob. :{" "}
                 {company.phones.replace(/\s*\/\s*/g, ", ")}
               </div>
               {company.companyGst ? (
@@ -180,7 +215,7 @@ export function BillTaxInvoice({
                 <span className="bill-print-label">PO No.:</span> {data.poNo || ""}
               </div>
             </td>
-            <td colSpan={colCount - Math.floor(colCount * 0.7)} className="bill-print-party bill-print-right">
+            <td colSpan={colCount - Math.floor(colCount * 0.7)} className="bill-print-party">
               <div>
                 <span className="bill-print-label">Bill No:-</span> {data.billNo}
               </div>
@@ -235,7 +270,7 @@ export function BillTaxInvoice({
             const lineFreight = lrLineFreight(row);
             if (isMeter) {
               return (
-                <tr key={`${row.lrNo}-${i}`} className="bill-print-center">
+                <tr key={`${row.lrNo}-${i}`} className="bill-print-center bill-print-data">
                   <td>{i + 1}</td>
                   <td>{stripLrPrefix(row.lrNo)}</td>
                   <td>{formatPrintDate(row.lrDate)}</td>
@@ -256,7 +291,7 @@ export function BillTaxInvoice({
               );
             }
             return (
-              <tr key={`${row.lrNo}-${i}`} className="bill-print-center">
+              <tr key={`${row.lrNo}-${i}`} className="bill-print-center bill-print-data">
                 <td>{i + 1}</td>
                 <td>{stripLrPrefix(row.lrNo)}</td>
                 <td>{formatPrintDate(row.lrDate)}</td>
@@ -278,7 +313,6 @@ export function BillTaxInvoice({
             );
           })}
 
-          {/* Totals + tax — legacy layout */}
           <tr>
             <td colSpan={leftCols} className="bill-print-bold">
               Total Freight : {formatPrintMoney(data.grandTotal || freightTotal)}
@@ -291,21 +325,15 @@ export function BillTaxInvoice({
                     <td className="bill-print-right">{formatPrintMoney(freightTotal)}</td>
                   </tr>
                   <tr>
-                    <td>
-                      CGST@{data.cgstPct || 0}%
-                    </td>
+                    <td>CGST@{data.cgstPct || 0}%</td>
                     <td className="bill-print-right">{fmtTax(data.cgstAmt)}</td>
                   </tr>
                   <tr>
-                    <td>
-                      SGST@{data.sgstPct || 0}%
-                    </td>
+                    <td>SGST@{data.sgstPct || 0}%</td>
                     <td className="bill-print-right">{fmtTax(data.sgstAmt)}</td>
                   </tr>
                   <tr>
-                    <td>
-                      IGST@{data.igstPct || 0}%
-                    </td>
+                    <td>IGST@{data.igstPct || 0}%</td>
                     <td className="bill-print-right">{fmtTax(data.igstAmt)}</td>
                   </tr>
                   <tr>
@@ -322,7 +350,7 @@ export function BillTaxInvoice({
             </td>
           </tr>
           <tr>
-            <td colSpan={leftCols} className="bill-print-th bill-print-bold">
+            <td colSpan={leftCols} className="bill-print-heading bill-print-bold">
               Bank Details
             </td>
           </tr>
@@ -352,6 +380,7 @@ export function BillTaxInvoice({
             </td>
             <td colSpan={colCount - Math.floor(colCount / 2)} className="bill-print-sign-cell bill-print-right">
               <div className="bill-print-bold">{forLabel}</div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={stampSrc} alt={`${company.name} stamp`} className="bill-print-stamp" />
             </td>
           </tr>

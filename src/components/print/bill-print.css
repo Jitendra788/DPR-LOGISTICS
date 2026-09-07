@@ -1,11 +1,12 @@
 .bill-print-page {
-  background: #e8e8e8;
-  padding: 12px;
-  color: #111;
-  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
-  font-size: 12.5px;
-  line-height: 1.35;
-  -webkit-font-smoothing: antialiased;
+  background: #dcdcdc;
+  padding: 14px;
+  color: #000;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  line-height: 1.3;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 .bill-print-sheet {
@@ -13,9 +14,12 @@
   max-width: 297mm;
   margin: 0 auto;
   background: #fff;
-  border: 3px double #000;
-  box-shadow: 0 0 0 1px #000;
+  border: 2px solid #000;
+  outline: 1px solid #000;
+  outline-offset: 2px;
   page-break-after: always;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 .bill-print-table {
@@ -25,24 +29,26 @@
 }
 
 .bill-print-table > tbody > tr > td {
-  border: 1.5px solid #000;
-  padding: 5px 6px;
+  border: 1px solid #000;
+  padding: 4px 5px;
   vertical-align: top;
   word-wrap: break-word;
-  font-size: 12.5px;
-  color: #111;
+  overflow-wrap: anywhere;
+  font-size: 11.5px;
+  color: #000;
 }
 
 .bill-print-inner {
   width: 100%;
   height: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .bill-print-inner td {
-  border: 1.5px solid #000;
-  padding: 4px 6px;
-  font-size: 12.5px;
+  border: 1px solid #000;
+  padding: 4px 5px;
+  font-size: 11.5px;
 }
 
 .bill-print-taxbox {
@@ -51,6 +57,7 @@
 
 .bill-print-taxbox td {
   font-weight: 600;
+  vertical-align: middle;
 }
 
 .bill-print-taxbox .bill-print-bold {
@@ -74,78 +81,103 @@
 }
 
 .bill-print-bless {
-  padding: 3px !important;
+  padding: 2px !important;
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
+  font-family: "Times New Roman", Times, serif;
 }
 
 .bill-print-title-red {
-  font-size: 28px;
+  font-family: "Times New Roman", Times, Georgia, serif;
+  font-size: 30px;
   font-weight: 900;
-  color: #b00000;
-  letter-spacing: 1px;
-  text-shadow: 0 0 0.4px #b00000;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
+  color: #c00000;
+  letter-spacing: 0.8px;
+  line-height: 1.1;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }
 
 .bill-print-subtitle-red {
+  font-family: "Times New Roman", Times, Georgia, serif;
   font-size: 15px;
   font-weight: 800;
-  color: #b00000;
-  margin: 3px 0 5px;
-  letter-spacing: 0.3px;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
+  color: #c00000;
+  margin: 2px 0 4px;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+.bill-print-addr {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
 }
 
 .bill-print-heading {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 900;
-  letter-spacing: 1.5px;
-  background: linear-gradient(#e8e8e8, #d0d0d0);
-  padding: 7px 0 !important;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
+  letter-spacing: 1px;
+  background: #d0d0d0 !important;
+  padding: 6px 0 !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }
 
 .bill-print-th {
-  background: linear-gradient(#ececec, #d4d4d4);
+  background: #e6e6e6 !important;
   font-weight: 800 !important;
-  font-size: 11.5px !important;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
+  font-size: 10.5px !important;
+  padding: 4px 2px !important;
+  vertical-align: middle !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+}
+
+.bill-print-th td,
+tr.bill-print-th > td {
+  background: #e6e6e6 !important;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }
 
 .bill-print-logo-cell {
-  width: 100px;
+  width: 110px;
   text-align: center;
   vertical-align: middle !important;
-  background: #fafafa;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
+  padding: 4px !important;
 }
 
 .bill-print-logo {
-  width: 92px;
+  width: 98px;
   height: auto;
-  max-height: 72px;
+  max-height: 78px;
   object-fit: contain;
-  filter: contrast(1.05);
+  display: block;
+  margin: 0 auto;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }
 
 .bill-print-party {
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 12.5px;
+  line-height: 1.45;
+  text-align: left !important;
 }
 
 .bill-print-label {
   font-weight: 800;
 }
 
+.bill-print-data td {
+  font-size: 11px;
+  vertical-align: middle !important;
+  padding: 3px 2px !important;
+}
+
 .bill-print-sign-cell {
-  height: 88px;
+  height: 92px;
   vertical-align: top !important;
   padding-top: 6px !important;
   padding-bottom: 6px !important;
@@ -154,21 +186,23 @@
 
 .bill-print-stamp {
   display: block;
-  width: 72px;
+  width: 78px;
   height: auto;
-  margin: 4px 6px 0 auto;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
+  margin: 4px 8px 0 auto;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }
 
 @media print {
   .bill-print-page {
-    background: #fff;
+    background: #fff !important;
     padding: 0;
   }
 
   .bill-print-sheet {
-    border: 3px double #000;
+    border: 2px solid #000;
+    outline: 1px solid #000;
+    outline-offset: 1px;
     max-width: none;
     box-shadow: none;
   }
@@ -177,11 +211,12 @@
   .bill-print-subtitle-red,
   .bill-print-heading,
   .bill-print-th,
+  .bill-print-th td,
+  tr.bill-print-th > td,
   .bill-print-logo,
-  .bill-print-logo-cell,
   .bill-print-stamp {
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   @page {

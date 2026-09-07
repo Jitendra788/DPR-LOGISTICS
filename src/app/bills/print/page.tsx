@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { BillTaxInvoice, type BillPrintData, type BillPrintVariant } from "@/components/print/BillTaxInvoice";
 import { api } from "@/lib/api-client";
 import { isMeterBill } from "@/lib/bill-route";
+import { roadwaysPrintCompany } from "@/lib/roadways-print";
 import { lrPrintCompany } from "@/lib/lr-print";
 import "@/components/print/bill-print.css";
 
@@ -14,6 +15,7 @@ function PrintInner() {
   const share = params.get("share") ?? "";
   const [data, setData] = useState<BillPrintData | null>(null);
   const [variant, setVariant] = useState<BillPrintVariant>("weight");
+  const [source, setSource] = useState("DPR");
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -38,16 +40,9 @@ function PrintInner() {
     }>(`/api/bills/print-data?${qs.toString()}`)
       .then((res) => {
         if (cancelled) return;
-        const source = (res.bill.source || "DPR").toUpperCase();
-        // Roadways bills use Loading Memo layout (old website style)
-        if (source === "ROADWAYS") {
-          const rwQs = new URLSearchParams({ billNo });
-          if (share) rwQs.set("share", share);
-          window.location.replace(`/roadways/bills/print?${rwQs.toString()}`);
-          return;
-        }
         const meter = isMeterBill(res.bill, res.lrs.map((r) => r.billAs));
         setVariant(meter ? "meter" : "weight");
+        setSource((res.bill.source || "DPR").toUpperCase());
         setData({
           billNo: res.bill.billNo,
           billDate: res.bill.billDate,
@@ -79,9 +74,16 @@ function PrintInner() {
   if (!billNo) return <p className="p-8">Bill number missing.</p>;
   if (!data) return <p className="p-8">Loading bill…</p>;
 
+  const isRoadways = source === "ROADWAYS";
+
   return (
     <div className="bill-print-page">
-      <BillTaxInvoice data={data} variant={variant} company={lrPrintCompany} docTitle="TAX INVOICE" />
+      <BillTaxInvoice
+        data={data}
+        variant={variant}
+        company={isRoadways ? roadwaysPrintCompany : lrPrintCompany}
+        docTitle={isRoadways ? "Customer Bill" : "TAX INVOICE"}
+      />
     </div>
   );
 }

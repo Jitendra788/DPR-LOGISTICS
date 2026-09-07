@@ -2,98 +2,91 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { LoadingMemo } from "@/components/print/LoadingMemo";
+import { BillTaxInvoice, type BillPrintData, type BillPrintVariant } from "@/components/print/BillTaxInvoice";
 import { api } from "@/lib/api-client";
-import { isoToDisplay } from "@/lib/dates";
+import { isMeterBill } from "@/lib/bill-route";
 import { isMeterBillAs } from "@/lib/lr-totals";
-import type { LoadingMemoData } from "@/lib/roadways-print";
-import "@/components/print/loading-memo.css";
-
-type PrintPayload = {
-  bill: {
-    billNo: string;
-    billDate: string;
-    fromDate: string;
-    partyName: string;
-    fromStation: string;
-    toStation: string;
-    freight: number;
-    grandTotal: number;
-    paidRs: number;
-    remark: string;
-  };
-  lrs: Array<{
-    vehNo: string;
-    fromStation: string;
-    toStation: string;
-    chargedWeight: string;
-    actWeight: string;
-    totalMeter: string;
-    billAs: string;
-  }>;
-};
-
-function slashDate(value: string) {
-  const text = isoToDisplay(value) || value;
-  return text.replaceAll("-", "/");
-}
+import { roadwaysPrintCompany } from "@/lib/roadways-print";
+import "@/components/print/bill-print.css";
 
 function PrintInner() {
   const params = useSearchParams();
   const billNo = params.get("billNo") ?? "";
-  const [data, setData] = useState<LoadingMemoData | null>(null);
+  const share = params.get("share") ?? "";
+  const [data, setData] = useState<BillPrintData | null>(null);
+  const [variant, setVariant] = useState<BillPrintVariant>("weight");
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!billNo) return;
-    api<PrintPayload>(`/api/bills/print-data?billNo=${encodeURIComponent(billNo)}`)
+    if (!billNo) {
+      setError("Bill number missing.");
+      return;
+    }
+    let cancelled = false;
+    const qs = new URLSearchParams({ billNo });
+    if (share) qs.set("share", share);
+    api<{
+      bill: BillPrintData & {
+        poNo: string;
+        partyName: string;
+        billDate: string;
+        billNo: string;
+        billAt?: string;
+        source?: string;
+      };
+      party: { address: string; gst: string } | null;
+      lrs: Array<BillPrintData["lrs"][number] & { billAs?: string; totalMeter?: string }>;
+    }>(`/api/bills/print-data?${qs.toString()}`)
       .then((res) => {
-        const linked = res.lrs || [];
-        const vehNos = [...new Set(linked.map((r) => r.vehNo).filter(Boolean))];
-        const weights = linked
-          .map((r) => {
-            if (isMeterBillAs(r.billAs) && r.totalMeter) return `${r.totalMeter} Mtr`;
-            return r.chargedWeight || r.actWeight || "";
-          })
-          .filter(Boolean);
-        const freight = Number(res.bill.freight) || 0;
-        const grand = Number(res.bill.grandTotal) || freight;
-        const paid = Number(res.bill.paidRs) || 0;
+        if (cancelled) return;
+        const meter =
+          isMeterBill(res.bill, res.lrs.map((r) => r.billAs)) ||
+          res.lrs.some((r) => isMeterBillAs(r.billAs));
+        setVariant(meter ? "meter" : "weight");
         setData({
-          slipNo: res.bill.billNo,
-          date: slashDate(res.bill.billDate || res.bill.fromDate),
+          billNo: res.bill.billNo,
+          billDate: res.bill.billDate,
+          poNo: res.bill.poNo,
           partyName: res.bill.partyName,
-          lorryNo: vehNos.join(", "),
-          fromStation: res.bill.fromStation || linked[0]?.fromStation || "",
-          toStation: res.bill.toStation || linked[0]?.toStation || "",
-          guaranteeWeight: weights[0] || weights.join(", "),
-          freight,
-          advance: paid,
-          balance: Number(Math.max(0, grand - paid).toFixed(2)),
-          remark: res.bill.remark,
+          partyAddress: res.party?.address ?? "",
+          partyGst: res.party?.gst ?? "",
+          freight: res.bill.freight,
+          cgstPct: res.bill.cgstPct,
+          cgstAmt: res.bill.cgstAmt,
+          sgstPct: res.bill.sgstPct,
+          sgstAmt: res.bill.sgstAmt,
+          igstPct: res.bill.igstPct,
+          igstAmt: res.bill.igstAmt,
+          grandTotal: res.bill.grandTotal,
+          lrs: res.lrs,
         });
-        setTimeout(() => window.print(), 400);
+        setTimeout(() => window.print(), 80);
       })
-      .catch(() => setError("Could not load bill"));
-  }, [billNo]);
+      .catch((err) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : "Unable to load bill");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [billNo, share]);
 
-  if (!billNo) return <p className="p-8">Bill number missing.</p>;
   if (error) return <p className="p-8">{error}</p>;
-  if (!data) return <p className="p-8">Loading Loading Memo…</p>;
+  if (!billNo) return <p className="p-8">Bill number missing.</p>;
+  if (!data) return <p className="p-8">Loading Customer Bill…</p>;
 
   return (
-    <div className="lm-page">
-      <div className="no-print mb-3 flex justify-center gap-2">
-        <button type="button" className="btn-admin btn-admin-solid bg-[#0f766e]" onClick={() => window.print()}>
-          Print
-        </button>
-      </div>
-      <LoadingMemo data={data} />
+    <div className="bill-print-page">
+      <BillTaxInvoice
+        data={data}
+        variant={variant}
+        company={roadwaysPrintCompany}
+        docTitle="Customer Bill"
+      />
     </div>
   );
 }
 
-/** Roadways bill print — Loading Memo format (separate from DPR tax invoice). */
+/** Roadways weight/meter bill — Customer Bill (old website style). Booking slip stays Loading Memo. */
 export default function RoadwaysBillPrintPage() {
   return (
     <Suspense fallback={<p className="p-8">Loading…</p>}>

@@ -192,10 +192,10 @@ export function LrConsignmentNote({
             <td colSpan={3} className="lr-print-no-pad">
               <table className="lr-nested">
                 <colgroup>
+                  <col style={{ width: "32%" }} />
+                  <col style={{ width: "24%" }} />
+                  <col style={{ width: "14%" }} />
                   <col style={{ width: "30%" }} />
-                  <col style={{ width: "26%" }} />
-                  <col style={{ width: "16%" }} />
-                  <col style={{ width: "28%" }} />
                 </colgroup>
                 <tbody>
                   <tr>
@@ -238,7 +238,7 @@ export function LrConsignmentNote({
           </tr>
 
           {/* Articles header */}
-          <tr className="lr-print-bold lr-print-center">
+          <tr className="lr-print-bold lr-print-center lr-print-articles-head">
             <td>No.Of Articales</td>
             <td>Description Said To Contents</td>
             <td>Inv.No. &amp; Date</td>
