@@ -71,9 +71,9 @@
 }
 
 .lhc-memo-logo {
-  width: 118px;
+  width: 92px;
   height: auto;
-  max-height: 96px;
+  max-height: 72px;
   object-fit: contain;
   display: block;
   margin: 0 auto;
@@ -188,9 +188,9 @@
 
 .lhc-memo-stamp {
   display: block;
-  width: 120px;
+  width: 72px;
   height: auto;
-  margin: 6px auto 0;
+  margin: 4px auto 0;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
