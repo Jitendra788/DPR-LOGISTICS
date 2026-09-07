@@ -362,9 +362,9 @@ export function LrConsignmentNote({
             </td>
           </tr>
 
-          {/* Footer: Value/Eway/Valid left | sign+stamp+care right (old ASP layout) */}
+          {/* Footer: Value/Eway/Valid left | sign+stamp / Customer Care right (old ASP) */}
           <tr>
-            <td colSpan={4} className="lr-print-footer-left">
+            <td colSpan={4} className="lr-print-footer-left" rowSpan={2}>
               <div>
                 <span className="lr-print-label">Value Rs.</span> {booking.valueRs}
               </div>
@@ -380,9 +380,11 @@ export function LrConsignmentNote({
               <div className="lr-print-bold">{forLabel}</div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={stampSrc} alt={`${company.name} stamp`} className="lr-print-stamp" />
-              <div className="lr-print-care">
-                Customer Care No : {company.customerCare}
-              </div>
+            </td>
+          </tr>
+          <tr>
+            <td colSpan={3} className="lr-print-care">
+              Customer Care No : {company.customerCare}
             </td>
           </tr>
         </tbody>
