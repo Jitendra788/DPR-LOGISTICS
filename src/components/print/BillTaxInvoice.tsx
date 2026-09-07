@@ -149,13 +149,13 @@ export function BillTaxInvoice({
     : "ICICI Bank (DPR Logistics)";
   const bankAcct = isRoadways ? "094920110000555" : "635805500736";
   const bankIfsc = isRoadways ? "BKID0000949" : "ICIC0006358";
-  /** Narrow right tax strip like old ASP (aligns under Total Bill) */
-  const rightCols = 3;
-  const leftCols = colCount - rightCols;
   const logoSrc = isRoadways ? ROADWAYS_LOGO : BRAND_LOGO_HEADER;
   const stampSrc = isRoadways ? ROADWAYS_STAMP : BRAND_STAMP;
   const colWidths = isMeter ? METER_COLS : WEIGHT_COLS;
-  const wordsLabel = isMeter ? "Amount in Words :" : "Amout in Words :";
+  const wordsLabel = "Amout in Words :";
+  /** Tax strip ~ Total Bill width on old ASP landscape */
+  const rightCols = 3;
+  const leftCols = colCount - rightCols;
   const sheetClass = [
     "bill-print-sheet",
     isMeter ? "bill-print-meter" : "bill-print-weight",
@@ -325,7 +325,7 @@ export function BillTaxInvoice({
           })}
 
           <tr>
-            <td colSpan={leftCols} className="bill-print-bold">
+            <td colSpan={leftCols} className="bill-print-bold bill-print-total-row">
               Total Freight : {formatPrintMoney(data.grandTotal || freightTotal)}
             </td>
             <td colSpan={rightCols} className="bill-print-no-pad" rowSpan={4}>
@@ -336,15 +336,15 @@ export function BillTaxInvoice({
                     <td className="bill-print-right">{formatPrintMoney(freightTotal)}</td>
                   </tr>
                   <tr>
-                    <td>CGST @{data.cgstPct || 0}%</td>
+                    <td>CGST@{data.cgstPct || 0}%</td>
                     <td className="bill-print-right">{fmtTax(data.cgstAmt)}</td>
                   </tr>
                   <tr>
-                    <td>SGST @{data.sgstPct || 0}%</td>
+                    <td>SGST@{data.sgstPct || 0}%</td>
                     <td className="bill-print-right">{fmtTax(data.sgstAmt)}</td>
                   </tr>
                   <tr>
-                    <td>IGST @{data.igstPct || 0}%</td>
+                    <td>IGST@{data.igstPct || 0}%</td>
                     <td className="bill-print-right">{fmtTax(data.igstAmt)}</td>
                   </tr>
                   <tr className="bill-print-grand">
@@ -356,8 +356,9 @@ export function BillTaxInvoice({
             </td>
           </tr>
           <tr>
-            <td colSpan={leftCols}>
-              <span className="bill-print-label">{wordsLabel}</span> {amountInWordsIndian(data.grandTotal)}
+            <td colSpan={leftCols} className="bill-print-words">
+              <span className="bill-print-label">{wordsLabel}</span>
+              {amountInWordsIndian(data.grandTotal)}
             </td>
           </tr>
           <tr>
