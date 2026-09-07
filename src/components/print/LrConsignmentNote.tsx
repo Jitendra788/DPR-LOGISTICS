@@ -123,7 +123,11 @@ export function LrConsignmentNote({
       : type === "ToPay"
         ? "Freight To Pay"
         : "To be bill for GST at";
-  const forLabel = signFor || `For ${company.name.toUpperCase().includes("ROADWAYS") ? "DELHI PUNJAB ROADWAYS" : "DPR LOGISTICS"}`;
+  const forLabel =
+    signFor ||
+    (company.name.toUpperCase().includes("ROADWAYS")
+      ? "For DELHI PUNJAB ROADWAYS"
+      : "For DPR Logistics");
   const taxBar =
     company.companyGst && company.companyPan
       ? `GST : ${company.companyGst} / PAN No. ${company.companyPan}`
@@ -358,29 +362,27 @@ export function LrConsignmentNote({
             </td>
           </tr>
 
-          {/* Value + signature / stamp (mor) */}
+          {/* Footer: Value/Eway/Valid left | sign+stamp+care right (old ASP layout) */}
           <tr>
-            <td colSpan={4}>
-              <span className="lr-print-label">Value Rs.</span> {booking.valueRs}
+            <td colSpan={4} className="lr-print-footer-left">
+              <div>
+                <span className="lr-print-label">Value Rs.</span> {booking.valueRs}
+              </div>
+              <div>
+                <span className="lr-print-label">Eway Bill No.</span> {booking.ewayBill}
+              </div>
+              <div>
+                <span className="lr-print-label">Valid Date</span>{" "}
+                {formatPrintDate(booking.validDate || "")}
+              </div>
             </td>
             <td colSpan={3} className="lr-print-sign">
               <div className="lr-print-bold">{forLabel}</div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={stampSrc} alt={`${company.name} stamp`} className="lr-print-stamp" />
-            </td>
-          </tr>
-
-          {/* Eway / Valid / Care */}
-          <tr>
-            <td colSpan={3}>
-              <span className="lr-print-label">Eway Bill No.</span> {booking.ewayBill}
-            </td>
-            <td colSpan={2}>
-              <span className="lr-print-label">Valid Date</span> {formatPrintDate(booking.validDate || "")}
-            </td>
-            <td colSpan={2} className="lr-print-bold lr-print-center">
-              Customer Care No :
-              <br />
-              {company.customerCare}
+              <div className="lr-print-care">
+                Customer Care No : {company.customerCare}
+              </div>
             </td>
           </tr>
         </tbody>

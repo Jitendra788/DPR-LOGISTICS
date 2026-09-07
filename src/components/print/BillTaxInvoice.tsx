@@ -49,12 +49,14 @@ export type BillPrintData = {
 
 export type BillPrintVariant = "weight" | "meter";
 
-/** Old bill prints keep weight compact: 18TN32FEET / 7 TN 32 FEET as stored. */
+/** Prefer charged/act weight as stored on old prints (e.g. 7 TN 32 FEET). */
 function lrWeight(row: BillPrintLr) {
   const w = String(row.chargedWeight || row.actWeight || "").trim();
   const p = String(row.particulars || "").trim();
-  if (w && p && w.toUpperCase() !== p.toUpperCase()) return `${w} ${p}`.replace(/\s+/g, " ").trim();
-  return w || p || "";
+  if (!w) return p;
+  if (!p || w.toUpperCase() === p.toUpperCase()) return w;
+  if (w.toUpperCase().includes(p.toUpperCase()) || p.toUpperCase().includes(w.toUpperCase())) return w;
+  return `${w} ${p}`.replace(/\s+/g, " ").trim();
 }
 
 function lrLineFreight(row: BillPrintLr) {
@@ -90,11 +92,12 @@ type Props = {
   docTitle?: string;
 };
 
+/** Column % matched to old ASP landscape invoices */
 const WEIGHT_COLS = [
   "3%",
   "7%",
   "6%",
-  "8%",
+  "9%",
   "4%",
   "9%",
   "9%",
@@ -105,7 +108,7 @@ const WEIGHT_COLS = [
   "5%",
   "5%",
   "5%",
-  "5%",
+  "4%",
   "5%",
   "8%",
 ] as const;
@@ -146,14 +149,21 @@ export function BillTaxInvoice({
     : "ICICI Bank (DPR Logistics)";
   const bankAcct = isRoadways ? "094920110000555" : "635805500736";
   const bankIfsc = isRoadways ? "BKID0000949" : "ICIC0006358";
-  const leftCols = isMeter ? 10 : 11;
-  const rightCols = colCount - leftCols;
+  /** Narrow right tax strip like old ASP (aligns under Total Bill) */
+  const rightCols = 3;
+  const leftCols = colCount - rightCols;
   const logoSrc = isRoadways ? ROADWAYS_LOGO : BRAND_LOGO_HEADER;
   const stampSrc = isRoadways ? ROADWAYS_STAMP : BRAND_STAMP;
   const colWidths = isMeter ? METER_COLS : WEIGHT_COLS;
+  const wordsLabel = isMeter ? "Amount in Words :" : "Amout in Words :";
+  const sheetClass = [
+    "bill-print-sheet",
+    isMeter ? "bill-print-meter" : "bill-print-weight",
+    isRoadways ? "bill-print-roadways" : "bill-print-dpr",
+  ].join(" ");
 
   return (
-    <section className="bill-print-sheet">
+    <section className={sheetClass}>
       <table className="bill-print-table">
         <colgroup>
           {colWidths.map((w, i) => (
@@ -181,23 +191,24 @@ export function BillTaxInvoice({
               <div className="bill-print-title-red">{company.name}</div>
               <div className="bill-print-subtitle-red">{company.tagline}</div>
               <div className="bill-print-addr">
-                {company.address} E-mail : {company.email}. Mob. :{" "}
-                {company.phones.replace(/\s*\/\s*/g, ", ")}
+                {company.address}
+                <br />
+                E-mail : {company.email}. Mob. : {company.phones.replace(/\s*\/\s*/g, ", ")}
               </div>
               {company.companyGst ? (
-                <div className="bill-print-bold">GST : {company.companyGst}</div>
+                <div className="bill-print-bold bill-print-gstline">GST : {company.companyGst}</div>
               ) : company.companyPan ? (
-                <div className="bill-print-bold">PAN No. {company.companyPan}</div>
+                <div className="bill-print-bold bill-print-gstline">PAN No. {company.companyPan}</div>
               ) : null}
             </td>
           </tr>
           <tr>
-            <td colSpan={colCount} className="bill-print-center bill-print-heading">
+            <td colSpan={colCount} className="bill-print-center bill-print-doctitle">
               {docTitle}
             </td>
           </tr>
           <tr>
-            <td colSpan={Math.floor(colCount * 0.7)} className="bill-print-party">
+            <td colSpan={Math.floor(colCount * 0.78)} className="bill-print-party">
               <div>
                 <span className="bill-print-label">Party Name :</span> {data.partyName}
               </div>
@@ -215,7 +226,7 @@ export function BillTaxInvoice({
                 <span className="bill-print-label">PO No.:</span> {data.poNo || ""}
               </div>
             </td>
-            <td colSpan={colCount - Math.floor(colCount * 0.7)} className="bill-print-party">
+            <td colSpan={colCount - Math.floor(colCount * 0.78)} className="bill-print-party">
               <div>
                 <span className="bill-print-label">Bill No:-</span> {data.billNo}
               </div>
@@ -317,7 +328,7 @@ export function BillTaxInvoice({
             <td colSpan={leftCols} className="bill-print-bold">
               Total Freight : {formatPrintMoney(data.grandTotal || freightTotal)}
             </td>
-            <td colSpan={rightCols} className="bill-print-no-pad" rowSpan={5}>
+            <td colSpan={rightCols} className="bill-print-no-pad" rowSpan={4}>
               <table className="bill-print-inner bill-print-taxbox">
                 <tbody>
                   <tr>
@@ -325,18 +336,18 @@ export function BillTaxInvoice({
                     <td className="bill-print-right">{formatPrintMoney(freightTotal)}</td>
                   </tr>
                   <tr>
-                    <td>CGST@{data.cgstPct || 0}%</td>
+                    <td>CGST @{data.cgstPct || 0}%</td>
                     <td className="bill-print-right">{fmtTax(data.cgstAmt)}</td>
                   </tr>
                   <tr>
-                    <td>SGST@{data.sgstPct || 0}%</td>
+                    <td>SGST @{data.sgstPct || 0}%</td>
                     <td className="bill-print-right">{fmtTax(data.sgstAmt)}</td>
                   </tr>
                   <tr>
-                    <td>IGST@{data.igstPct || 0}%</td>
+                    <td>IGST @{data.igstPct || 0}%</td>
                     <td className="bill-print-right">{fmtTax(data.igstAmt)}</td>
                   </tr>
-                  <tr>
+                  <tr className="bill-print-grand">
                     <td className="bill-print-bold">Grand Total</td>
                     <td className="bill-print-right bill-print-bold">{formatPrintMoney(data.grandTotal)}</td>
                   </tr>
@@ -346,11 +357,11 @@ export function BillTaxInvoice({
           </tr>
           <tr>
             <td colSpan={leftCols}>
-              <span className="bill-print-label">Amout in Words :</span> {amountInWordsIndian(data.grandTotal)}
+              <span className="bill-print-label">{wordsLabel}</span> {amountInWordsIndian(data.grandTotal)}
             </td>
           </tr>
           <tr>
-            <td colSpan={leftCols} className="bill-print-heading bill-print-bold">
+            <td colSpan={leftCols} className="bill-print-bankhead bill-print-bold">
               Bank Details
             </td>
           </tr>
@@ -369,9 +380,6 @@ export function BillTaxInvoice({
                 </tbody>
               </table>
             </td>
-          </tr>
-          <tr>
-            <td colSpan={leftCols}>&nbsp;</td>
           </tr>
 
           <tr>
