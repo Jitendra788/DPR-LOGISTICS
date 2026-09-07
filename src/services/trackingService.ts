@@ -263,12 +263,12 @@ export async function trackShipment(input: {
       return { ok: false, error: "This tracking link is invalid or expired.", code: "NOT_FOUND" };
     }
 
-    if (!trimmed) {
-      return { ok: false, error: "Please enter a GC / LR / Docket number.", code: "INVALID" };
-    }
+  if (!trimmed) {
+    return { ok: false, error: "Please enter a GC / LR / Docket number.", code: "INVALID" };
+  }
     if (trimmed.length < 3) {
-      return { ok: false, error: "Tracking number is too short. Check and try again.", code: "INVALID" };
-    }
+    return { ok: false, error: "Tracking number is too short. Check and try again.", code: "INVALID" };
+  }
 
     const fromDb = await buildFromLrTrip(trimmed);
     if (fromDb) {

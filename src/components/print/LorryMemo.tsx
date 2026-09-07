@@ -258,7 +258,7 @@ export function LorryMemo({ lhc, rows, company = lrPrintCompany }: Props) {
             ),
           )}
 
-          {/* Under Actual Weight: Total Freight / Advance / Cash / Transfer / Fuel / Balance — thick grid rows */}
+          {/* Under Actual Weight: label | amount (no vertical line before amount) */}
           <tr>
             <td colSpan={2} className="lhc-memo-finance-label lhc-memo-center">
               Total Articals
@@ -266,8 +266,9 @@ export function LorryMemo({ lhc, rows, company = lrPrintCompany }: Props) {
             <td className="lhc-memo-finance-label lhc-memo-center">{articleCount || ""}</td>
             <td />
             <td className="lhc-memo-finance-label">Total Freight</td>
-            <td />
-            <td className="lhc-memo-finance-value">{money(lhc.lorryFreight)}</td>
+            <td colSpan={2} className="lhc-memo-finance-value">
+              {money(lhc.lorryFreight)}
+            </td>
           </tr>
 
           <tr>
@@ -275,28 +276,33 @@ export function LorryMemo({ lhc, rows, company = lrPrintCompany }: Props) {
               GST No. {company.companyGst} / PAN No.{company.companyPan}
             </td>
             <td className="lhc-memo-finance-label">Advance</td>
-            <td />
-            <td className="lhc-memo-finance-value">{money(lhc.totalAdvance)}</td>
+            <td colSpan={2} className="lhc-memo-finance-value">
+              {money(lhc.totalAdvance)}
+            </td>
           </tr>
           <tr>
             <td className="lhc-memo-finance-label">Cash</td>
-            <td />
-            <td className="lhc-memo-finance-value">{money(lhc.cash)}</td>
+            <td colSpan={2} className="lhc-memo-finance-value">
+              {money(lhc.cash)}
+            </td>
           </tr>
           <tr>
             <td className="lhc-memo-finance-label">Transfer</td>
-            <td />
-            <td className="lhc-memo-finance-value">{money(lhc.transfer)}</td>
+            <td colSpan={2} className="lhc-memo-finance-value">
+              {money(lhc.transfer)}
+            </td>
           </tr>
           <tr>
             <td className="lhc-memo-finance-label">Fuel</td>
-            <td />
-            <td className="lhc-memo-finance-value">{money(lhc.fuel)}</td>
+            <td colSpan={2} className="lhc-memo-finance-value">
+              {money(lhc.fuel)}
+            </td>
           </tr>
           <tr>
             <td className="lhc-memo-finance-label">Balance</td>
-            <td />
-            <td className="lhc-memo-finance-value">{money(lhc.balance)}</td>
+            <td colSpan={2} className="lhc-memo-finance-value">
+              {money(lhc.balance)}
+            </td>
           </tr>
 
           <tr>
