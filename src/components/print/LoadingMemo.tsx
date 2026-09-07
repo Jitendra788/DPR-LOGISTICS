@@ -73,9 +73,7 @@ export function LoadingMemo({ data }: { data: LoadingMemoData }) {
                 Slip No. <strong>{data.slipNo || "____"}</strong>
               </p>
               <p>
-                To,
-                <br />
-                <strong>{partyLabel}</strong>
+                To,<strong>{partyLabel}</strong>
               </p>
               <p>Dear Sir, With reference to your telephonic message we hereby send</p>
               <p>
