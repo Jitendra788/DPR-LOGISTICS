@@ -23,7 +23,7 @@
 }
 
 .lhc-memo-table > tbody > tr > td {
-  border: 1px solid #000;
+  border: 2px solid #000;
   padding: 4px 6px;
   vertical-align: top;
   word-wrap: break-word;
@@ -41,7 +41,7 @@
 }
 
 .lhc-memo-nested td {
-  border: 1px solid #000;
+  border: 2px solid #000;
   padding: 2px 5px;
   vertical-align: middle;
 }
@@ -147,25 +147,29 @@
 }
 
 .lhc-memo-finance-label {
-  font-weight: 700;
-  text-align: center;
+  font-weight: 800;
+  text-align: left;
   vertical-align: middle !important;
+  padding: 5px 8px !important;
+  border: 2px solid #000 !important;
 }
 
 .lhc-memo-finance-value {
-  font-weight: 700;
+  font-weight: 800;
   text-align: right;
   vertical-align: middle !important;
-  padding-right: 8px !important;
+  padding: 5px 10px !important;
+  border: 2px solid #000 !important;
 }
 
 .lhc-memo-gst-pan {
   text-align: center;
-  font-weight: 800;
-  font-size: 12px;
+  font-weight: 900;
+  font-size: 13px;
   color: #c00000;
   vertical-align: middle !important;
   padding: 8px 6px !important;
+  border: 2px solid #000 !important;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
 }
@@ -216,6 +220,14 @@
     margin: 0;
     box-shadow: none;
     border: 2px solid #000;
+  }
+
+  .lhc-memo-table > tbody > tr > td,
+  .lhc-memo-nested td,
+  .lhc-memo-finance-label,
+  .lhc-memo-finance-value,
+  .lhc-memo-gst-pan {
+    border: 2px solid #000 !important;
   }
 
   .lhc-memo-title-red,
