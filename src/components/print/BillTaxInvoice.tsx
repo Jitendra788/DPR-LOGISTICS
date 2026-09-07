@@ -49,14 +49,11 @@ export type BillPrintData = {
 
 export type BillPrintVariant = "weight" | "meter";
 
-/** Prefer charged/act weight as stored on old prints (e.g. 7 TN 32 FEET). */
+/** Old ASP Weight column = charged/act weight only (e.g. 18TN32FEET), not goods desc. */
 function lrWeight(row: BillPrintLr) {
   const w = String(row.chargedWeight || row.actWeight || "").trim();
-  const p = String(row.particulars || "").trim();
-  if (!w) return p;
-  if (!p || w.toUpperCase() === p.toUpperCase()) return w;
-  if (w.toUpperCase().includes(p.toUpperCase()) || p.toUpperCase().includes(w.toUpperCase())) return w;
-  return `${w} ${p}`.replace(/\s+/g, " ").trim();
+  if (w) return w;
+  return String(row.particulars || "").trim();
 }
 
 function lrLineFreight(row: BillPrintLr) {
@@ -95,22 +92,22 @@ type Props = {
 /** Column % matched to old ASP landscape invoices */
 const WEIGHT_COLS = [
   "3%",
-  "7%",
+  "6.5%",
   "6%",
-  "9%",
+  "10%",
   "4%",
-  "9%",
-  "9%",
-  "6%",
-  "5%",
-  "5%",
-  "5%",
-  "5%",
-  "5%",
-  "5%",
-  "4%",
-  "5%",
   "8%",
+  "8%",
+  "6%",
+  "5%",
+  "5%",
+  "5.5%",
+  "5.5%",
+  "5.5%",
+  "4.5%",
+  "4%",
+  "4.5%",
+  "9%",
 ] as const;
 
 const METER_COLS = [
@@ -191,9 +188,9 @@ export function BillTaxInvoice({
               <div className="bill-print-title-red">{company.name}</div>
               <div className="bill-print-subtitle-red">{company.tagline}</div>
               <div className="bill-print-addr">
-                {company.address}
+                {company.address} E-mail : {company.email}.
                 <br />
-                E-mail : {company.email}. Mob. : {company.phones.replace(/\s*\/\s*/g, ", ")}
+                Mob. : {company.phones.replace(/\s*\/\s*/g, ", ")}
               </div>
               {company.companyGst ? (
                 <div className="bill-print-bold bill-print-gstline">GST : {company.companyGst}</div>
