@@ -1,5 +1,5 @@
-import { BRAND_LOGO_HEADER } from "@/lib/brand";
-import { formatPrintDate, formatPrintMoney, lrPrintCompany } from "@/lib/lr-print";
+import { BRAND_LOGO_HEADER, BRAND_STAMP } from "@/lib/brand";
+import { formatPrintDate, lrPrintCompany } from "@/lib/lr-print";
 import { stripLrPrefix } from "@/lib/lr-no";
 import { normalizeLrType } from "@/lib/lr-type";
 import "./lr-print.css";
@@ -79,17 +79,6 @@ function partyLine(party: LrPrintParty | undefined, fallbackName: string) {
   };
 }
 
-function gstPaidMark(gstPaidBy: string | undefined, option: string) {
-  const raw = String(gstPaidBy || "").trim().toLowerCase();
-  const opt = option.toLowerCase();
-  if (!raw) return "";
-  if (opt === "dprl" && (raw.includes("dpr") || raw === "self" || raw.includes("transporter"))) {
-    return "✓";
-  }
-  if (raw.includes(opt) || raw === opt) return "✓";
-  return "";
-}
-
 export function LrConsignmentNote({
   booking,
   copyLabel,
@@ -100,22 +89,11 @@ export function LrConsignmentNote({
 }: Props) {
   const consignor = partyLine(consignorParty, booking.consignor);
   const consignee = partyLine(consigneeParty, booking.consignee);
-  const total =
-    booking.total ??
-    booking.freight +
-      (booking.serviceTax || 0) +
-      (booking.haltage || 0) +
-      (booking.insurance || 0) +
-      (booking.stCharges || 0) +
-      (booking.doorCollection || 0) +
-      (booking.barrier || 0) +
-      (booking.other || 0) +
-      (booking.hamali || 0);
+  const type = normalizeLrType(booking.lrType);
   const handlingLabel =
     copyLabel.toLowerCase().includes("lorry") || copyLabel.toLowerCase().includes("lory")
       ? "Handling"
       : "Halting";
-  const type = normalizeLrType(booking.lrType);
   const gstHead =
     type === "Paid"
       ? "Freight Paid"
@@ -230,88 +208,106 @@ export function LrConsignmentNote({
             <td>{gstHead}</td>
           </tr>
 
-          {/* Articles body — nested weight / rate / freight / gst columns */}
-          <tr>
+          {/* Articles body — 4 columns, same 6-row lines */}
+          <tr className="lr-print-charges-row">
             <td className="lr-print-center lr-print-value lr-print-bold">{booking.articles}</td>
             <td className="lr-print-value">{booking.particulars}</td>
             <td className="lr-print-center lr-print-value">{booking.invNoDate}</td>
             <td className="lr-print-no-pad">
-              <table className="lr-nested lr-nested-fill">
+              <table className="lr-charges-col">
                 <tbody>
                   <tr>
                     <td className="lr-print-label">Act Weight</td>
-                    <td>{booking.actWeight}</td>
+                    <td className="lr-print-center">{booking.actWeight}</td>
                   </tr>
                   <tr>
                     <td className="lr-print-label">Chg.Wt.</td>
-                    <td>{booking.chargedWeight}</td>
+                    <td className="lr-print-center">{booking.chargedWeight}</td>
                   </tr>
                   <tr>
                     <td className="lr-print-label">Meter</td>
-                    <td>{booking.totalMeter}</td>
+                    <td className="lr-print-center">{booking.totalMeter}</td>
+                  </tr>
+                  <tr>
+                    <td colSpan={2}>&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td colSpan={2}>&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td colSpan={2}>&nbsp;</td>
                   </tr>
                 </tbody>
               </table>
             </td>
             <td className="lr-print-no-pad">
-              <table className="lr-nested lr-nested-fill">
+              <table className="lr-charges-col">
                 <tbody>
                   <tr>
-                    <td className="lr-print-label">Freight Rs</td>
+                    <td>Freight Rs</td>
                   </tr>
                   <tr>
-                    <td className="lr-print-label">Ser.Tax</td>
+                    <td>Ser.Tax</td>
                   </tr>
                   <tr>
-                    <td className="lr-print-label">{handlingLabel}</td>
+                    <td>{handlingLabel}</td>
                   </tr>
                   <tr>
-                    <td className="lr-print-label">Insurance</td>
+                    <td>Insurance</td>
                   </tr>
                   <tr>
-                    <td className="lr-print-label">St.Charges</td>
+                    <td>St.Charges</td>
                   </tr>
                   <tr>
-                    <td className="lr-print-label">Total Amt.</td>
+                    <td className="lr-print-bold">Total Amt.</td>
                   </tr>
                 </tbody>
               </table>
             </td>
             <td className="lr-print-no-pad">
-              <table className="lr-nested lr-nested-fill">
+              <table className="lr-charges-col">
                 <tbody>
                   <tr>
-                    <td className="lr-print-right">&nbsp;</td>
+                    <td className="lr-freight-amt">&nbsp;</td>
                   </tr>
                   <tr>
-                    <td className="lr-print-right">{formatPrintMoney(booking.serviceTax || 0)}</td>
+                    <td className="lr-freight-amt">&nbsp;</td>
                   </tr>
                   <tr>
-                    <td className="lr-print-right">{formatPrintMoney(booking.haltage || 0)}</td>
+                    <td className="lr-freight-amt">&nbsp;</td>
                   </tr>
                   <tr>
-                    <td className="lr-print-right">{formatPrintMoney(booking.insurance || 0)}</td>
+                    <td className="lr-freight-amt">&nbsp;</td>
                   </tr>
                   <tr>
-                    <td className="lr-print-right">{formatPrintMoney(booking.stCharges || 0)}</td>
+                    <td className="lr-freight-amt">&nbsp;</td>
                   </tr>
                   <tr>
-                    <td className="lr-print-right lr-print-bold">{formatPrintMoney(total)}</td>
+                    <td className="lr-freight-amt">&nbsp;</td>
                   </tr>
                 </tbody>
               </table>
             </td>
             <td className="lr-print-no-pad">
-              <table className="lr-nested lr-nested-fill">
+              <table className="lr-charges-col">
                 <tbody>
                   <tr>
-                    <td>Consignor {gstPaidMark(booking.gstPaidBy, "Consignor")}</td>
+                    <td className="lr-print-center">Consignor</td>
                   </tr>
                   <tr>
-                    <td>Consignee {gstPaidMark(booking.gstPaidBy, "Consignee")}</td>
+                    <td className="lr-print-center">Consignee</td>
                   </tr>
                   <tr>
-                    <td>DPRL {gstPaidMark(booking.gstPaidBy, "DPRL")}</td>
+                    <td className="lr-print-center">DPRL</td>
+                  </tr>
+                  <tr>
+                    <td>&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td>&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td>&nbsp;</td>
                   </tr>
                 </tbody>
               </table>
@@ -325,13 +321,14 @@ export function LrConsignmentNote({
             </td>
           </tr>
 
-          {/* Value + signature */}
+          {/* Value + signature / stamp (mor) */}
           <tr>
             <td colSpan={4}>
               <span className="lr-print-label">Value Rs.</span> {booking.valueRs}
             </td>
-            <td colSpan={3} className="lr-print-bold lr-print-sign">
-              For {company.name}
+            <td colSpan={3} className="lr-print-sign">
+              <div className="lr-print-bold">For {company.name}</div>
+              <img src={BRAND_STAMP} alt="DPR Logistics stamp" className="lr-print-stamp" />
             </td>
           </tr>
 
