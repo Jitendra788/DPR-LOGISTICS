@@ -15,6 +15,8 @@
   font-size: 14px;
   line-height: 1.4;
   box-sizing: border-box;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 .lm-table {
@@ -24,7 +26,7 @@
 }
 
 .lm-table > tbody > tr > td {
-  border: 2px solid #000;
+  border: 1.5px solid #000;
   vertical-align: top;
   padding: 6px 8px;
 }
@@ -43,6 +45,8 @@
   object-fit: contain;
   display: block;
   margin: 0 auto;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }
 
 .lm-head-main {
@@ -95,7 +99,6 @@
 }
 
 .lm-tb-left {
-  width: 28%;
   font-size: 14px;
 }
 
@@ -114,14 +117,13 @@
 }
 
 .lm-tb-date {
-  width: 26%;
   text-align: right;
   font-size: 14px;
   font-weight: 700;
 }
 
 .lm-body {
-  min-height: 170px;
+  min-height: 175px;
   font-size: 15px;
   padding: 10px 12px !important;
 }
@@ -142,7 +144,7 @@
 }
 
 .lm-bank {
-  min-height: 110px;
+  min-height: 120px;
   font-size: 13px;
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -159,26 +161,31 @@
 
 .lm-sign {
   text-align: center;
-  min-height: 110px;
+  min-height: 120px;
+  vertical-align: top !important;
 }
 
 .lm-sign-for {
   font-weight: 800;
   font-size: 13px;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
-.lm-stamp {
+.lm-signature {
   display: block;
-  width: 88px;
+  width: 150px;
   height: auto;
-  margin: 4px auto;
-  -webkit-print-color-adjust: exact;
-  print-color-adjust: exact;
+  max-height: 58px;
+  object-fit: contain;
+  margin: 8px auto 6px;
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
 }
 
 .lm-care {
-  margin-top: 6px;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px solid #000;
   font-size: 12.5px;
   font-weight: 700;
   font-family: Arial, Helvetica, sans-serif;
@@ -232,9 +239,9 @@
   .lm-name,
   .lm-tag,
   .lm-logo,
-  .lm-stamp {
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+  .lm-signature {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   .no-print {

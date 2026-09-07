@@ -1,4 +1,4 @@
-import { ROADWAYS_LOGO, ROADWAYS_STAMP } from "@/lib/brand";
+import { ROADWAYS_LOGO, ROADWAYS_SIGNATURE } from "@/lib/brand";
 import { roadwaysPrintCompany, type LoadingMemoData } from "@/lib/roadways-print";
 import "./loading-memo.css";
 
@@ -32,6 +32,12 @@ export function LoadingMemo({ data }: { data: LoadingMemoData }) {
   return (
     <section className="lm-sheet">
       <table className="lm-table">
+        <colgroup>
+          <col style={{ width: "26%" }} />
+          <col style={{ width: "24%" }} />
+          <col style={{ width: "24%" }} />
+          <col style={{ width: "26%" }} />
+        </colgroup>
         <tbody>
           <tr>
             <td className="lm-logo-cell">
@@ -115,7 +121,7 @@ export function LoadingMemo({ data }: { data: LoadingMemoData }) {
             <td colSpan={2} className="lm-sign">
               <div className="lm-sign-for">For {c.name}</div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={ROADWAYS_STAMP} alt="stamp" className="lm-stamp" />
+              <img src={ROADWAYS_SIGNATURE} alt="Authorised signature" className="lm-signature" />
               <div className="lm-care">Customer Care No : {c.customerCare}</div>
             </td>
           </tr>
