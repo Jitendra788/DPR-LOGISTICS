@@ -177,11 +177,11 @@
   color: #000000 !important;
 }
 
-/* Table headers ~9–10pt — must stay one line */
+/* Table headers — tight fit inside cell borders (no overflow) */
 .bill-print-th {
   font-weight: 800 !important;
-  font-size: 9pt !important;
-  padding: 3px 0 !important;
+  font-size: 8pt !important;
+  padding: 2px 0 !important;
   vertical-align: middle !important;
   background: #ffffff !important;
   color: #000000 !important;
@@ -193,11 +193,12 @@
   white-space: nowrap !important;
   word-break: keep-all !important;
   overflow: hidden !important;
+  text-overflow: clip !important;
   overflow-wrap: normal !important;
-  line-height: 1.1 !important;
-  letter-spacing: -0.15px;
-  padding-left: 1px !important;
-  padding-right: 1px !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.3px;
+  padding: 2px 0 !important;
+  box-sizing: border-box !important;
 }
 
 /* Table data ~9–10pt */
@@ -390,7 +391,10 @@
 
   .bill-print-th > td {
     white-space: nowrap !important;
-    font-size: 9pt !important;
+    font-size: 8pt !important;
+    letter-spacing: -0.3px !important;
+    padding: 2px 0 !important;
+    overflow: hidden !important;
   }
 
   .bill-print-data td {

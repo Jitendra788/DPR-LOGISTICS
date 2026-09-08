@@ -94,44 +94,44 @@ type Props = {
   docTitle?: string;
 };
 
-/** Column % — Insurance / St.Charges / Hamali fit at ~9pt headers */
+/** Column % — Sr No / Ser Tax / St.Charges / Door Colle. stay inside borders */
 const WEIGHT_COLS = [
-  "3%",
-  "5.5%",
-  "5.5%",
-  "6%",
   "4%",
-  "7.5%",
-  "7.5%",
   "5.5%",
-  "4.5%",
   "5.5%",
-  "7%",
+  "5.5%",
+  "4%",
   "6.5%",
   "6.5%",
   "5%",
+  "6%",
+  "5.5%",
+  "6.5%",
+  "7.5%",
+  "7.5%",
+  "5%",
   "5.5%",
   "4.5%",
-  "10.5%",
+  "9.5%",
 ] as const;
 
 const METER_COLS = [
-  "3%",
+  "4%",
   "6%",
   "5.5%",
-  "9%",
-  "9%",
-  "5.5%",
+  "8.5%",
+  "8.5%",
+  "5%",
   "4.5%",
-  "4.5%",
+  "5.5%",
   "5.5%",
   "6.5%",
-  "6.5%",
-  "6.5%",
+  "7%",
+  "7%",
   "5%",
   "5.5%",
   "4.5%",
-  "13%",
+  "11.5%",
 ] as const;
 
 export function BillTaxInvoice({
