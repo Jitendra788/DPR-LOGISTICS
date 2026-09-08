@@ -172,18 +172,20 @@
   background: #ffffff !important;
 }
 
-/* Bill No top / Date bottom — large gap like old ASP */
+/* Bill No top / Date lower — moderate gap like old ASP */
 .bill-print-party-meta {
   vertical-align: top !important;
-  height: 1px; /* stretch with sibling party cell */
+  height: 1px;
 }
 
 .bill-print-party-meta-inner {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  min-height: 78px;
-  height: 100%;
+  justify-content: flex-start;
+  gap: 22px;
+  min-height: 0;
+  height: auto;
+  padding-top: 2px;
 }
 
 .bill-print-label {

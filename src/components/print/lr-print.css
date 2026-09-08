@@ -327,13 +327,13 @@
 }
 
 .lr-print-table > tbody > tr > td.lr-print-gst-pan {
-  text-align: center !important;
+  text-align: left !important;
   vertical-align: middle !important;
   font-weight: 900 !important;
   font-size: 11.5px !important;
   font-family: Arial, Helvetica, sans-serif !important;
   color: #000000 !important;
-  padding: 2px 4px !important;
+  padding: 2px 6px !important;
   letter-spacing: 0.15px;
   background: #ffffff !important;
   border: 1.5px solid #000000 !important;
