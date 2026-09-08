@@ -254,13 +254,22 @@
   padding: 4px 6px !important;
   color: #000000 !important;
   background: #ffffff !important;
+  font-family: Arial, Helvetica, sans-serif !important;
 }
 
 .bill-print-words {
-  font-size: 10.5px !important;
-  padding: 3px 5px !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  padding: 4px 6px !important;
   color: #000000 !important;
   background: #ffffff !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  line-height: 1.25;
+}
+
+.bill-print-words .bill-print-label {
+  font-size: 13px !important;
+  font-weight: 800 !important;
 }
 
 .bill-print-sign-cell {
@@ -345,13 +354,19 @@
     print-color-adjust: exact !important;
   }
 
-  .bill-print-taxbox td,
-  .bill-print-grand td {
+  .bill-print-total-row {
     font-size: 13px !important;
     font-weight: 800 !important;
   }
 
-  .bill-print-total-row {
+  .bill-print-words,
+  .bill-print-words .bill-print-label {
+    font-size: 13px !important;
+    font-weight: 800 !important;
+  }
+
+  .bill-print-taxbox td,
+  .bill-print-grand td {
     font-size: 13px !important;
     font-weight: 800 !important;
   }

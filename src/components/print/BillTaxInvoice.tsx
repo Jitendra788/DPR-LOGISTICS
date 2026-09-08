@@ -363,8 +363,7 @@ export function BillTaxInvoice({
           </tr>
           <tr>
             <td colSpan={leftCols} className="bill-print-words">
-              <span className="bill-print-label">{wordsLabel}</span>
-              {amountInWordsIndian(data.grandTotal)}
+              <span className="bill-print-label">{wordsLabel}</span>{amountInWordsIndian(data.grandTotal)}
             </td>
           </tr>
           <tr>
