@@ -819,3 +819,46 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   font-size: 13px;
   color: #64748b;
 }
+
+/* LHC Payment Entry */
+.lhc-pay-filters {
+  display: grid;
+  grid-template-columns: minmax(200px, 1.2fr) minmax(160px, 0.8fr) auto;
+  gap: 14px 18px;
+  align-items: end;
+}
+
+.lhc-pay-filters .form-group {
+  margin-bottom: 0;
+}
+
+.lhc-pay-filters-action {
+  padding-bottom: 2px;
+}
+
+.lhc-pay-table th,
+.lhc-pay-table td {
+  padding: 8px 8px;
+  vertical-align: middle;
+}
+
+.lhc-pay-table .lhc-pay-lrnos {
+  white-space: normal;
+  min-width: 90px;
+  max-width: 140px;
+}
+
+.lhc-pay-narration {
+  width: 100%;
+  min-width: 140px;
+  max-width: 220px;
+  height: 32px;
+  min-height: 32px;
+}
+
+@media (max-width: 900px) {
+  .lhc-pay-filters {
+    grid-template-columns: 1fr;
+  }
+}
+

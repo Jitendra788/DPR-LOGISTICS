@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { FormCard, TwoCol } from "@/components/ui/FormCard";
+import { FormCard } from "@/components/ui/FormCard";
 import { DateField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
@@ -212,39 +212,40 @@ export default function LhcPaymentPage() {
   );
 
   return (
-    <>
+    <div className="lhc-payment-page">
       <PageHeader
         title="LHC Payment Entry"
-        subtitle="Select and fill data for the lhc payment"
+        subtitle="Select vehicle and enter payment against outstanding LHC"
         crumbs={[{ label: "Home", href: "/dashboard" }, { label: "LHC Payment" }]}
       />
       <Flash message={message} />
       <form onSubmit={showReport}>
         <FormCard>
-          <TwoCol>
-            <div>
-              <ComboboxField
-                label="Select Veh No"
-                value={vehNo}
-                onChange={setVehNo}
-                options={vehOptions}
-                placeholder="Search or select vehicle"
-              />
-              <Button type="submit" variant="teal" className="mt-1" disabled={loading}>
+          <div className="lhc-pay-filters">
+            <ComboboxField
+              label="Select Veh No"
+              value={vehNo}
+              onChange={setVehNo}
+              options={vehOptions}
+              placeholder="Search or select vehicle"
+            />
+            <DateField label="Paid Date" value={paidDate} onChange={setPaidDate} />
+            <div className="lhc-pay-filters-action">
+              <Button type="submit" variant="teal" disabled={loading}>
                 {loading ? "Loading…" : "Show Report"}
               </Button>
             </div>
-            <div>
-              <DateField label="Paid Date" value={paidDate} onChange={setPaidDate} />
-            </div>
-          </TwoCol>
+          </div>
         </FormCard>
       </form>
 
       {rows.length ? (
         <div className="box overflow-x-auto">
+          <div className="box-header !py-2">
+            <strong>Outstanding LHC — {vehNo}</strong>
+          </div>
           <div className="box-body !py-2 !px-2">
-            <table className="erp-dt mr-receipt-table w-full min-w-[1100px] border-collapse text-[13px]">
+            <table className="erp-dt mr-receipt-table lhc-pay-table w-full min-w-[1100px] border-collapse text-[13px]">
               <thead>
                 <tr>
                   <th>Sr No</th>
@@ -259,6 +260,7 @@ export default function LhcPaymentPage() {
                   <th>Paid Amount</th>
                   <th>Other Ded.</th>
                   <th>Narration</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -268,14 +270,16 @@ export default function LhcPaymentPage() {
                   return (
                     <tr key={row.id}>
                       <td>{row.id}</td>
-                      <td>{row.challanNo}</td>
+                      <td className="font-semibold">{row.challanNo}</td>
                       <td>{row.vehNo}</td>
                       <td>{row.fromStation}</td>
                       <td>{row.toStation}</td>
-                      <td>{row.lrNos}</td>
+                      <td className="lhc-pay-lrnos">{row.lrNos}</td>
                       <td>{slashDate(row.challanDate)}</td>
                       <td>{row.brokerName}</td>
-                      <td className="text-right">{cellMoneyText(outstanding)}</td>
+                      <td className="text-right font-semibold whitespace-nowrap">
+                        ₹{Number(outstanding).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                      </td>
                       <td>
                         <CellMoneyInput
                           value={d.paidAmt}
@@ -291,30 +295,36 @@ export default function LhcPaymentPage() {
                         />
                       </td>
                       <td>
-                        <div className="flex items-center gap-1">
-                          <input
-                            className="form-control mr-cell-input mr-narration-input"
-                            value={d.narration}
-                            onChange={(e) => updateDraft(row.id, { narration: e.target.value })}
-                          />
-                          <Button type="button" size="sm" variant="teal" onClick={() => savePayment(row)}>
-                            Save
-                          </Button>
-                        </div>
+                        <input
+                          className="form-control mr-cell-input lhc-pay-narration"
+                          value={d.narration}
+                          onChange={(e) => updateDraft(row.id, { narration: e.target.value })}
+                          placeholder="Narration"
+                        />
+                      </td>
+                      <td>
+                        <Button type="button" size="sm" variant="teal" onClick={() => savePayment(row)}>
+                          Save
+                        </Button>
                       </td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
-            <p className="mt-3 text-sm font-semibold">
-              Total Outstanding: ₹{totalOutstanding.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+            <p className="mt-3 mb-1 text-sm font-semibold">
+              Total Outstanding: ₹
+              {totalOutstanding.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </p>
           </div>
         </div>
       ) : (
-        <FormCard className="min-h-16" />
+        <FormCard>
+          <p className="m-0 py-5 text-center text-sm text-[#64748b]">
+            {loading ? "Loading…" : "Select vehicle and click Show Report."}
+          </p>
+        </FormCard>
       )}
-    </>
+    </div>
   );
 }
