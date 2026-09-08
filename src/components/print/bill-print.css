@@ -185,8 +185,8 @@
 
 .bill-print-th {
   font-weight: 800 !important;
-  font-size: 8.5px !important;
-  padding: 3px 1px !important;
+  font-size: 8px !important;
+  padding: 2px 0 !important;
   vertical-align: middle !important;
   background: #ffffff !important;
   color: #000000 !important;
@@ -197,8 +197,12 @@
   color: #000000 !important;
   white-space: nowrap !important;
   word-break: keep-all !important;
+  overflow: hidden !important;
   overflow-wrap: normal !important;
-  line-height: 1.15 !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.2px;
+  padding-left: 1px !important;
+  padding-right: 1px !important;
 }
 
 .bill-print-logo-cell {
@@ -330,7 +334,8 @@
   .bill-print-th > td {
     white-space: nowrap !important;
     word-break: keep-all !important;
-    font-size: 8.5px !important;
+    overflow: hidden !important;
+    font-size: 8px !important;
   }
 
   .bill-print-title-red,

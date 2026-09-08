@@ -94,44 +94,44 @@ type Props = {
   docTitle?: string;
 };
 
-/** Column % matched to old ASP landscape invoices — charge headers stay one line */
+/** Column % — long headers (Insurance, St.Charges, Hamali) must fit inside borders */
 const WEIGHT_COLS = [
   "3%",
   "6%",
   "5.5%",
-  "6.5%",
+  "6%",
   "4%",
   "8%",
   "8%",
   "5.5%",
   "4.5%",
-  "5%",
-  "5%",
+  "5.5%",
   "7%",
-  "7%",
+  "6.5%",
+  "6.5%",
   "5%",
-  "6%",
+  "5.5%",
   "4.5%",
-  "9.5%",
+  "9%",
 ] as const;
 
 const METER_COLS = [
   "3%",
-  "7%",
+  "6.5%",
   "5.5%",
-  "10%",
-  "10%",
+  "9%",
+  "9%",
   "5.5%",
   "4.5%",
   "4.5%",
-  "5%",
-  "5%",
+  "5.5%",
   "6.5%",
   "6.5%",
+  "6.5%",
   "5%",
   "5.5%",
   "4.5%",
-  "12%",
+  "12.5%",
 ] as const;
 
 export function BillTaxInvoice({
