@@ -172,6 +172,20 @@
   background: #ffffff !important;
 }
 
+/* Bill No top / Date bottom — large gap like old ASP */
+.bill-print-party-meta {
+  vertical-align: top !important;
+  height: 1px; /* stretch with sibling party cell */
+}
+
+.bill-print-party-meta-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 78px;
+  height: 100%;
+}
+
 .bill-print-label {
   font-weight: 700;
   color: #000000 !important;

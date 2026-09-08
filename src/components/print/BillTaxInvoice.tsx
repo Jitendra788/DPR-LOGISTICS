@@ -228,12 +228,14 @@ export function BillTaxInvoice({
                 <span className="bill-print-label">PO No.:</span> {data.poNo || ""}
               </div>
             </td>
-            <td colSpan={colCount - Math.floor(colCount * 0.78)} className="bill-print-party">
-              <div>
-                <span className="bill-print-label">Bill No:-</span> {data.billNo}
-              </div>
-              <div>
-                <span className="bill-print-label">Date :-</span> {formatPrintDate(data.billDate)}
+            <td colSpan={colCount - Math.floor(colCount * 0.78)} className="bill-print-party bill-print-party-meta">
+              <div className="bill-print-party-meta-inner">
+                <div>
+                  <span className="bill-print-label">Bill No:-</span> {data.billNo}
+                </div>
+                <div>
+                  <span className="bill-print-label">Date :-</span> {formatPrintDate(data.billDate)}
+                </div>
               </div>
             </td>
           </tr>
