@@ -61,7 +61,7 @@ export default function SimConsentPage() {
   }
 
   return (
-    <div className="lt-share">
+    <div className="lt-share sim-consent">
       <header>
         <Link href="/">DPR Logistics</Link>
         <span>SIM Location Consent</span>

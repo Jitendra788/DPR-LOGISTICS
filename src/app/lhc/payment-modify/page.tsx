@@ -343,6 +343,7 @@ export default function LhcPaymentModifyPage() {
       {rows.length ? (
         <div className="box overflow-x-auto">
           <div className="box-body !py-2 !px-2">
+            <div className="table-scroll">
             <table className="erp-dt mr-receipt-table w-full min-w-[1000px] border-collapse text-[13px]">
               <thead>
                 <tr>
@@ -406,6 +407,7 @@ export default function LhcPaymentModifyPage() {
                 })}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       ) : (

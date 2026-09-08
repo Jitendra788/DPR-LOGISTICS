@@ -3,25 +3,31 @@
 type BarItem = { label: string; value: number };
 
 export function BarChart({ data, color = "#0f766e" }: { data: BarItem[]; color?: string }) {
-  const max = Math.max(1, ...data.map((d) => d.value));
+  const max = Math.max(1, ...data.map((d) => Math.abs(d.value)));
   const empty = data.every((d) => d.value === 0);
 
   return (
     <div className="erp-chart">
       {empty ? <p className="erp-empty">No data for this period</p> : null}
       <div className="erp-bars" role="img" aria-label="Bar chart">
-        {data.map((d) => (
-          <div key={d.label} className="erp-bar-col">
-            <div className="erp-bar-track">
-              <div
-                className="erp-bar"
-                style={{ height: `${(d.value / max) * 100}%`, ...(color !== "#0f766e" ? { background: color } : {}) }}
-                title={`${d.label}: ${d.value}`}
-              />
+        {data.map((d) => {
+          const neg = d.value < 0;
+          return (
+            <div key={d.label} className="erp-bar-col">
+              <div className="erp-bar-track">
+                <div
+                  className={`erp-bar${neg ? " is-neg" : ""}`}
+                  style={{
+                    height: `${(Math.abs(d.value) / max) * 100}%`,
+                    ...(color !== "#0f766e" && !neg ? { background: color } : {}),
+                  }}
+                  title={`${d.label}: ${d.value.toLocaleString("en-IN")}`}
+                />
+              </div>
+              <span>{d.label}</span>
             </div>
-            <span>{d.label}</span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

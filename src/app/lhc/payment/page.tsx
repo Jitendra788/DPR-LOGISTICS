@@ -245,73 +245,75 @@ export default function LhcPaymentPage() {
             <strong>Outstanding LHC — {vehNo}</strong>
           </div>
           <div className="box-body !py-2 !px-2">
-            <table className="erp-dt mr-receipt-table lhc-pay-table w-full border-collapse text-[12px]">
-              <thead>
-                <tr>
-                  <th>Sr</th>
-                  <th>Challan</th>
-                  <th>Vehicle</th>
-                  <th>From</th>
-                  <th>To</th>
-                  <th>LR Nos</th>
-                  <th>Date</th>
-                  <th>Broker</th>
-                  <th>Outstanding</th>
-                  <th>Paid Amt</th>
-                  <th>Other Ded.</th>
-                  <th>Narration</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row) => {
-                  const outstanding = lhcOutstanding(row);
-                  const d = draftFor(row);
-                  return (
-                    <tr key={row.id}>
-                      <td>{row.id}</td>
-                      <td className="font-semibold">{row.challanNo}</td>
-                      <td>{row.vehNo}</td>
-                      <td>{row.fromStation}</td>
-                      <td>{row.toStation}</td>
-                      <td className="lhc-pay-lrnos">{row.lrNos}</td>
-                      <td>{slashDate(row.challanDate)}</td>
-                      <td className="lhc-pay-broker">{row.brokerName}</td>
-                      <td className="text-right font-semibold">
-                        ₹{Number(outstanding).toLocaleString("en-IN", { minimumFractionDigits: 0 })}
-                      </td>
-                      <td>
-                        <CellMoneyInput
-                          value={d.paidAmt}
-                          width="72px"
-                          onChange={(n) => updateDraft(row.id, { paidAmt: n })}
-                        />
-                      </td>
-                      <td>
-                        <CellMoneyInput
-                          value={d.otherDed}
-                          width="64px"
-                          onChange={(n) => updateDraft(row.id, { otherDed: n })}
-                        />
-                      </td>
-                      <td>
-                        <input
-                          className="form-control mr-cell-input lhc-pay-narration"
-                          value={d.narration}
-                          onChange={(e) => updateDraft(row.id, { narration: e.target.value })}
-                          placeholder="Narration"
-                        />
-                      </td>
-                      <td>
-                        <Button type="button" size="sm" variant="teal" onClick={() => savePayment(row)}>
-                          Save
-                        </Button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <div className="table-scroll">
+              <table className="erp-dt mr-receipt-table lhc-pay-table w-full border-collapse text-[12px]">
+                <thead>
+                  <tr>
+                    <th>Sr</th>
+                    <th>Challan</th>
+                    <th>Vehicle</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>LR Nos</th>
+                    <th>Date</th>
+                    <th>Broker</th>
+                    <th>Outstanding</th>
+                    <th>Paid Amt</th>
+                    <th>Other Ded.</th>
+                    <th>Narration</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rows.map((row) => {
+                    const outstanding = lhcOutstanding(row);
+                    const d = draftFor(row);
+                    return (
+                      <tr key={row.id}>
+                        <td>{row.id}</td>
+                        <td className="font-semibold">{row.challanNo}</td>
+                        <td>{row.vehNo}</td>
+                        <td>{row.fromStation}</td>
+                        <td>{row.toStation}</td>
+                        <td className="lhc-pay-lrnos">{row.lrNos}</td>
+                        <td>{slashDate(row.challanDate)}</td>
+                        <td className="lhc-pay-broker">{row.brokerName}</td>
+                        <td className="text-right font-semibold">
+                          ₹{Number(outstanding).toLocaleString("en-IN", { minimumFractionDigits: 0 })}
+                        </td>
+                        <td>
+                          <CellMoneyInput
+                            value={d.paidAmt}
+                            width="72px"
+                            onChange={(n) => updateDraft(row.id, { paidAmt: n })}
+                          />
+                        </td>
+                        <td>
+                          <CellMoneyInput
+                            value={d.otherDed}
+                            width="64px"
+                            onChange={(n) => updateDraft(row.id, { otherDed: n })}
+                          />
+                        </td>
+                        <td>
+                          <input
+                            className="form-control mr-cell-input lhc-pay-narration"
+                            value={d.narration}
+                            onChange={(e) => updateDraft(row.id, { narration: e.target.value })}
+                            placeholder="Narration"
+                          />
+                        </td>
+                        <td>
+                          <Button type="button" size="sm" variant="teal" onClick={() => savePayment(row)}>
+                            Save
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
             <p className="mt-3 mb-1 text-sm font-semibold">
               Total Outstanding: ₹
               {totalOutstanding.toLocaleString("en-IN", { minimumFractionDigits: 2 })}

@@ -920,13 +920,187 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
+.erp-dash-banner-side {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.erp-dash-profit {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(6px);
+  min-width: 180px;
+}
+
+.erp-dash-profit.is-down {
+  background: rgba(254, 226, 226, 0.18);
+  border-color: rgba(254, 202, 202, 0.35);
+}
+
+.erp-dash-profit-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.erp-dash-profit-val {
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: #fff;
+}
+
+.erp-dash-profit-meta {
+  font-size: 11px;
+  opacity: 0.78;
+}
+
 @media (min-width: 768px) {
   .erp-dash-banner {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 18px;
+    padding: 18px 20px;
   }
+
+  .erp-dash-banner-side {
+    align-items: flex-end;
+  }
+
+  .erp-dash-profit {
+    text-align: right;
+    align-items: flex-end;
+  }
+}
+
+.erp-finance-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+@media (min-width: 900px) {
+  .erp-finance-strip {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.erp-finance-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.erp-finance-ico {
+  display: inline-flex;
+  height: 34px;
+  width: 34px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.erp-finance-card.tone-rev {
+  border-color: #99f6e4;
+  background: linear-gradient(160deg, #f0fdfa 0%, #fff 70%);
+}
+.erp-finance-card.tone-rev .erp-finance-ico {
+  background: #ccfbf1;
+  color: #0f766e;
+}
+
+.erp-finance-card.tone-cost .erp-finance-ico {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.erp-finance-card.tone-profit {
+  border-color: #6ee7b7;
+  background: linear-gradient(160deg, #ecfdf5 0%, #fff 70%);
+}
+.erp-finance-card.tone-profit .erp-finance-ico {
+  background: #d1fae5;
+  color: #047857;
+}
+.erp-finance-card.tone-profit .erp-finance-value {
+  color: #047857;
+}
+
+.erp-finance-card.tone-loss {
+  border-color: #fecaca;
+  background: linear-gradient(160deg, #fef2f2 0%, #fff 70%);
+}
+.erp-finance-card.tone-loss .erp-finance-ico {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+.erp-finance-card.tone-loss .erp-finance-value {
+  color: #b91c1c;
+}
+
+.erp-finance-label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.erp-finance-value {
+  margin: 3px 0 1px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: #0f172a;
+}
+
+.erp-finance-hint {
+  margin: 0;
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.erp-skel-light {
+  background: linear-gradient(90deg, rgba(255,255,255,0.25), rgba(255,255,255,0.45), rgba(255,255,255,0.25));
+  background-size: 200% 100%;
+}
+
+.erp-panel-meta {
+  font-size: 12px;
+  font-weight: 650;
+  color: #94a3b8;
+}
+
+.erp-bottom-full {
+  grid-template-columns: 1fr !important;
+}
+
+.erp-bar.is-neg {
+  background: linear-gradient(180deg, #f87171 0%, #b91c1c 100%);
 }
 
 .erp-hero {
@@ -1237,7 +1411,7 @@
 
 @media (min-width: 900px) {
   .erp-mid {
-    grid-template-columns: 1.4fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -2250,6 +2424,25 @@
   gap: 1rem;
 }
 
+.td-side-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.td-toolbar-detail {
+  margin-top: 0.85rem;
+  padding: 0.5rem;
+}
+
+.td-tool-btn-xs {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.72rem;
+  flex: 0 0 auto;
+  min-height: 0;
+}
+
 @media (min-width: 1024px) {
   .td-grid-main {
     grid-template-columns: 1fr 340px;
@@ -2365,6 +2558,16 @@
   .td-map-empty {
     height: min(380px, 50vh);
     min-height: 240px;
+  }
+
+  .td-tool-btn-xs {
+    flex: 0 0 auto;
+    width: auto;
+    min-height: 0;
+  }
+
+  .td-toolbar-detail .td-tool-btn {
+    flex: 1 1 100%;
   }
 }
 

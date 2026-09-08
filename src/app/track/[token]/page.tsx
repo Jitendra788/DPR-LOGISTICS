@@ -110,7 +110,7 @@ export default function CustomerTrackPage() {
   }, [data, load]);
 
   return (
-    <div className="lt-page">
+    <div className="lt-page track-public">
       <header className="lt-header">
         <Link href="/" className="lt-brand">
           DPR Logistics
@@ -163,11 +163,9 @@ export default function CustomerTrackPage() {
               <p className="lt-map-empty">Waiting for live GPS…</p>
             )}
             {data.mapsUrl ? (
-              <p>
-                <a href={data.mapsUrl} target="_blank" rel="noreferrer">
-                  Open in Google Maps
-                </a>
-              </p>
+              <a className="lt-maps-link" href={data.mapsUrl} target="_blank" rel="noreferrer">
+                Open in Google Maps
+              </a>
             ) : null}
           </section>
         ) : null}

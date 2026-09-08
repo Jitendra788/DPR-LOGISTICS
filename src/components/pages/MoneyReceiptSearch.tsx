@@ -361,7 +361,8 @@ export function MoneyReceiptSearch({
       {rows.length ? (
         <div className="box overflow-x-auto">
           <div className="box-body !py-2 !px-2">
-            <table className="erp-dt mr-receipt-table w-full min-w-[960px] border-collapse text-[13px]">
+            <div className="table-scroll">
+              <table className="erp-dt mr-receipt-table w-full min-w-[960px] border-collapse text-[13px]">
               <thead>
                 <tr>
                   <th>Sr</th>
@@ -434,6 +435,7 @@ export function MoneyReceiptSearch({
                 })}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       ) : null}

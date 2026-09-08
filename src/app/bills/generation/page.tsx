@@ -109,7 +109,7 @@ export default function BillGenerationPage() {
               />
             </div>
           </TwoCol>
-          <div className="flex gap-2">
+          <div className="mt-2 flex flex-wrap gap-2">
             <Button type="submit">Generate Bill</Button>
           </div>
         </FormCard>

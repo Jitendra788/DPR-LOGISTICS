@@ -167,7 +167,8 @@ export function ComboboxField({
     const spaceAbove = rect.top - gap - 12;
     const place: "bottom" | "top" = spaceBelow < 180 && spaceAbove > spaceBelow ? "top" : "bottom";
     const maxHeight = Math.max(160, Math.min(preferred, place === "bottom" ? spaceBelow : spaceAbove));
-    const width = Math.max(rect.width, 240);
+    const maxW = Math.max(200, window.innerWidth - 24);
+    const width = Math.min(Math.max(rect.width, Math.min(240, maxW)), maxW);
     let left = rect.left;
     if (left + width > window.innerWidth - 12) left = Math.max(12, window.innerWidth - width - 12);
     if (left < 12) left = 12;

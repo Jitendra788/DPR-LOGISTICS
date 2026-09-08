@@ -181,7 +181,7 @@ export default function TrackingDeskPage() {
           </div>
         </TdPanel>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <div className="td-side-stack">
           <TdPanel
             title="Alerts"
             extra={alerts.length ? <TdBadge tone="red">{alerts.length}</TdBadge> : <TdBadge tone="green">Clear</TdBadge>}
@@ -192,7 +192,7 @@ export default function TrackingDeskPage() {
                 <div key={a.id} className={`td-alert-card ${a.severity === "high" ? "is-high" : ""}`}>
                   <div className="td-alert-card-head">
                     <TdBadge tone="red">{a.type}</TdBadge>
-                    <button type="button" className="td-tool-btn" style={{ padding: "0.25rem 0.5rem", fontSize: "0.72rem" }} onClick={() => ackAlert(a.id)}>
+                    <button type="button" className="td-tool-btn td-tool-btn-xs" onClick={() => ackAlert(a.id)}>
                       Ack
                     </button>
                   </div>
@@ -266,7 +266,7 @@ export default function TrackingDeskPage() {
               <strong>{selected.lastLocationAt || "Not yet"}</strong>
             </div>
           </div>
-          <div className="td-toolbar" style={{ marginTop: "0.85rem", padding: "0.5rem" }}>
+          <div className="td-toolbar td-toolbar-detail">
             <a
               className="td-tool-btn td-tool-accent"
               href={`/live-track?phone=${encodeURIComponent(selected.driverPhone)}`}

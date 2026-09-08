@@ -82,7 +82,7 @@ function SelectDocCell({
       <input
         ref={inputRef}
         type="file"
-        className="max-w-[220px] text-[12px]"
+        className="erp-file-input max-w-full text-[12px]"
         disabled={busy}
         onChange={(e) => setFileName(e.target.files?.[0]?.name ?? "")}
       />

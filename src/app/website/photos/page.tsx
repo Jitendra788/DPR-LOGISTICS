@@ -187,7 +187,7 @@ export default function WebsitePhotosPage() {
               <InputField label="Sort order" name="sortOrder" type="number" value={form.sortOrder ?? 0} onChange={(e) => setForm({ ...form, sortOrder: Number(e.target.value) || 0 })} />
               <ComboboxField label="Published" value={form.published ? "Visible" : "Hidden"} onChange={(v) => setForm({ ...form, published: v === "Visible" })} options={["Visible", "Hidden"]} placeholder="Select" />
             </TwoCol>
-            <div className="mt-4 flex gap-2">
+            <div className="mt-4 flex flex-wrap gap-2">
               <Button type="submit">Save changes</Button>
               <Button type="button" variant="secondary" onClick={resetForm}>
                 Cancel

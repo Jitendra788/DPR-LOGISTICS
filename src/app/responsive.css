@@ -328,8 +328,7 @@ body {
 
 @media (max-width: 767px) {
   .table-scroll,
-  .erp-table-wrap,
-  table.erp-dt {
+  .erp-table-wrap {
     display: block;
     width: 100%;
     overflow-x: auto;
@@ -523,7 +522,9 @@ body {
   }
 
   .grid.grid-cols-2,
-  .grid.grid-cols-3 {
+  .grid.grid-cols-3,
+  .grid.md\:grid-cols-4,
+  .grid.md\:grid-cols-3 {
     grid-template-columns: 1fr !important;
   }
 }
@@ -671,6 +672,13 @@ iframe {
     padding-left: 12px;
     padding-right: 12px;
   }
+
+  .sim-consent .hint,
+  .sim-consent p,
+  .track-public .lt-meta p,
+  .track-public h1 {
+    overflow-wrap: anywhere;
+  }
 }
 
 @media (max-width: 479px) {
@@ -795,5 +803,252 @@ iframe {
 .mkt-network-map-wrap {
   width: 100% !important;
   max-width: 100%;
+}
+
+/* ═══════════════════════════════════════════════
+   ERP pages — mobile hardening (all modules)
+   ═══════════════════════════════════════════════ */
+
+.page-content,
+.page-content > *,
+.box,
+.erp-form-card,
+.erp-admin-form {
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Any box that holds a wide table can scroll sideways */
+.page-content .box:has(table.erp-dt),
+.page-content .box:has(.table-scroll),
+.page-content .box.overflow-x-auto {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-scroll,
+.erp-table-wrap {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+@media (max-width: 767px) {
+  /* Dashboard finance */
+  .erp-finance-strip {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px;
+  }
+
+  .erp-finance-value {
+    font-size: 1.05rem;
+  }
+
+  .erp-dash-banner-side {
+    width: 100%;
+  }
+
+  .erp-dash-profit {
+    width: 100%;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .erp-dash-profit-val {
+    font-size: 1.35rem;
+  }
+
+  /* Filter / toolbar rows on report pages */
+  .erp-search-bill-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .erp-search-bill-row .form-group {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
+  .erp-search-bill-row .btn-admin {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Receipt / payment tables */
+  .mr-receipt-table {
+    min-width: 960px;
+  }
+
+  .erp-gst-summary,
+  .erp-party-ledger {
+    min-width: 720px;
+  }
+
+  /* Action cells inside stacked DataTable */
+  .erp-dt-stack-mobile td[data-label="Actions"] .flex,
+  .erp-dt-stack-mobile td[data-label="Action"] .flex,
+  .erp-dt-stack-mobile td[data-label="Select Doc"] .flex,
+  .erp-dt-stack-mobile td .flex.flex-wrap {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .erp-dt-stack-mobile td .btn-admin,
+  .erp-dt-stack-mobile td .btn-admin-sm {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .erp-dt-stack-mobile td input[type="file"] {
+    max-width: 100% !important;
+    width: 100%;
+  }
+
+  /* CRUD form footers — full-width buttons */
+  .erp-admin-form .mt-2.flex,
+  .erp-admin-form .mt-4.flex,
+  .erp-form-card-body > .mt-1.flex,
+  .erp-form-card-body > .mt-3.flex,
+  .erp-form-card-body > .mb-2.flex,
+  .erp-form-card-body > .mb-3.flex,
+  .erp-form-card-body > .mb-4.flex {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .erp-admin-form .mt-2.flex .btn-admin,
+  .erp-admin-form .mt-4.flex .btn-admin,
+  .erp-form-card-body > .mt-1.flex .btn-admin,
+  .erp-form-card-body > .mt-3.flex .btn-admin,
+  .erp-form-card-body > .mb-2.flex .btn-admin,
+  .erp-form-card-body > .mb-3.flex .btn-admin,
+  .erp-form-card-body > .mb-4.flex .btn-admin {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Combobox / date fields never overflow */
+  .form-group,
+  .s2-wrap,
+  .s2-control {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Trip / tracking desk */
+  .td-page,
+  .td-panel,
+  .td-form-section {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .td-toolbar {
+    flex-wrap: wrap;
+  }
+
+  /* Global search results */
+  .erp-search-hit,
+  .page-content a.block {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  /* Flash / alerts */
+  .erp-flash,
+  .erp-alert {
+    max-width: 100%;
+    word-break: break-word;
+  }
+
+  /* Website CMS / photos grid */
+  .erp-form-card-body .grid.grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Report / bill filter action rows */
+  .erp-form-card-body > .flex.flex-wrap.items-center.justify-between {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .erp-form-card-body > .flex.flex-wrap.items-center.justify-between .btn-admin {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .erp-form-card-body > .mt-2.flex.flex-wrap.items-center .btn-admin,
+  .erp-form-card-body > .mb-2.flex.flex-wrap .btn-admin {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Search bill panel never overflows */
+  .erp-search-bill-panel {
+    max-width: 100%;
+  }
+}
+
+/* Trip desk action density on tablet (before card-stack) */
+@media (max-width: 1023px) {
+  .td-action-group {
+    max-width: none;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .td-action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .td-side-stack,
+  .td-page,
+  .td-panel {
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 479px) {
+  .erp-finance-strip {
+    grid-template-columns: 1fr !important;
+  }
+
+  .erp-finance-card {
+    padding: 10px 12px;
+  }
+
+  .erp-page-title {
+    font-size: 1.15rem;
+  }
+
+  .box-header strong,
+  .box-header {
+    font-size: 13px;
+    word-break: break-word;
+  }
+}
+
+/* Header dropdowns: stay inside viewport on phones */
+@media (max-width: 639px) {
+  .erp-header .erp-dropdown {
+    position: fixed;
+    top: 64px;
+    right: 8px;
+    left: 8px;
+    width: auto;
+    max-width: none;
+    margin-top: 0;
+    z-index: 90;
+  }
+
+  .erp-header .erp-dropdown-wide {
+    max-width: none;
+  }
 }
 

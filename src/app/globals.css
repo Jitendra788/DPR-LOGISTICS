@@ -548,12 +548,25 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   min-height: 28px;
   padding: 2px 6px;
   font-size: 13px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.mr-receipt-table .mr-cell-input {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100%;
 }
 
 .mr-narration-input {
   width: 100%;
   min-width: 90px;
   max-width: 140px;
+}
+
+.mr-receipt-table .mr-narration-input {
+  max-width: none;
+  min-width: 0;
 }
 
 .erp-pager {
@@ -873,13 +886,30 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   box-sizing: border-box;
 }
 
-.lhc-payment-page .box {
-  overflow-x: visible;
+.lhc-payment-page .box:has(.table-scroll) {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.lhc-payment-page .table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
 }
 
 @media (max-width: 900px) {
   .lhc-pay-filters {
     grid-template-columns: 1fr;
+  }
+
+  .lhc-pay-filters-action .btn-admin {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .lhc-pay-table {
+    table-layout: auto;
+    min-width: 980px;
   }
 }
 

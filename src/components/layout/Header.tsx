@@ -27,6 +27,42 @@ type NoteItem = {
   count: number;
 };
 
+type SeenMap = Record<string, number>;
+
+const SEEN_KEY = "dpr_notifications_seen";
+
+function readSeen(): SeenMap {
+  try {
+    const raw = localStorage.getItem(SEEN_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw) as { totals?: SeenMap } | SeenMap;
+    if (parsed && typeof parsed === "object" && "totals" in parsed && parsed.totals) {
+      return parsed.totals;
+    }
+    return parsed as SeenMap;
+  } catch {
+    return {};
+  }
+}
+
+function writeSeen(items: NoteItem[]) {
+  try {
+    const totals: SeenMap = {};
+    for (const item of items) totals[item.id] = item.count;
+    localStorage.setItem(SEEN_KEY, JSON.stringify({ totals, at: Date.now() }));
+  } catch {
+    /* ignore */
+  }
+}
+
+/** Badge = only unseen / increased counts since last open. */
+function unseenBadge(items: NoteItem[], seen: SeenMap) {
+  return items.reduce((sum, item) => {
+    const prev = Number(seen[item.id]) || 0;
+    return sum + Math.max(0, item.count - prev);
+  }, 0);
+}
+
 export function Header({ collapsed, onToggle, isDesktop, mobileOpen }: Props) {
   const router = useRouter();
   const { theme, toggleTheme } = useTheme();
@@ -37,12 +73,23 @@ export function Header({ collapsed, onToggle, isDesktop, mobileOpen }: Props) {
   const [notesOpen, setNotesOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const notesRef = useRef<HTMLDivElement>(null);
+  const notesRefLatest = useRef<NoteItem[]>([]);
 
-  function loadNotes() {
+  function applyNotes(items: NoteItem[], markSeen = false) {
+    notesRefLatest.current = items;
+    setNotes(items);
+    if (markSeen) {
+      writeSeen(items);
+      setBadge(0);
+      return;
+    }
+    setBadge(unseenBadge(items, readSeen()));
+  }
+
+  function loadNotes(markSeen = false) {
     api<{ badge: number; items: NoteItem[] }>("/api/notifications")
       .then((res) => {
-        setNotes(res.items ?? []);
-        setBadge(res.badge ?? 0);
+        applyNotes(res.items ?? [], markSeen);
       })
       .catch(() => undefined);
   }
@@ -51,7 +98,7 @@ export function Header({ collapsed, onToggle, isDesktop, mobileOpen }: Props) {
     api<{ user: SessionUser | null }>("/api/auth/me")
       .then((res) => setUser(res.user))
       .catch(() => undefined);
-    loadNotes();
+    loadNotes(false);
   }, []);
 
   useEffect(() => {
@@ -70,7 +117,21 @@ export function Header({ collapsed, onToggle, isDesktop, mobileOpen }: Props) {
     router.refresh();
   }
 
+  function openNotes() {
+    setNotesOpen((open) => {
+      const next = !open;
+      if (next) {
+        writeSeen(notesRefLatest.current);
+        setBadge(0);
+        loadNotes(true);
+      }
+      return next;
+    });
+    setProfileOpen(false);
+  }
+
   const displayName = user?.name || (user?.username ? capitalize(user.username) : "Admin User");
+  const listCount = notes.reduce((s, n) => s + n.count, 0);
 
   return (
     <header className="erp-header">
@@ -106,26 +167,30 @@ export function Header({ collapsed, onToggle, isDesktop, mobileOpen }: Props) {
           <button
             type="button"
             className="erp-icon-btn"
-            aria-label={`Notifications${badge ? `, ${badge} pending` : ""}`}
+            aria-label={`Notifications${badge ? `, ${badge} new` : ""}`}
             aria-expanded={notesOpen}
-            onClick={() => {
-              setNotesOpen((v) => {
-                const next = !v;
-                if (next) loadNotes();
-                return next;
-              });
-              setProfileOpen(false);
-            }}
+            onClick={openNotes}
           >
             <Bell className="h-5 w-5" />
             {badge > 0 ? <span className="erp-badge">{badge > 99 ? "99+" : badge}</span> : null}
           </button>
           {notesOpen ? (
             <div className="erp-dropdown erp-dropdown-wide" role="menu">
-              <p className="erp-dropdown-title">{badge ? `You have ${badge} notification${badge === 1 ? "" : "s"}` : "Notifications"}</p>
+              <p className="erp-dropdown-title">
+                {listCount ? `Pending alerts (${listCount})` : "Notifications"}
+              </p>
               {notes.length ? (
                 notes.map((n) => (
-                  <Link key={n.id} href={n.href} className="erp-dropdown-item erp-note-item" onClick={() => setNotesOpen(false)}>
+                  <Link
+                    key={n.id}
+                    href={n.href}
+                    className="erp-dropdown-item erp-note-item"
+                    onClick={() => {
+                      setNotesOpen(false);
+                      writeSeen(notesRefLatest.current);
+                      setBadge(0);
+                    }}
+                  >
                     <span>
                       <span className="erp-note-title">{n.title}</span>
                       <span className="erp-note-detail">{n.detail}</span>
@@ -136,7 +201,15 @@ export function Header({ collapsed, onToggle, isDesktop, mobileOpen }: Props) {
               ) : (
                 <p className="erp-dropdown-empty">No pending alerts</p>
               )}
-              <Link href="/dashboard" className="erp-dropdown-foot" onClick={() => setNotesOpen(false)}>
+              <Link
+                href="/dashboard"
+                className="erp-dropdown-foot"
+                onClick={() => {
+                  setNotesOpen(false);
+                  writeSeen(notesRefLatest.current);
+                  setBadge(0);
+                }}
+              >
                 View dashboard
               </Link>
             </div>

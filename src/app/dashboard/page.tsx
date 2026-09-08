@@ -14,6 +14,9 @@ import {
   PackageCheck,
   CircleDot,
   X,
+  IndianRupee,
+  TrendingUp,
+  Fuel,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { ClientFormattedDate } from "@/components/ui/ClientFormattedDate";
@@ -26,13 +29,24 @@ type Stats = {
   pendingLorryHire: number;
   pendingBill: number;
   customers: number;
+  profit?: number;
+};
+
+type Finance = {
+  revenue: number;
+  lhcCost: number;
+  maintCost: number;
+  profit: number;
+  marginPct: number;
 };
 
 type DashPayload = {
   stats: Stats;
+  finance?: Finance;
   billedCount: number;
   unbilledCount: number;
   monthly: { label: string; value: number }[];
+  monthlyProfit?: { label: string; value: number }[];
   vehicles: { total: number; available: number; onTrip: number; maint: number; pending: number };
   recent: {
     bookings: { k: string; v: string }[];
@@ -65,6 +79,14 @@ type PartyRow = {
 };
 
 type ListKey = "totalBookings" | "pendingLorryHire" | "pendingBill" | "customers";
+
+function moneyInr(n: number | null | undefined) {
+  const v = Number(n) || 0;
+  const abs = Math.abs(v).toLocaleString("en-IN", {
+    maximumFractionDigits: 0,
+  });
+  return `${v < 0 ? "-" : ""}₹${abs}`;
+}
 
 const summaryCards: {
   key: ListKey;
@@ -152,7 +174,10 @@ export default function DashboardPage() {
   }, [openList]);
 
   const stats = data?.stats ?? null;
+  const finance = data?.finance ?? null;
+  const profit = finance?.profit ?? stats?.profit ?? null;
   const listMeta = openList ? summaryCards.find((c) => c.key === openList) : null;
+  const profitPositive = (profit ?? 0) >= 0;
 
   return (
     <div className="erp-dash">
@@ -165,17 +190,33 @@ export default function DashboardPage() {
             {stats ? ` · ${stats.totalBookings.toLocaleString("en-IN")} total bookings` : " · Loading…"}
           </p>
         </div>
-        <div className="erp-dash-banner-actions">
-          <Link href="/booking/lr" className="erp-dash-cta">
-            New Booking
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-          <Link href="/lhc/contract" className="erp-dash-cta erp-dash-cta-ghost">
-            Lorry Hire
-          </Link>
-          <Link href="/bills/weightwise" className="erp-dash-cta erp-dash-cta-ghost">
-            Create Bill
-          </Link>
+        <div className="erp-dash-banner-side">
+          <div className={`erp-dash-profit ${profitPositive ? "is-up" : "is-down"}`}>
+            <span className="erp-dash-profit-label">
+              <TrendingUp className="h-3.5 w-3.5" />
+              Net Profit
+            </span>
+            <strong className="erp-dash-profit-val">
+              {profit === null ? <span className="erp-skel erp-skel-light" /> : moneyInr(profit)}
+            </strong>
+            <span className="erp-dash-profit-meta">
+              {finance
+                ? `Margin ${finance.marginPct.toLocaleString("en-IN", { maximumFractionDigits: 1 })}% · LR − LHC − Maint`
+                : "Revenue − hire − maintenance"}
+            </span>
+          </div>
+          <div className="erp-dash-banner-actions">
+            <Link href="/booking/lr" className="erp-dash-cta">
+              New Booking
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link href="/lhc/contract" className="erp-dash-cta erp-dash-cta-ghost">
+              Lorry Hire
+            </Link>
+            <Link href="/bills/weightwise" className="erp-dash-cta erp-dash-cta-ghost">
+              Create Bill
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -184,6 +225,31 @@ export default function DashboardPage() {
           {error}
         </div>
       ) : null}
+
+      <section className="erp-finance-strip" aria-label="Finance summary">
+        {[
+          { label: "Revenue", value: finance?.revenue, hint: "LR grand total", icon: IndianRupee, tone: "rev" },
+          { label: "LHC Cost", value: finance?.lhcCost, hint: "Lorry freight", icon: Truck, tone: "cost" },
+          { label: "Maint Cost", value: finance?.maintCost, hint: "Service + diesel", icon: Fuel, tone: "cost" },
+          { label: "Profit", value: profit, hint: finance ? `${finance.marginPct}% margin` : "Net", icon: TrendingUp, tone: profitPositive ? "profit" : "loss" },
+        ].map((item) => {
+          const Icon = item.icon;
+          return (
+            <article key={item.label} className={`erp-finance-card tone-${item.tone}`}>
+              <span className="erp-finance-ico" aria-hidden>
+                <Icon className="h-4 w-4" />
+              </span>
+              <div>
+                <p className="erp-finance-label">{item.label}</p>
+                <p className="erp-finance-value">
+                  {item.value == null ? <span className="erp-skel" /> : moneyInr(item.value)}
+                </p>
+                <p className="erp-finance-hint">{item.hint}</p>
+              </div>
+            </article>
+          );
+        })}
+      </section>
 
       <section className="erp-kpi-grid" aria-label="Summary">
         {summaryCards.map((card) => {
@@ -243,6 +309,16 @@ export default function DashboardPage() {
 
         <section className="erp-panel">
           <header className="erp-panel-h">
+            <h2>Profit — last 6 months</h2>
+            <span className="erp-panel-meta">₹ net</span>
+          </header>
+          <BarChart data={data?.monthlyProfit ?? []} color="#059669" />
+        </section>
+      </div>
+
+      <div className="erp-mid">
+        <section className="erp-panel">
+          <header className="erp-panel-h">
             <h2>Bill status</h2>
             <button type="button" className="erp-text-btn" onClick={() => setOpenList("pendingBill")}>
               Pending list
@@ -255,9 +331,7 @@ export default function DashboardPage() {
             ]}
           />
         </section>
-      </div>
 
-      <div className="erp-bottom">
         <section className="erp-panel">
           <header className="erp-panel-h">
             <h2>Fleet snapshot</h2>
@@ -283,7 +357,9 @@ export default function DashboardPage() {
             })}
           </div>
         </section>
+      </div>
 
+      <div className="erp-bottom erp-bottom-full">
         <section className="erp-panel">
           <header className="erp-panel-h">
             <h2>Recent activity</h2>

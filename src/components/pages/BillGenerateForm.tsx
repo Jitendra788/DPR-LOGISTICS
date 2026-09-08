@@ -85,7 +85,9 @@ export function BillGenerateForm({
               <InputField label="To Station" value={form.toStation} onChange={(e) => setForm({ ...form, toStation: e.target.value })} placeholder="Type station" />
             </div>
           </TwoCol>
-          <Button type="submit">Generate Bill</Button>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <Button type="submit">Generate Bill</Button>
+          </div>
         </FormCard>
       </form>
       <DataTable
