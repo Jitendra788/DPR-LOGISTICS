@@ -1,4 +1,4 @@
-import { BRAND_LOGO_HEADER, BRAND_STAMP } from "@/lib/brand";
+import { BRAND_LOGO_HEADER_PRINT, BRAND_STAMP_PRINT } from "@/lib/brand";
 import { formatPrintDate, lrPrintCompany } from "@/lib/lr-print";
 import { stripLrPrefix } from "@/lib/lr-no";
 import { normalizeLrType } from "@/lib/lr-type";
@@ -105,8 +105,8 @@ export function LrConsignmentNote({
   consigneeParty,
   company = lrPrintCompany,
   hideLogo = false,
-  logoSrc = BRAND_LOGO_HEADER,
-  stampSrc = BRAND_STAMP,
+  logoSrc = BRAND_LOGO_HEADER_PRINT,
+  stampSrc = BRAND_STAMP_PRINT,
   signFor,
   gstPartyLabel = "DPRL",
 }: Props) {

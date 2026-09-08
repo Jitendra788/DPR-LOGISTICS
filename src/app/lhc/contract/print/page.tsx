@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { LorryMemo, type LorryMemoLhc, type LorryMemoLr } from "@/components/print/LorryMemo";
 import { api } from "@/lib/api-client";
 import { lrNoEquals } from "@/lib/lr-no";
+import { printWhenReady } from "@/lib/print-when-ready";
 import "@/components/print/lorry-memo.css";
 
 type LhcRow = LorryMemoLhc & { lrNos?: string };
@@ -77,9 +78,6 @@ function PrintInner() {
         }
         setLhc(row);
         setRows(linkedBookings(bookings, row.challanNo, row.lrNos || ""));
-        requestAnimationFrame(() => {
-          setTimeout(() => window.print(), 50);
-        });
       })
       .catch((err) => {
         if (!cancelled) setError(err instanceof Error ? err.message : "Unable to load Lorry Memo");
@@ -88,6 +86,11 @@ function PrintInner() {
       cancelled = true;
     };
   }, [challanNo]);
+
+  useEffect(() => {
+    if (!lhc) return;
+    printWhenReady(250);
+  }, [lhc]);
 
   if (error) return <p className="p-8">{error}</p>;
   if (!lhc) return <p className="p-8">Loading Lorry Memo…</p>;

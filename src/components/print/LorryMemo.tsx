@@ -1,4 +1,4 @@
-import { BRAND_LOGO_HEADER, BRAND_STAMP } from "@/lib/brand";
+import { BRAND_LOGO_HEADER_PRINT, BRAND_STAMP_PRINT } from "@/lib/brand";
 import { formatPrintDate, lrPrintCompany } from "@/lib/lr-print";
 import { stripLrPrefix } from "@/lib/lr-no";
 import "./lorry-memo.css";
@@ -83,7 +83,7 @@ export function LorryMemo({ lhc, rows, company = lrPrintCompany }: Props) {
           <tr>
             <td colSpan={1} className="lhc-memo-logo-cell">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={BRAND_LOGO_HEADER} alt={company.name} className="lhc-memo-logo" />
+              <img src={BRAND_LOGO_HEADER_PRINT} alt={company.name} className="lhc-memo-logo" decoding="sync" />
             </td>
             <td colSpan={6} className="lhc-memo-center lhc-memo-header-mid">
               <div className="lhc-memo-title-red">{company.name}</div>
@@ -312,7 +312,7 @@ export function LorryMemo({ lhc, rows, company = lrPrintCompany }: Props) {
             <td colSpan={3} className="lhc-memo-sign-right">
               <div>For DPR Logistics</div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={BRAND_STAMP} alt="DPR Logistics stamp" className="lhc-memo-stamp" />
+              <img src={BRAND_STAMP_PRINT} alt="DPR Logistics stamp" className="lhc-memo-stamp" decoding="sync" />
             </td>
           </tr>
         </tbody>

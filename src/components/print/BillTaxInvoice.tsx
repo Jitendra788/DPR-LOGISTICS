@@ -1,4 +1,9 @@
-import { BRAND_LOGO_HEADER, BRAND_STAMP, ROADWAYS_LOGO, ROADWAYS_STAMP } from "@/lib/brand";
+import {
+  BRAND_LOGO_HEADER_PRINT,
+  BRAND_STAMP_PRINT,
+  ROADWAYS_LOGO_PRINT,
+  ROADWAYS_STAMP_PRINT,
+} from "@/lib/brand";
 import { amountInWordsIndian } from "@/lib/amount-words";
 import { formatPrintDate, formatPrintMoney, lrPrintCompany } from "@/lib/lr-print";
 import { stripLrPrefix } from "@/lib/lr-no";
@@ -146,8 +151,8 @@ export function BillTaxInvoice({
     : "ICICI Bank (DPR Logistics)";
   const bankAcct = isRoadways ? "094920110000555" : "635805500736";
   const bankIfsc = isRoadways ? "BKID0000949" : "ICIC0006358";
-  const logoSrc = isRoadways ? ROADWAYS_LOGO : BRAND_LOGO_HEADER;
-  const stampSrc = isRoadways ? ROADWAYS_STAMP : BRAND_STAMP;
+  const logoSrc = isRoadways ? ROADWAYS_LOGO_PRINT : BRAND_LOGO_HEADER_PRINT;
+  const stampSrc = isRoadways ? ROADWAYS_STAMP_PRINT : BRAND_STAMP_PRINT;
   const colWidths = isMeter ? METER_COLS : WEIGHT_COLS;
   const wordsLabel = "Amout in Words :";
   /** Tax strip ~ Total Bill width on old ASP landscape */

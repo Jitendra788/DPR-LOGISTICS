@@ -6,6 +6,7 @@ import { BillTaxInvoice, type BillPrintData, type BillPrintVariant } from "@/com
 import { api } from "@/lib/api-client";
 import { isMeterBill } from "@/lib/bill-route";
 import { isMeterBillAs } from "@/lib/lr-totals";
+import { printWhenReady } from "@/lib/print-when-ready";
 import { roadwaysPrintCompany } from "@/lib/roadways-print";
 import "@/components/print/bill-print.css";
 
@@ -60,7 +61,6 @@ function PrintInner() {
           grandTotal: res.bill.grandTotal,
           lrs: res.lrs,
         });
-        setTimeout(() => window.print(), 80);
       })
       .catch((err) => {
         if (!cancelled) setError(err instanceof Error ? err.message : "Unable to load bill");
@@ -69,6 +69,11 @@ function PrintInner() {
       cancelled = true;
     };
   }, [billNo, share]);
+
+  useEffect(() => {
+    if (!data) return;
+    printWhenReady(250);
+  }, [data]);
 
   if (error) return <p className="p-8">{error}</p>;
   if (!billNo) return <p className="p-8">Bill number missing.</p>;
