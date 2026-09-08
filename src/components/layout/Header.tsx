@@ -35,11 +35,17 @@ function readSeen(): SeenMap {
   try {
     const raw = localStorage.getItem(SEEN_KEY);
     if (!raw) return {};
-    const parsed = JSON.parse(raw) as { totals?: SeenMap } | SeenMap;
-    if (parsed && typeof parsed === "object" && "totals" in parsed && parsed.totals) {
-      return parsed.totals;
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return {};
+    const obj = parsed as Record<string, unknown>;
+    if (obj.totals && typeof obj.totals === "object" && !Array.isArray(obj.totals)) {
+      return obj.totals as SeenMap;
     }
-    return parsed as SeenMap;
+    const flat: SeenMap = {};
+    for (const [k, v] of Object.entries(obj)) {
+      if (typeof v === "number") flat[k] = v;
+    }
+    return flat;
   } catch {
     return {};
   }
