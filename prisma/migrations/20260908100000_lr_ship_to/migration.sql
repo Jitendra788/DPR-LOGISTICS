@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "LrBooking" ADD COLUMN IF NOT EXISTS "shipTo" TEXT NOT NULL DEFAULT '';

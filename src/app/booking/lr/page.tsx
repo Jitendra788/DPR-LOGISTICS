@@ -23,6 +23,7 @@ type Booking = {
   toStation: string;
   vehNo: string;
   deliveryAt: string;
+  shipTo: string;
   billingParty: string;
   consignor: string;
   consignee: string;
@@ -77,6 +78,7 @@ function LrBookingInner() {
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState<Partial<Booking>>({
     deliveryAt: "DOOR",
+    shipTo: "",
     billAs: "Weight",
     gstPaidBy: "Consigner",
     lrType: "TBB",
@@ -212,6 +214,7 @@ function LrBookingInner() {
       const next = await api<{ value: string }>("/api/next-no?type=lr&source=DPR");
       setForm({
         deliveryAt: "DOOR",
+        shipTo: "",
         billAs: "Weight",
         gstPaidBy: "Consigner",
         lrType: "TBB",
@@ -328,6 +331,7 @@ function LrBookingInner() {
               <InputField label="To Station" name="toStation" value={form.toStation ?? ""} onChange={(e) => setForm({ ...form, toStation: e.target.value })} placeholder="Type station name" />
               <InputField label="Veh No" name="vehNo" value={form.vehNo ?? ""} onChange={(e) => setForm({ ...form, vehNo: e.target.value })} placeholder="e.g. MH-15-GH-4455" />
               <ComboboxField label="Delivery At" name="deliveryAt" value={form.deliveryAt ?? "DOOR"} onChange={(deliveryAt) => setForm({ ...form, deliveryAt })} options={["DOOR", "GODOWN"]} placeholder="Select delivery" />
+              <ComboboxField label="Ship To" name="shipTo" value={form.shipTo ?? ""} onChange={(shipTo) => setForm({ ...form, shipTo })} options={partyNames} placeholder="Search or select ship to" />
               <ComboboxField label="Billing Party" name="billingParty" value={form.billingParty ?? ""} onChange={(billingParty) => setForm({ ...form, billingParty })} options={partyNames} placeholder="Search or select party" />
               <ComboboxField label="Consignor" name="consignor" value={form.consignor ?? ""} onChange={(consignor) => setForm({ ...form, consignor })} options={partyNames} placeholder="Search or select consignor" />
             </div>

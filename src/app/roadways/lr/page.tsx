@@ -22,6 +22,7 @@ type Booking = {
   toStation: string;
   vehNo: string;
   deliveryAt: string;
+  shipTo: string;
   billingParty: string;
   consignor: string;
   consignee: string;
@@ -79,6 +80,7 @@ function blankForm(lrNo = "") {
     toStation: "",
     vehNo: "",
     deliveryAt: "DOOR",
+    shipTo: "",
     billingParty: "",
     consignor: "",
     consignee: "",
@@ -338,6 +340,7 @@ export default function RoadwaysLrPage() {
                 placeholder="Type or select vehicle"
               />
               <ComboboxField label="Delivery At" name="deliveryAt" value={form.deliveryAt} onChange={(deliveryAt) => setForm({ ...form, deliveryAt })} options={["DOOR", "GODOWN"]} placeholder="Select delivery" />
+              <ComboboxField label="Ship To" name="shipTo" value={form.shipTo} onChange={(shipTo) => setForm({ ...form, shipTo })} options={parties.map((p) => p.name)} placeholder="Search or select ship to" />
               <ComboboxField label="Billing Party" name="billingParty" value={form.billingParty} onChange={(billingParty) => setForm({ ...form, billingParty })} options={parties.map((p) => p.name)} placeholder="Search or select party" />
               <ComboboxField label="Consignor" name="consignor" value={form.consignor} onChange={(consignor) => setForm({ ...form, consignor })} options={parties.map((p) => p.name)} placeholder="Search or select consignor" />
             </div>

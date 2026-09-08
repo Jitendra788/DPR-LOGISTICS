@@ -30,6 +30,7 @@ export type LrPrintBooking = {
   toStation: string;
   vehNo: string;
   deliveryAt?: string;
+  shipTo?: string;
   billingParty?: string;
   consignor: string;
   consignee: string;
@@ -244,6 +245,10 @@ export function LrConsignmentNote({
               <div className="lr-print-party-line">
                 <span className="lr-print-label">GST No. :</span>{" "}
                 <span className="lr-print-party-val">{consignee.gst}</span>
+              </div>
+              <div className="lr-print-party-line">
+                <span className="lr-print-label">Ship To :</span>{" "}
+                <span className="lr-print-party-val">{booking.shipTo || ""}</span>
               </div>
             </td>
           </tr>

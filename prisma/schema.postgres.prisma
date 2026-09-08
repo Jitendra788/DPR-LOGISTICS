@@ -117,6 +117,7 @@ model LrBooking {
   toStation      String   @default("")
   vehNo          String   @default("")
   deliveryAt     String   @default("DOOR")
+  shipTo         String   @default("")
   billingParty   String   @default("")
   consignor      String   @default("")
   consignee      String   @default("")

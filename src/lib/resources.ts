@@ -64,7 +64,7 @@ const RESOURCE_FIELDS: Record<ResourceKey, ReadonlySet<string>> = {
   stations: new Set(["name", "code"]),
   rates: new Set(["fromStation", "toStation", "ratePerTon", "effectiveDate"]),
   bookings: new Set([
-    "bookingFrom", "lrNo", "lrDate", "fromStation", "toStation", "vehNo", "deliveryAt", "billingParty",
+    "bookingFrom", "lrNo", "lrDate", "fromStation", "toStation", "vehNo", "deliveryAt", "shipTo", "billingParty",
     "consignor", "consignee", "articles", "particulars", "invNoDate", "actWeight", "chargedWeight", "rate",
     "billAs", "totalMeter", "freight", "serviceTax", "haltage", "insurance", "stCharges", "doorCollection",
     "barrier", "other", "hamali", "total", "gst", "cgstAmt", "sgstAmt", "igstAmt", "grandTotal", "gstPaidBy", "ewayBill", "validDate",
