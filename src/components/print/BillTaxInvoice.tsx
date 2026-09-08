@@ -155,8 +155,8 @@ export function BillTaxInvoice({
   const stampSrc = isRoadways ? ROADWAYS_STAMP_PRINT : BRAND_STAMP_PRINT;
   const colWidths = isMeter ? METER_COLS : WEIGHT_COLS;
   const wordsLabel = "Amout in Words :";
-  /** Tax strip width on old ASP — stamp left edge aligns with this */
-  const rightCols = 4;
+  /** Tax strip narrow like old ASP — stamp left edge aligns with this */
+  const rightCols = 3;
   const leftCols = colCount - rightCols;
   const sheetClass = [
     "bill-print-sheet",
@@ -333,8 +333,8 @@ export function BillTaxInvoice({
             <td colSpan={rightCols} className="bill-print-no-pad" rowSpan={4}>
               <table className="bill-print-inner bill-print-taxbox">
                 <colgroup>
-                  <col style={{ width: "40%" }} />
-                  <col style={{ width: "60%" }} />
+                  <col style={{ width: "48%" }} />
+                  <col style={{ width: "52%" }} />
                 </colgroup>
                 <tbody>
                   <tr>
@@ -373,7 +373,11 @@ export function BillTaxInvoice({
           </tr>
           <tr>
             <td colSpan={leftCols} className="bill-print-no-pad">
-              <table className="bill-print-inner">
+              <table className="bill-print-inner bill-print-bank">
+                <colgroup>
+                  <col style={{ width: "50%" }} />
+                  <col style={{ width: "50%" }} />
+                </colgroup>
                 <tbody>
                   <tr>
                     <td>Bank Name : {bankName}</td>
