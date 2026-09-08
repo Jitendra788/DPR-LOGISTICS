@@ -292,46 +292,22 @@ export function LrConsignmentNote({
               <table className="lr-charges-col">
                 <tbody>
                   <tr>
-                    <td>Freight Rs</td>
+                    <td className="lr-print-label lr-print-center">Freight Rs</td>
                   </tr>
                   <tr>
-                    <td>Ser.Tax</td>
+                    <td className="lr-print-label lr-print-center">Ser.Tax</td>
                   </tr>
                   <tr>
-                    <td>{handlingLabel}</td>
+                    <td className="lr-print-label lr-print-center">{handlingLabel}</td>
                   </tr>
                   <tr>
-                    <td>Insurance</td>
+                    <td className="lr-print-label lr-print-center">Insurance</td>
                   </tr>
                   <tr>
-                    <td>St.Charges</td>
+                    <td className="lr-print-label lr-print-center">St.Charges</td>
                   </tr>
                   <tr>
-                    <td className="lr-print-bold">Total Amt.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </td>
-            <td className="lr-print-no-pad">
-              <table className="lr-charges-col">
-                <tbody>
-                  <tr>
-                    <td className="lr-freight-amt">&nbsp;</td>
-                  </tr>
-                  <tr>
-                    <td className="lr-freight-amt">&nbsp;</td>
-                  </tr>
-                  <tr>
-                    <td className="lr-freight-amt">&nbsp;</td>
-                  </tr>
-                  <tr>
-                    <td className="lr-freight-amt">&nbsp;</td>
-                  </tr>
-                  <tr>
-                    <td className="lr-freight-amt">&nbsp;</td>
-                  </tr>
-                  <tr>
-                    <td className="lr-freight-amt">&nbsp;</td>
+                    <td className="lr-print-label lr-print-center lr-print-bold">Total Amt.</td>
                   </tr>
                 </tbody>
               </table>
@@ -340,19 +316,43 @@ export function LrConsignmentNote({
               <table className="lr-charges-col">
                 <tbody>
                   <tr>
-                    <td className="lr-print-center">Consignor</td>
+                    <td className="lr-freight-amt">&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td className="lr-freight-amt">&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td className="lr-freight-amt">&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td className="lr-freight-amt">&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td className="lr-freight-amt">&nbsp;</td>
+                  </tr>
+                  <tr>
+                    <td className="lr-freight-amt">&nbsp;</td>
+                  </tr>
+                </tbody>
+              </table>
+            </td>
+            <td className="lr-print-no-pad">
+              <table className="lr-charges-col">
+                <tbody>
+                  <tr>
+                    <td className="lr-print-label lr-print-center">Consignor</td>
                   </tr>
                   <tr>
                     <td>&nbsp;</td>
                   </tr>
                   <tr>
-                    <td className="lr-print-center">Consignee</td>
+                    <td className="lr-print-label lr-print-center">Consignee</td>
                   </tr>
                   <tr>
                     <td>&nbsp;</td>
                   </tr>
                   <tr>
-                    <td className="lr-print-center">{gstPartyLabel}</td>
+                    <td className="lr-print-label lr-print-center">{gstPartyLabel}</td>
                   </tr>
                   <tr>
                     <td>&nbsp;</td>
@@ -362,10 +362,28 @@ export function LrConsignmentNote({
             </td>
           </tr>
 
-          {/* GST / PAN — full-width red bar above Value Rs. (old ASP place) */}
+          {/* GST / PAN — keys blue, values black */}
           <tr className="lr-print-gst-row">
             <td colSpan={7} className="lr-print-gst-pan">
-              {taxBar || "GST :  / PAN No. "}
+              {company.companyGst || company.companyPan ? (
+                <>
+                  {company.companyGst ? (
+                    <>
+                      <span className="lr-print-label">GST :</span>{" "}
+                      <span className="lr-print-party-val">{company.companyGst}</span>
+                    </>
+                  ) : null}
+                  {company.companyGst && company.companyPan ? " / " : null}
+                  {company.companyPan ? (
+                    <>
+                      <span className="lr-print-label">PAN No.</span>{" "}
+                      <span className="lr-print-party-val">{company.companyPan}</span>
+                    </>
+                  ) : null}
+                </>
+              ) : (
+                taxBar || "GST :  / PAN No. "
+              )}
             </td>
           </tr>
 
@@ -373,14 +391,16 @@ export function LrConsignmentNote({
           <tr>
             <td colSpan={4} className="lr-print-footer-left" rowSpan={2}>
               <div>
-                <span className="lr-print-label">Value Rs.</span> {booking.valueRs}
+                <span className="lr-print-label">Value Rs.</span>{" "}
+                <span className="lr-print-party-val">{booking.valueRs}</span>
               </div>
               <div>
-                <span className="lr-print-label">Eway Bill No.</span> {booking.ewayBill}
+                <span className="lr-print-label">Eway Bill No.</span>{" "}
+                <span className="lr-print-party-val">{booking.ewayBill}</span>
               </div>
               <div>
                 <span className="lr-print-label">Valid Date</span>{" "}
-                {formatPrintDate(booking.validDate || "")}
+                <span className="lr-print-party-val">{formatPrintDate(booking.validDate || "")}</span>
               </div>
             </td>
             <td colSpan={3} className="lr-print-sign">
@@ -391,7 +411,8 @@ export function LrConsignmentNote({
           </tr>
           <tr>
             <td colSpan={3} className="lr-print-care">
-              Customer Care No : {company.customerCare}
+              <span className="lr-print-label">Customer Care No :</span>{" "}
+              <span className="lr-print-party-val">{company.customerCare}</span>
             </td>
           </tr>
         </tbody>
