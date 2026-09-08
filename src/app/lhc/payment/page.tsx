@@ -48,10 +48,17 @@ function cellMoneyText(value: number) {
   return num.toFixed(2);
 }
 
+function inr(value: number) {
+  return Number(value || 0).toLocaleString("en-IN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
 function CellMoneyInput({
   value,
   onChange,
-  width = "80px",
+  width = "88px",
 }: {
   value: number;
   onChange?: (n: number) => void;
@@ -109,7 +116,9 @@ export default function LhcPaymentPage() {
   const [drafts, setDrafts] = useState<Record<number, RowDraft>>({});
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [savingId, setSavingId] = useState<number | null>(null);
   const [allLhcVeh, setAllLhcVeh] = useState<string[]>([]);
+  const [searched, setSearched] = useState(false);
 
   const vehOptions = useMemo(() => {
     return [...new Set([...vehicles.map((v) => v.vehNo), ...allLhcVeh])].filter(Boolean);
@@ -144,6 +153,7 @@ export default function LhcPaymentPage() {
       return;
     }
     setLoading(true);
+    setSearched(true);
     try {
       const qs = new URLSearchParams({ vehNo: vehNo.trim(), paid: "false" }).toString();
       const data = await api<Lhc[]>(`/api/reports/lhc-payments?${qs}`);
@@ -181,8 +191,8 @@ export default function LhcPaymentPage() {
     const newBalance = Number(Math.max(0, outstanding - d.paidAmt - d.otherDed).toFixed(2));
     const newPaidAmount = Number(((Number(row.paidAmount) || 0) + d.paidAmt).toFixed(2));
     const newOtherDed = Number(((Number(row.otherDed) || 0) + d.otherDed).toFixed(2));
+    setSavingId(row.id);
     try {
-      // Only payment fields — avoid full-row PUT (can break on schema/client mismatch)
       await api(`/api/lhc/${row.id}`, {
         method: "PUT",
         body: JSON.stringify({
@@ -199,11 +209,13 @@ export default function LhcPaymentPage() {
         text:
           newBalance <= 0
             ? `Payment saved — Challan ${row.challanNo} fully paid`
-            : `Payment saved for Challan ${row.challanNo}. Remaining ₹${newBalance.toFixed(2)}`,
+            : `Payment saved for Challan ${row.challanNo}. Remaining ₹${inr(newBalance)}`,
       });
       await showReport();
     } catch (err) {
       setMessage({ type: "err", text: err instanceof Error ? err.message : "Save failed" });
+    } finally {
+      setSavingId(null);
     }
   }
 
@@ -212,14 +224,29 @@ export default function LhcPaymentPage() {
     [rows],
   );
 
+  const totalPaying = useMemo(
+    () =>
+      rows.reduce((s, r) => {
+        const d = draftFor(r);
+        return s + (Number(d.paidAmt) || 0) + (Number(d.otherDed) || 0);
+      }, 0),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [rows, drafts],
+  );
+
   return (
     <>
       <PageHeader
         title="LHC Payment Entry"
-        subtitle="Select and fill data for the lhc payment"
-        crumbs={[{ label: "Home", href: "/dashboard" }, { label: "LHC Payment" }]}
+        subtitle="Vehicle select karke outstanding LHC pe payment / deduction save karein"
+        crumbs={[
+          { label: "Home", href: "/dashboard" },
+          { label: "LHC", href: "/lhc/contract" },
+          { label: "Payment Entry" },
+        ]}
       />
       <Flash message={message} />
+
       <form onSubmit={showReport}>
         <FormCard>
           <TwoCol>
@@ -231,75 +258,123 @@ export default function LhcPaymentPage() {
                 options={vehOptions}
                 placeholder="Search or select vehicle"
               />
-              <Button type="submit" variant="teal" className="mt-1" disabled={loading}>
-                {loading ? "Loading…" : "Show Report"}
-              </Button>
             </div>
             <div>
               <DateField label="Paid Date" value={paidDate} onChange={setPaidDate} />
             </div>
           </TwoCol>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <Button type="submit" variant="teal" disabled={loading || !vehNo.trim()}>
+              {loading ? "Loading…" : "Show Outstanding"}
+            </Button>
+            {rows.length > 0 ? (
+              <span className="text-sm text-[var(--muted,#64748b)]">
+                {rows.length} challan · Outstanding ₹{inr(totalOutstanding)}
+              </span>
+            ) : null}
+          </div>
         </FormCard>
       </form>
 
       {rows.length ? (
         <div className="box overflow-x-auto">
+          <div className="box-header flex flex-wrap items-center justify-between gap-2 !py-2.5">
+            <strong className="text-[14px]">Outstanding LHC — {vehNo}</strong>
+            <span className="text-[13px] font-semibold text-[#0f766e]">
+              Paying / Deducting now: ₹{inr(totalPaying)}
+            </span>
+          </div>
           <div className="box-body !py-2 !px-2">
-            <table className="erp-dt mr-receipt-table w-full min-w-[1100px] border-collapse text-[13px]">
+            <table className="erp-dt mr-receipt-table lhc-pay-table w-full min-w-[1180px] border-collapse text-[13px]">
               <thead>
                 <tr>
-                  <th>Sr No</th>
-                  <th>Challan No</th>
-                  <th>Vehicle No.</th>
-                  <th>From</th>
-                  <th>To</th>
-                  <th>LR Nos</th>
+                  <th>Sr</th>
+                  <th>Challan</th>
                   <th>Date</th>
+                  <th>Route</th>
+                  <th>LR Nos</th>
                   <th>Broker</th>
-                  <th>Outstanding</th>
-                  <th>Paid Amount</th>
+                  <th className="text-right">Outstanding</th>
+                  <th>Paid Amt</th>
                   <th>Other Ded.</th>
-                  <th>Narration</th>
+                  <th className="text-right">After Pay</th>
+                  <th>Narration / Save</th>
                 </tr>
               </thead>
               <tbody>
                 {rows.map((row, i) => {
                   const outstanding = lhcOutstanding(row);
                   const d = draftFor(row);
+                  const afterPay = Number(
+                    Math.max(0, outstanding - (d.paidAmt || 0) - (d.otherDed || 0)).toFixed(2),
+                  );
+                  const busy = savingId === row.id;
                   return (
                     <tr key={row.id}>
-                      <td>{row.id}</td>
-                      <td>{row.challanNo}</td>
-                      <td>{row.vehNo}</td>
-                      <td>{row.fromStation}</td>
-                      <td>{row.toStation}</td>
-                      <td>{row.lrNos}</td>
-                      <td>{slashDate(row.challanDate)}</td>
-                      <td>{row.brokerName}</td>
-                      <td className="text-right">{cellMoneyText(outstanding)}</td>
+                      <td>{i + 1}</td>
                       <td>
-                        <CellMoneyInput
-                          value={d.paidAmt}
-                          width="88px"
-                          onChange={(n) => updateDraft(row.id, { paidAmt: n })}
-                        />
+                        <div className="font-semibold">{row.challanNo}</div>
+                        <div className="text-[11px] text-[var(--muted,#64748b)]">{row.vehNo}</div>
+                      </td>
+                      <td>{slashDate(row.challanDate)}</td>
+                      <td>
+                        <div>{row.fromStation || "—"}</div>
+                        <div className="text-[11px] text-[var(--muted,#64748b)]">→ {row.toStation || "—"}</div>
+                      </td>
+                      <td className="max-w-[140px] break-words">{row.lrNos || "—"}</td>
+                      <td>{row.brokerName || "—"}</td>
+                      <td className="text-right font-semibold whitespace-nowrap">₹{inr(outstanding)}</td>
+                      <td>
+                        <div className="flex flex-col gap-1">
+                          <CellMoneyInput
+                            value={d.paidAmt}
+                            width="92px"
+                            onChange={(n) => updateDraft(row.id, { paidAmt: n })}
+                          />
+                          <button
+                            type="button"
+                            className="text-left text-[11px] text-[#0f766e] underline"
+                            onClick={() =>
+                              updateDraft(row.id, {
+                                paidAmt: outstanding,
+                                otherDed: 0,
+                              })
+                            }
+                          >
+                            Pay full
+                          </button>
+                        </div>
                       </td>
                       <td>
                         <CellMoneyInput
                           value={d.otherDed}
-                          width="80px"
+                          width="84px"
                           onChange={(n) => updateDraft(row.id, { otherDed: n })}
                         />
                       </td>
+                      <td
+                        className={`text-right whitespace-nowrap font-semibold ${
+                          afterPay <= 0 ? "text-[#15803d]" : ""
+                        }`}
+                      >
+                        ₹{inr(afterPay)}
+                      </td>
                       <td>
-                        <div className="flex items-center gap-1">
+                        <div className="flex min-w-[220px] items-center gap-1.5">
                           <input
-                            className="form-control mr-cell-input mr-narration-input"
+                            className="form-control mr-cell-input mr-narration-input flex-1"
+                            placeholder="Narration"
                             value={d.narration}
                             onChange={(e) => updateDraft(row.id, { narration: e.target.value })}
                           />
-                          <Button type="button" size="sm" variant="teal" onClick={() => savePayment(row)}>
-                            Save
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="teal"
+                            disabled={busy || (!d.paidAmt && !d.otherDed)}
+                            onClick={() => savePayment(row)}
+                          >
+                            {busy ? "…" : "Save"}
                           </Button>
                         </div>
                       </td>
@@ -308,13 +383,27 @@ export default function LhcPaymentPage() {
                 })}
               </tbody>
             </table>
-            <p className="mt-3 text-sm font-semibold">
-              Total Outstanding: ₹{totalOutstanding.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
-            </p>
+
+            <div className="erp-dt-foot mt-3 flex flex-col gap-2 border-t border-[var(--border,#e2e8f0)] pt-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+              <span className="font-semibold">
+                Total Outstanding: ₹{inr(totalOutstanding)}
+              </span>
+              <span className="text-[var(--muted,#64748b)]">
+                Paid Date applied on save: {slashDate(paidDate)}
+              </span>
+            </div>
           </div>
         </div>
       ) : (
-        <FormCard className="min-h-16" />
+        <FormCard>
+          <p className="m-0 py-6 text-center text-sm text-[var(--muted,#64748b)]">
+            {loading
+              ? "Loading outstanding LHC…"
+              : searched
+                ? `No outstanding payment for vehicle ${vehNo || "—"}.`
+                : "Vehicle select karke Show Outstanding dabayein."}
+          </p>
+        </FormCard>
       )}
     </>
   );
