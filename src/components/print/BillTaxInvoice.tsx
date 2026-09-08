@@ -94,15 +94,15 @@ type Props = {
   docTitle?: string;
 };
 
-/** Column % — long headers (Insurance, St.Charges, Hamali) must fit inside borders */
+/** Column % — Insurance / St.Charges / Hamali fit at ~9pt headers */
 const WEIGHT_COLS = [
   "3%",
-  "6%",
+  "5.5%",
   "5.5%",
   "6%",
   "4%",
-  "8%",
-  "8%",
+  "7.5%",
+  "7.5%",
   "5.5%",
   "4.5%",
   "5.5%",
@@ -112,12 +112,12 @@ const WEIGHT_COLS = [
   "5%",
   "5.5%",
   "4.5%",
-  "9%",
+  "10.5%",
 ] as const;
 
 const METER_COLS = [
   "3%",
-  "6.5%",
+  "6%",
   "5.5%",
   "9%",
   "9%",
@@ -131,7 +131,7 @@ const METER_COLS = [
   "5%",
   "5.5%",
   "4.5%",
-  "12.5%",
+  "13%",
 ] as const;
 
 export function BillTaxInvoice({
