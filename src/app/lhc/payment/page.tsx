@@ -240,24 +240,24 @@ export default function LhcPaymentPage() {
       </form>
 
       {rows.length ? (
-        <div className="box overflow-x-auto">
+        <div className="box">
           <div className="box-header !py-2">
             <strong>Outstanding LHC — {vehNo}</strong>
           </div>
           <div className="box-body !py-2 !px-2">
-            <table className="erp-dt mr-receipt-table lhc-pay-table w-full min-w-[1100px] border-collapse text-[13px]">
+            <table className="erp-dt mr-receipt-table lhc-pay-table w-full border-collapse text-[12px]">
               <thead>
                 <tr>
-                  <th>Sr No</th>
-                  <th>Challan No</th>
-                  <th>Vehicle No.</th>
+                  <th>Sr</th>
+                  <th>Challan</th>
+                  <th>Vehicle</th>
                   <th>From</th>
                   <th>To</th>
                   <th>LR Nos</th>
                   <th>Date</th>
                   <th>Broker</th>
                   <th>Outstanding</th>
-                  <th>Paid Amount</th>
+                  <th>Paid Amt</th>
                   <th>Other Ded.</th>
                   <th>Narration</th>
                   <th>Action</th>
@@ -276,21 +276,21 @@ export default function LhcPaymentPage() {
                       <td>{row.toStation}</td>
                       <td className="lhc-pay-lrnos">{row.lrNos}</td>
                       <td>{slashDate(row.challanDate)}</td>
-                      <td>{row.brokerName}</td>
-                      <td className="text-right font-semibold whitespace-nowrap">
-                        ₹{Number(outstanding).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                      <td className="lhc-pay-broker">{row.brokerName}</td>
+                      <td className="text-right font-semibold">
+                        ₹{Number(outstanding).toLocaleString("en-IN", { minimumFractionDigits: 0 })}
                       </td>
                       <td>
                         <CellMoneyInput
                           value={d.paidAmt}
-                          width="88px"
+                          width="72px"
                           onChange={(n) => updateDraft(row.id, { paidAmt: n })}
                         />
                       </td>
                       <td>
                         <CellMoneyInput
                           value={d.otherDed}
-                          width="80px"
+                          width="64px"
                           onChange={(n) => updateDraft(row.id, { otherDed: n })}
                         />
                       </td>

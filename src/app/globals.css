@@ -836,24 +836,45 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   padding-bottom: 2px;
 }
 
-.lhc-pay-table th,
-.lhc-pay-table td {
-  padding: 8px 8px;
-  vertical-align: middle;
+.lhc-pay-table {
+  table-layout: fixed;
+  width: 100%;
 }
 
-.lhc-pay-table .lhc-pay-lrnos {
+.lhc-pay-table th,
+.lhc-pay-table td {
+  padding: 6px 4px;
+  vertical-align: middle;
   white-space: normal;
-  min-width: 90px;
-  max-width: 140px;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.lhc-pay-table .lhc-pay-lrnos,
+.lhc-pay-table .lhc-pay-broker {
+  white-space: normal;
+  font-size: 11px;
+  line-height: 1.25;
 }
 
 .lhc-pay-narration {
   width: 100%;
-  min-width: 140px;
-  max-width: 220px;
-  height: 32px;
-  min-height: 32px;
+  min-width: 0;
+  max-width: none;
+  height: 30px;
+  min-height: 30px;
+  box-sizing: border-box;
+}
+
+.lhc-pay-table .mr-cell-input {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.lhc-payment-page .box {
+  overflow-x: visible;
 }
 
 @media (max-width: 900px) {
