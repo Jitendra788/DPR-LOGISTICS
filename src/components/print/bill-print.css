@@ -318,8 +318,8 @@
 
 /* Signature ~25–30mm tall */
 .bill-print-sign-cell {
-  height: 28mm;
-  min-height: 28mm;
+  height: 32mm;
+  min-height: 32mm;
   vertical-align: top !important;
   padding-top: 4px !important;
   padding-bottom: 4px !important;
@@ -335,7 +335,7 @@
 
 .bill-print-stamp {
   display: block;
-  width: 22mm;
+  width: 28mm;
   height: auto;
   margin: 3px auto 0;
   -webkit-print-color-adjust: exact !important;
