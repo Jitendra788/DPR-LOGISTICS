@@ -64,25 +64,41 @@
   height: 100%;
   width: 100%;
   background: #ffffff !important;
+  table-layout: fixed;
 }
 
 .bill-print-taxbox td {
-  font-weight: 700;
+  font-weight: 800;
   vertical-align: middle;
-  padding: 3px 5px !important;
-  font-size: 10.5px !important;
+  padding: 4px 6px !important;
+  font-size: 13px !important;
+  line-height: 1.2;
   color: #000000 !important;
   background: #ffffff !important;
 }
 
 .bill-print-taxbox .bill-print-bold {
-  font-weight: 800;
+  font-weight: 900;
+}
+
+.bill-print-taxbox td:first-child {
+  width: 40%;
+  text-align: left;
+  white-space: normal;
+}
+
+.bill-print-taxbox td:last-child {
+  width: 60%;
+  text-align: right;
+  white-space: nowrap;
 }
 
 .bill-print-grand td {
   border-top: 2px solid #000000 !important;
   background: #ffffff !important;
   color: #000000 !important;
+  font-size: 13px !important;
+  font-weight: 900 !important;
 }
 
 .bill-print-no-pad {
@@ -229,8 +245,9 @@
 }
 
 .bill-print-total-row {
-  font-size: 11px !important;
-  padding: 3px 5px !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  padding: 4px 6px !important;
   color: #000000 !important;
   background: #ffffff !important;
 }
@@ -252,11 +269,15 @@
   background: #ffffff !important;
 }
 
+.bill-print-sign-right {
+  text-align: center !important;
+}
+
 .bill-print-stamp {
   display: block;
-  width: 82px;
+  width: 78px;
   height: auto;
-  margin: 2px 8px 0 auto;
+  margin: 4px auto 0;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
@@ -317,6 +338,17 @@
     color: #c00000 !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
+  }
+
+  .bill-print-taxbox td,
+  .bill-print-grand td {
+    font-size: 13px !important;
+    font-weight: 800 !important;
+  }
+
+  .bill-print-total-row {
+    font-size: 13px !important;
+    font-weight: 800 !important;
   }
 
   .bill-print-bless {
