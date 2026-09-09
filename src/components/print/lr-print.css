@@ -266,15 +266,15 @@
 .lr-print-logo-cell {
   text-align: center;
   vertical-align: middle !important;
-  width: 80px;
+  width: 140px;
   padding: 2px 1px !important;
   background: #ffffff !important;
 }
 
 .lr-print-logo {
-  width: 68px;
+  width: 132px;
   height: auto;
-  max-height: 48px;
+  max-height: 90px;
   object-fit: contain;
   display: block;
   margin: 0 auto;

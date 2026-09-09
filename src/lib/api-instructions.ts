@@ -42,11 +42,12 @@ export async function assertUniqueOnCreate(resource: ResourceKey, data: Record<s
   for (const field of fields) {
     const value = String(data[field] ?? "").trim();
     if (!value) continue;
-    const existing = await model.findFirst({
+    const existing = await model.findMany({
       where: { [field]: value },
       select: { id: true },
+      take: 1,
     });
-    if (existing) {
+    if (existing.length) {
       throw new Error(alreadySavedInstruction(field, value));
     }
   }
@@ -68,11 +69,13 @@ export async function assertUniqueOnUpdate(
     if (!(field in data)) continue;
     const value = String(data[field] ?? "").trim();
     if (!value) continue;
-    const existing = await model.findFirst({
+    const existing = await model.findMany({
       where: { [field]: value },
       select: { id: true },
+      take: 1,
     });
-    if (existing && Number((existing as { id: number }).id) !== id) {
+    const row = existing[0] as { id?: number } | undefined;
+    if (row && Number(row.id) !== id) {
       throw new Error(alreadySavedInstruction(field, value));
     }
   }

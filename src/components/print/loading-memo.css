@@ -37,7 +37,7 @@
 }
 
 .lm-logo-cell {
-  width: 100px;
+  width: 150px;
   text-align: center;
   vertical-align: middle !important;
   padding: 5px !important;
@@ -46,9 +46,9 @@
 }
 
 .lm-logo {
-  width: 90px;
+  width: 132px;
   height: auto;
-  max-height: 70px;
+  max-height: 90px;
   object-fit: contain;
   display: block;
   margin: 0 auto;

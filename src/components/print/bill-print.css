@@ -208,7 +208,7 @@
 }
 
 .bill-print-logo-cell {
-  width: 110px;
+  width: 150px;
   text-align: center;
   vertical-align: middle !important;
   padding: 4px 3px !important;
@@ -216,9 +216,9 @@
 }
 
 .bill-print-logo {
-  width: 96px;
+  width: 132px;
   height: auto;
-  max-height: 78px;
+  max-height: 90px;
   object-fit: contain;
   display: block;
   margin: 0 auto;
