@@ -12,6 +12,7 @@ export type NavItem = {
 
 export const navItems: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: "gauge" },
+  { label: "Letterhead", href: "/other/letterhead", icon: "file" },
   {
     label: "Master Data",
     icon: "monitor",
@@ -62,7 +63,7 @@ export const navItems: NavItem[] = [
       { label: "Vendor Expense Vouher", href: "/other/vendor-voucher" },
       { label: "Vendor Oustanding", href: "/other/vendor-outstanding" },
       { label: "Vendor Ledger", href: "/other/vendor-ledger" },
-      { label: "Company Letterhead", href: "/other/letterhead" },
+      { label: "Letterhead", href: "/other/letterhead" },
     ],
   },
   {
