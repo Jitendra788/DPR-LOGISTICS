@@ -3,7 +3,14 @@
 import { useMemo, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
-import { BRAND_LOGO_HEADER_PRINT, BRAND_NAME, ROADWAYS_LOGO_PRINT } from "@/lib/brand";
+import {
+  BRAND_AUTHORIZED_SIGNATORY_PRINT,
+  BRAND_LOGO_HEADER_PRINT,
+  BRAND_NAME,
+  ROADWAYS_LOGO_PRINT,
+  ROADWAYS_SIGNATURE_PRINT,
+  ROADWAYS_STAMP_PRINT,
+} from "@/lib/brand";
 import { lrPrintCompany } from "@/lib/lr-print";
 import { roadwaysPrintCompany } from "@/lib/roadways-print";
 import { printWhenReady } from "@/lib/print-when-ready";
@@ -33,6 +40,7 @@ export default function LetterheadPage() {
         phones: roadwaysPrintCompany.phones,
         logo: ROADWAYS_LOGO_PRINT,
         sheetClass: "lh-sheet lh-sheet-roadways",
+        signMode: "roadways" as const,
       };
     }
     return {
@@ -43,6 +51,7 @@ export default function LetterheadPage() {
       phones: lrPrintCompany.phones,
       logo: BRAND_LOGO_HEADER_PRINT,
       sheetClass: "lh-sheet lh-sheet-dpr",
+      signMode: "dpr" as const,
     };
   }, [brand]);
 
@@ -116,6 +125,39 @@ export default function LetterheadPage() {
           role="textbox"
           aria-label="Letterhead body"
         />
+
+        <div className="lh-sign" aria-label="Authorized Signatory">
+          {profile.signMode === "dpr" ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={BRAND_AUTHORIZED_SIGNATORY_PRINT}
+              alt="Authorized Signatory — Rakesh Kumar / Stamp"
+              className="lh-sign-block"
+              decoding="sync"
+            />
+          ) : (
+            <>
+              <div className="lh-sign-title">Authorized Signatory</div>
+              <div className="lh-sign-name">Stamp / Signature</div>
+              <div className="lh-sign-stack">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={ROADWAYS_STAMP_PRINT}
+                  alt="Roadways stamp"
+                  className="lh-sign-stamp"
+                  decoding="sync"
+                />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={ROADWAYS_SIGNATURE_PRINT}
+                  alt="Authorized signature"
+                  className="lh-sign-signature"
+                  decoding="sync"
+                />
+              </div>
+            </>
+          )}
+        </div>
       </section>
     </div>
   );

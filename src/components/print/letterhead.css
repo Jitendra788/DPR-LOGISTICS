@@ -47,6 +47,8 @@
   color: #111;
   border: 1px solid #d8e2ec;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
 }
@@ -129,7 +131,8 @@
 }
 
 .lh-body {
-  min-height: 180mm;
+  flex: 1 1 auto;
+  min-height: 140mm;
   font-size: 13.5px;
   line-height: 1.55;
   outline: none;
@@ -141,6 +144,57 @@
   content: attr(data-placeholder);
   color: #94a3b8;
   pointer-events: none;
+}
+
+.lh-sign {
+  margin-top: 28px;
+  width: min(280px, 52%);
+  flex: 0 0 auto;
+}
+
+.lh-sign-block {
+  display: block;
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+}
+
+.lh-sign-title {
+  border-top: 1px solid #111;
+  padding-top: 4px;
+  font-size: 12.5px;
+  font-weight: 800;
+}
+
+.lh-sign-name {
+  margin-top: 2px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lh-sign-stack {
+  position: relative;
+  margin-top: 6px;
+  width: 150px;
+  height: 120px;
+}
+
+.lh-sign-stamp {
+  position: absolute;
+  inset: 0;
+  width: 140px;
+  height: auto;
+  object-fit: contain;
+}
+
+.lh-sign-signature {
+  position: absolute;
+  left: 8px;
+  top: 34px;
+  width: 130px;
+  height: auto;
+  object-fit: contain;
+  opacity: 0.95;
 }
 
 .lh-hint {
