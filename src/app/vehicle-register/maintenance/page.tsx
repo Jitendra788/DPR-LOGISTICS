@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
 import { DateField, InputField, ComboboxField } from "@/components/ui/FormField";
@@ -42,11 +42,21 @@ function money(n: number) {
   return Number(n) || 0;
 }
 
+/** Balance = Freight − Diesel − FasTag − Other Expenses */
+function calcBalance(freight: number, diesel: number, fasTag: number, otherExpenses = 0) {
+  return Number((money(freight) - money(diesel) - money(fasTag) - money(otherExpenses)).toFixed(2));
+}
+
 export default function MaintenancePage() {
   const { rows, message, create, update, remove, setMessage } = useCrud<Row>("maintenance");
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState(emptyForm);
+
+  const balance = useMemo(
+    () => calcBalance(form.freight, form.diesel, form.fasTag, form.otherExpenses),
+    [form.freight, form.diesel, form.fasTag, form.otherExpenses],
+  );
 
   useEffect(() => {
     api<Vehicle[]>("/api/fleet").then(setVehicles);
@@ -58,7 +68,7 @@ export default function MaintenancePage() {
     const otherExpenses = money(form.otherExpenses);
     const fasTag = money(form.fasTag);
     const freight = money(form.freight);
-    const amount = diesel + otherExpenses + fasTag + freight;
+    const amount = calcBalance(freight, diesel, fasTag, otherExpenses);
     const body = {
       ...form,
       amount,
@@ -121,6 +131,7 @@ export default function MaintenancePage() {
                 value={form.narration}
                 onChange={(e) => setForm({ ...form, narration: e.target.value })}
               />
+              <InputField label="Balance" value={balance} readOnly />
             </div>
           </TwoCol>
           <Button type="submit" variant="teal">
@@ -168,7 +179,11 @@ export default function MaintenancePage() {
           { key: "fasTag", header: "FasTag" },
           { key: "otherExpenses", header: "Other Exp" },
           { key: "narration", header: "Narration" },
-          { key: "amount", header: "Total" },
+          {
+            key: "balance",
+            header: "Balance",
+            render: (row) => calcBalance(row.freight, row.diesel, row.fasTag, row.otherExpenses),
+          },
         ]}
       />
     </>

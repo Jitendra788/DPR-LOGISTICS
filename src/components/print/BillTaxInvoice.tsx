@@ -94,44 +94,44 @@ type Props = {
   docTitle?: string;
 };
 
-/** Column % — Sr No / Ser Tax / St.Charges / Door Colle. stay inside borders */
+/** Column % — room for LR Date / From / To / Freight without overflow */
 const WEIGHT_COLS = [
-  "4%",
-  "5.5%",
-  "7.5%", // LR Date — keep DD/MM/YYYY on one line
+  "3%",
   "5%",
-  "4%",
-  "6%",
-  "6%",
+  "8%",
   "5%",
-  "5.5%",
-  "5.5%",
-  "6%",
+  "3.5%",
+  "7.5%",
+  "7.5%",
   "7%",
-  "7%",
-  "5%",
-  "5%",
   "4.5%",
-  "11.5%",
+  "5%",
+  "5%",
+  "6%",
+  "6%",
+  "4.5%",
+  "4.5%",
+  "4%",
+  "14%",
 ] as const;
 
 const METER_COLS = [
+  "3%",
+  "5.5%",
+  "8%",
+  "8%",
+  "8%",
+  "5%",
   "4%",
-  "6%",
-  "7.5%", // LR Date — keep DD/MM/YYYY on one line
-  "7.5%",
-  "7.5%",
   "5%",
-  "4.5%",
-  "5.5%",
-  "5.5%",
-  "6%",
-  "6.5%",
-  "6.5%",
   "5%",
   "5.5%",
+  "6%",
+  "6%",
   "4.5%",
-  "13%",
+  "5%",
+  "4%",
+  "17.5%",
 ] as const;
 
 export function BillTaxInvoice({
@@ -289,19 +289,19 @@ export function BillTaxInvoice({
                   <td>{i + 1}</td>
                   <td>{stripLrPrefix(row.lrNo)}</td>
                   <td className="bill-print-lr-date">{formatPrintDate(row.lrDate)}</td>
-                  <td>{row.fromStation}</td>
-                  <td>{row.toStation}</td>
-                  <td>{row.totalMeter || ""}</td>
-                  <td>{row.rate || ""}</td>
-                  <td>{fmtCharge(row.serviceTax)}</td>
-                  <td>{fmtCharge(row.haltage)}</td>
-                  <td>{fmtCharge(row.insurance)}</td>
-                  <td>{fmtCharge(row.stCharges)}</td>
-                  <td>{fmtCharge(row.doorCollection)}</td>
-                  <td>{fmtCharge(row.barrier)}</td>
-                  <td>{fmtCharge(row.hamali)}</td>
-                  <td>{fmtCharge(row.other)}</td>
-                  <td>{formatPrintMoney(lineFreight)}</td>
+                  <td className="bill-print-station">{row.fromStation}</td>
+                  <td className="bill-print-station">{row.toStation}</td>
+                  <td className="bill-print-tight">{row.totalMeter || ""}</td>
+                  <td className="bill-print-tight">{row.rate || ""}</td>
+                  <td className="bill-print-amt">{fmtCharge(row.serviceTax)}</td>
+                  <td className="bill-print-amt">{fmtCharge(row.haltage)}</td>
+                  <td className="bill-print-amt">{fmtCharge(row.insurance)}</td>
+                  <td className="bill-print-amt">{fmtCharge(row.stCharges)}</td>
+                  <td className="bill-print-amt">{fmtCharge(row.doorCollection)}</td>
+                  <td className="bill-print-amt">{fmtCharge(row.barrier)}</td>
+                  <td className="bill-print-amt">{fmtCharge(row.hamali)}</td>
+                  <td className="bill-print-amt">{fmtCharge(row.other)}</td>
+                  <td className="bill-print-amt">{formatPrintMoney(lineFreight)}</td>
                 </tr>
               );
             }
@@ -310,20 +310,20 @@ export function BillTaxInvoice({
                 <td>{i + 1}</td>
                 <td>{stripLrPrefix(row.lrNo)}</td>
                 <td className="bill-print-lr-date">{formatPrintDate(row.lrDate)}</td>
-                <td>{lrWeight(row)}</td>
-                <td>{row.rate || ""}</td>
-                <td>{row.fromStation}</td>
-                <td>{row.toStation}</td>
-                <td>{formatPrintMoney(row.freight)}</td>
-                <td>{fmtCharge(row.serviceTax)}</td>
-                <td>{fmtCharge(row.haltage)}</td>
-                <td>{fmtCharge(row.insurance)}</td>
-                <td>{fmtCharge(row.stCharges)}</td>
-                <td>{fmtCharge(row.doorCollection)}</td>
-                <td>{fmtCharge(row.barrier)}</td>
-                <td>{fmtCharge(row.hamali)}</td>
-                <td>{fmtCharge(row.other)}</td>
-                <td>{formatPrintMoney(lineFreight)}</td>
+                <td className="bill-print-tight">{lrWeight(row)}</td>
+                <td className="bill-print-tight">{row.rate || ""}</td>
+                <td className="bill-print-station">{row.fromStation}</td>
+                <td className="bill-print-station">{row.toStation}</td>
+                <td className="bill-print-amt">{formatPrintMoney(row.freight)}</td>
+                <td className="bill-print-amt">{fmtCharge(row.serviceTax)}</td>
+                <td className="bill-print-amt">{fmtCharge(row.haltage)}</td>
+                <td className="bill-print-amt">{fmtCharge(row.insurance)}</td>
+                <td className="bill-print-amt">{fmtCharge(row.stCharges)}</td>
+                <td className="bill-print-amt">{fmtCharge(row.doorCollection)}</td>
+                <td className="bill-print-amt">{fmtCharge(row.barrier)}</td>
+                <td className="bill-print-amt">{fmtCharge(row.hamali)}</td>
+                <td className="bill-print-amt">{fmtCharge(row.other)}</td>
+                <td className="bill-print-amt">{formatPrintMoney(lineFreight)}</td>
               </tr>
             );
           })}

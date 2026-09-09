@@ -35,13 +35,68 @@
 
 .bill-print-table > tbody > tr > td {
   border: 1px solid #000000;
-  padding: 2px 3px;
-  vertical-align: top;
+  padding: 2px 2px;
+  vertical-align: middle;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  font-size: 9.5pt;
+  box-sizing: border-box;
+  font-size: 8.5pt;
   color: #000000 !important;
   background: #ffffff !important;
+}
+
+/* Table headers — wrap inside cell, never clip mid-word across border */
+.bill-print-th {
+  font-weight: 800 !important;
+  font-size: 7pt !important;
+  padding: 2px 0 !important;
+  vertical-align: middle !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+.bill-print-th > td {
+  background: #ffffff !important;
+  color: #000000 !important;
+  white-space: normal !important;
+  word-break: normal !important;
+  overflow: hidden !important;
+  overflow-wrap: break-word !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.15px;
+  padding: 2px 1px !important;
+  box-sizing: border-box !important;
+  max-width: 0;
+}
+
+/* Table data */
+.bill-print-data td {
+  font-size: 8pt;
+  font-weight: 400;
+  vertical-align: middle !important;
+  padding: 2px 1px !important;
+  color: #000000 !important;
+  background: #ffffff !important;
+  overflow: hidden !important;
+  max-width: 0;
+}
+
+.bill-print-lr-date,
+.bill-print-amt,
+.bill-print-tight {
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+  word-wrap: normal !important;
+  overflow: hidden !important;
+}
+
+.bill-print-station {
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+  line-height: 1.1;
+  overflow: hidden !important;
 }
 
 .bill-print-inner {
@@ -191,47 +246,6 @@
 .bill-print-label {
   font-weight: 700;
   color: #000000 !important;
-}
-
-/* Table headers — tight fit inside cell borders (no overflow) */
-.bill-print-th {
-  font-weight: 800 !important;
-  font-size: 8pt !important;
-  padding: 2px 0 !important;
-  vertical-align: middle !important;
-  background: #ffffff !important;
-  color: #000000 !important;
-}
-
-.bill-print-th > td {
-  background: #ffffff !important;
-  color: #000000 !important;
-  white-space: nowrap !important;
-  word-break: keep-all !important;
-  overflow: hidden !important;
-  text-overflow: clip !important;
-  overflow-wrap: normal !important;
-  line-height: 1.05 !important;
-  letter-spacing: -0.3px;
-  padding: 2px 0 !important;
-  box-sizing: border-box !important;
-}
-
-/* Table data ~9–10pt */
-.bill-print-data td {
-  font-size: 9.5pt;
-  font-weight: 400;
-  vertical-align: middle !important;
-  padding: 2px 1px !important;
-  color: #000000 !important;
-  background: #ffffff !important;
-}
-
-.bill-print-lr-date {
-  white-space: nowrap !important;
-  word-break: keep-all !important;
-  overflow-wrap: normal !important;
-  word-wrap: normal !important;
 }
 
 /* Left totals / words ~11–12pt */
@@ -412,23 +426,34 @@
     padding: 4px 3px !important;
   }
 
-  .bill-print-th > td {
-    white-space: nowrap !important;
-    font-size: 8pt !important;
-    letter-spacing: -0.3px !important;
-    padding: 2px 0 !important;
+  .bill-print-th > td,
+  .bill-print-data td {
     overflow: hidden !important;
+    max-width: 0 !important;
   }
 
-  .bill-print-lr-date {
-    white-space: nowrap !important;
-    word-break: keep-all !important;
-    overflow-wrap: normal !important;
-    word-wrap: normal !important;
+  .bill-print-th > td {
+    white-space: normal !important;
+    font-size: 7pt !important;
+    letter-spacing: -0.15px !important;
+    padding: 2px 1px !important;
+    line-height: 1.1 !important;
   }
 
   .bill-print-data td {
-    font-size: 9.5pt !important;
+    font-size: 8pt !important;
+  }
+
+  .bill-print-lr-date,
+  .bill-print-amt,
+  .bill-print-tight {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+  }
+
+  .bill-print-station {
+    overflow: hidden !important;
+    word-break: break-word !important;
   }
 
   .bill-print-total-row,
@@ -442,6 +467,8 @@
     font-size: 11pt !important;
     font-weight: 700 !important;
     font-family: Arial, Helvetica, sans-serif !important;
+    max-width: none !important;
+    overflow: visible !important;
   }
 
   .bill-print-logo,
@@ -450,9 +477,9 @@
     print-color-adjust: exact !important;
   }
 
+  /* Bill table needs width — Landscape */
   @page {
-    /* Portrait / Landscape both — browser Layout dropdown controls orientation */
-    size: auto;
-    margin: 10mm;
+    size: A4 landscape;
+    margin: 6mm;
   }
 }
