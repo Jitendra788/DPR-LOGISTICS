@@ -5,7 +5,7 @@ import { api } from "@/lib/api-client";
 
 export type FlashState = { type: "ok" | "err"; text: string; at: number } | null;
 
-/** Blocks identical create payloads while a request is in flight (and briefly after). */
+/** Blocks identical / same-doc creates while in flight (and briefly after). */
 const recentCreates = new Map<string, number>();
 
 function bodyKey(resource: string, body: unknown) {
@@ -14,6 +14,21 @@ function bodyKey(resource: string, body: unknown) {
   } catch {
     return `${resource}:${String(body)}`;
   }
+}
+
+/** Prefer document-number key so double-click with same LR/Bill cannot slip through. */
+function docGuardKey(resource: string, body: unknown) {
+  if (!body || typeof body !== "object") return "";
+  const row = body as Record<string, unknown>;
+  const fields: Record<string, string> = {
+    bookings: "lrNo",
+    bills: "billNo",
+    lhc: "challanNo",
+  };
+  const field = fields[resource];
+  if (!field) return "";
+  const value = String(row[field] ?? "").trim();
+  return value ? `${resource}:${field}:${value}` : "";
 }
 
 export function useCrud<T extends { id: number }>(resource: string) {
@@ -57,13 +72,22 @@ export function useCrud<T extends { id: number }>(resource: string) {
 
   async function create(body: unknown) {
     const key = bodyKey(resource, body);
+    const docKey = docGuardKey(resource, body);
     const now = Date.now();
-    const last = recentCreates.get(key) ?? 0;
-    if (now - last < 2500) {
-      setMessage({ type: "err", text: "Already saved — wait a moment before saving again" });
-      return null;
+    for (const k of [key, docKey].filter(Boolean)) {
+      const last = recentCreates.get(k) ?? 0;
+      if (now - last < 2500) {
+        setMessage({
+          type: "err",
+          text: docKey
+            ? "Already saved — wait a moment before saving again"
+            : "Already saved — wait a moment before saving again",
+        });
+        return null;
+      }
     }
     recentCreates.set(key, now);
+    if (docKey) recentCreates.set(docKey, now);
 
     return withLock(async () => {
       try {
@@ -77,6 +101,7 @@ export function useCrud<T extends { id: number }>(resource: string) {
         return saved;
       } catch (err) {
         recentCreates.delete(key);
+        if (docKey) recentCreates.delete(docKey);
         setMessage({ type: "err", text: err instanceof Error ? err.message : "Could not save. Please try again." });
         return null;
       }

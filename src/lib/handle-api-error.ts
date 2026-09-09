@@ -13,9 +13,9 @@ function prismaTarget(err: unknown) {
 }
 
 const UNIQUE_LABELS: Record<string, string> = {
-  lrNo: "LR number",
-  billNo: "Bill number",
-  challanNo: "Challan number",
+  lrNo: "LR",
+  billNo: "Bill",
+  challanNo: "Challan",
   username: "Username",
   vehNo: "Vehicle number",
   name: "Name",
@@ -32,9 +32,16 @@ export function isUniqueViolation(err: unknown, field?: string) {
 }
 
 export function userFacingError(err: unknown, fallback = "Could not save. Please try again.") {
+  if (err instanceof Error) {
+    const msg = err.message.trim();
+    if (/already saved/i.test(msg)) return msg;
+  }
   if (isUniqueViolation(err)) {
     const key = prismaTarget(err).split(",")[0]?.trim() || "";
     const label = UNIQUE_LABELS[key] || key || "This value";
+    if (key === "lrNo" || key === "billNo" || key === "challanNo") {
+      return `${label} already saved`;
+    }
     return `${label} already exists`;
   }
   if (prismaCode(err) === "P2025") {

@@ -49,9 +49,12 @@ export function AdminForm({ onSubmit, children, className = "", noValidate }: Pr
     try {
       await onSubmit(e);
     } finally {
-      busyRef.current = false;
-      setBusy(false);
-      setSubmitBusy(form, false);
+      // Keep lock briefly so a second click queued in the same tick cannot fire.
+      window.setTimeout(() => {
+        busyRef.current = false;
+        setBusy(false);
+        setSubmitBusy(form, false);
+      }, 400);
     }
   }
 

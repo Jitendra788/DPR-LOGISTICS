@@ -73,23 +73,56 @@ const chargeLabels: Record<(typeof chargeKeys)[number], string> = {
   hamali: "Hamali",
 };
 
-function LrBookingInner() {
-  const searchParams = useSearchParams();
-  const { rows, message, create, update, remove, setMessage, reload } = useCrud<Booking>("bookings");
-  const [editId, setEditId] = useState<number | null>(null);
-  const [form, setForm] = useState<Partial<Booking>>({
+function blankLrForm(lrNo = ""): Partial<Booking> {
+  const today = new Date().toISOString().slice(0, 10);
+  return {
+    bookingFrom: "",
+    lrNo,
+    lrDate: today,
+    fromStation: "",
+    toStation: "",
+    vehNo: "",
     deliveryAt: "DOOR",
     shipTo: "",
+    billingParty: "",
+    consignor: "",
+    consignee: "",
+    articles: "",
+    particulars: "",
+    invNoDate: "",
+    actWeight: "",
+    chargedWeight: "",
+    rate: "",
     billAs: "Weight",
-    gstPaidBy: "Consigner",
-    lrType: "TBB",
-    lrDate: new Date().toISOString().slice(0, 10),
-    validDate: new Date().toISOString().slice(0, 10),
+    totalMeter: "",
+    freight: 0,
+    serviceTax: 0,
+    haltage: 0,
+    insurance: 0,
+    stCharges: 0,
+    doorCollection: 0,
+    barrier: 0,
+    other: 0,
+    hamali: 0,
+    total: 0,
+    gst: 0,
     cgstAmt: 0,
     sgstAmt: 0,
     igstAmt: 0,
-    gst: 0,
-  });
+    grandTotal: 0,
+    gstPaidBy: "Consigner",
+    ewayBill: "",
+    validDate: today,
+    lrType: "TBB",
+    valueRs: "",
+  };
+}
+
+function LrBookingInner() {
+  const searchParams = useSearchParams();
+  const { rows, message, create, update, remove, setMessage, reload, saving } = useCrud<Booking>("bookings");
+  const [editId, setEditId] = useState<number | null>(null);
+  const [form, setForm] = useState<Partial<Booking>>(blankLrForm());
   const [parties, setParties] = useState<Party[]>([]);
   const partyNames = useMemo(() => parties.map((p) => p.name).filter(Boolean), [parties]);
   const [searchLr, setSearchLr] = useState("");
@@ -180,6 +213,7 @@ function LrBookingInner() {
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (editId || saving) return;
     const body = {
       ...form,
       ...formToObject(e.currentTarget),
@@ -204,7 +238,7 @@ function LrBookingInner() {
       consignor: String(form.consignor ?? "").trim(),
       consignee: String(form.consignee ?? "").trim(),
     };
-    const saved = editId ? await update(editId, body) : await create(body);
+    const saved = await create(body);
     if (saved) {
       const token = String((saved as { trackToken?: string }).trackToken ?? "");
       if (token) {
@@ -213,29 +247,7 @@ function LrBookingInner() {
       }
       setEditId(null);
       const next = await api<{ value: string }>("/api/next-no?type=lr&source=DPR");
-      setForm({
-        deliveryAt: "DOOR",
-        shipTo: "",
-        billAs: "Weight",
-        gstPaidBy: "Consigner",
-        lrType: "TBB",
-        lrDate: new Date().toISOString().slice(0, 10),
-        validDate: new Date().toISOString().slice(0, 10),
-        lrNo: next.value,
-        freight: 0,
-        serviceTax: 0,
-        haltage: 0,
-        insurance: 0,
-        stCharges: 0,
-        doorCollection: 0,
-        barrier: 0,
-        other: 0,
-        hamali: 0,
-        gst: 0,
-        cgstAmt: 0,
-        sgstAmt: 0,
-        igstAmt: 0,
-      });
+      setForm(blankLrForm(next.value));
       await reload();
     }
   }
@@ -391,13 +403,51 @@ function LrBookingInner() {
             </div>
           </TwoCol>
           <div className="mt-2 flex flex-wrap gap-2">
-            <Button type="submit" disabled={!!editId}>
-              Save LR
+            <Button type="submit" disabled={!!editId || saving}>
+              {saving && !editId ? "Saving…" : "Save LR"}
             </Button>
-            <Button type="button" variant="teal" disabled={!editId} onClick={() => editId && update(editId, { ...form, gst: gstTotal, cgstAmt: Number(form.cgstAmt) || 0, sgstAmt: Number(form.sgstAmt) || 0, igstAmt: Number(form.igstAmt) || 0, total, grandTotal, lrType: normalizeLrType(form.lrType), billingParty: String(form.billingParty ?? "").trim(), consignor: String(form.consignor ?? "").trim(), consignee: String(form.consignee ?? "").trim() })}>
-              Update LR
+            <Button
+              type="button"
+              variant="teal"
+              disabled={!editId || saving}
+              onClick={() =>
+                editId &&
+                update(editId, {
+                  ...form,
+                  gst: gstTotal,
+                  cgstAmt: Number(form.cgstAmt) || 0,
+                  sgstAmt: Number(form.sgstAmt) || 0,
+                  igstAmt: Number(form.igstAmt) || 0,
+                  total,
+                  grandTotal,
+                  lrType: normalizeLrType(form.lrType),
+                  billingParty: String(form.billingParty ?? "").trim(),
+                  consignor: String(form.consignor ?? "").trim(),
+                  consignee: String(form.consignee ?? "").trim(),
+                }).then(async (saved) => {
+                  if (!saved) return;
+                  setEditId(null);
+                  const next = await api<{ value: string }>("/api/next-no?type=lr&source=DPR");
+                  setForm(blankLrForm(next.value));
+                })
+              }
+            >
+              {saving && editId ? "Updating…" : "Update LR"}
             </Button>
-            <Button type="button" variant="danger" disabled={!editId} onClick={() => editId && remove(editId).then((ok) => ok && setEditId(null))}>
+            <Button
+              type="button"
+              variant="danger"
+              disabled={!editId || saving}
+              onClick={async () => {
+                if (!editId) return;
+                const ok = await remove(editId);
+                if (ok) {
+                  setEditId(null);
+                  const next = await api<{ value: string }>("/api/next-no?type=lr&source=DPR");
+                  setForm(blankLrForm(next.value));
+                }
+              }}
+            >
               Delete LR
             </Button>
           </div>

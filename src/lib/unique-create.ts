@@ -10,11 +10,33 @@ const DOC_RETRY: Partial<Record<ResourceKey, { field: string; width: number; sou
   lhc: { field: "challanNo", width: 2 },
 };
 
+const ALREADY_SAVED: Record<string, (value: string) => string> = {
+  lrNo: (v) => `LR ${v} already saved`,
+  billNo: (v) => `Bill ${v} already saved`,
+  challanNo: (v) => `Challan ${v} already saved`,
+};
+
+function alreadySavedMessage(field: string, value: string) {
+  return ALREADY_SAVED[field]?.(value) || `${field} ${value} already saved`;
+}
+
 export async function createWithUniqueRetry(resource: ResourceKey, data: Record<string, unknown>) {
   const model = getModel(resource);
   const retry = DOC_RETRY[resource];
   let payload = { ...data };
   const taken = new Set<string>();
+  const explicitDoc = retry ? String(payload[retry.field] ?? "").trim() : "";
+
+  // Client sent a document number — never silently renumber; reject duplicates.
+  if (retry && explicitDoc) {
+    const existing = await model.findFirst({
+      where: { [retry.field]: explicitDoc },
+      select: { id: true },
+    });
+    if (existing) {
+      throw new Error(alreadySavedMessage(retry.field, explicitDoc));
+    }
+  }
 
   for (let attempt = 0; attempt < 16; attempt++) {
     try {
@@ -28,8 +50,16 @@ export async function createWithUniqueRetry(resource: ResourceKey, data: Record<
           continue;
         }
       }
+
       if (!retry || !isUniqueViolation(err, retry.field)) throw err;
+
       const failed = String(payload[retry.field] ?? "").trim();
+
+      // User-supplied number collided (race) — do not auto-create next number.
+      if (explicitDoc) {
+        throw new Error(alreadySavedMessage(retry.field, explicitDoc || failed));
+      }
+
       if (failed) taken.add(failed);
       const source = retry.sourceAware ? normalizeDocSource(String(payload.source ?? "DPR")) : undefined;
       const [moduleRows, allRows] = await Promise.all([

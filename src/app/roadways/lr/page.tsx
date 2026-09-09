@@ -115,7 +115,7 @@ function blankForm(lrNo = "") {
 }
 
 export default function RoadwaysLrPage() {
-  const { rows, message, create, update, remove, setMessage, reload } = useCrud<Booking>("bookings");
+  const { rows, message, create, update, remove, setMessage, reload, saving } = useCrud<Booking>("bookings");
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState(blankForm());
   const [parties, setParties] = useState<Party[]>([]);
@@ -213,7 +213,7 @@ export default function RoadwaysLrPage() {
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (editId) return;
+    if (editId || saving) return;
     const body = {
       ...form,
       ...formToObject(e.currentTarget),
@@ -400,13 +400,13 @@ export default function RoadwaysLrPage() {
             </div>
           </TwoCol>
           <div className="mt-2 flex flex-wrap gap-2">
-            <Button type="submit" disabled={!!editId}>
-              Save LR
+            <Button type="submit" disabled={!!editId || saving}>
+              {saving && !editId ? "Saving…" : "Save LR"}
             </Button>
-            <Button type="button" variant="teal" disabled={!editId} onClick={modifyLr}>
-              Update LR
+            <Button type="button" variant="teal" disabled={!editId || saving} onClick={modifyLr}>
+              {saving && editId ? "Updating…" : "Update LR"}
             </Button>
-            <Button type="button" variant="danger" disabled={!editId} onClick={deleteLr}>
+            <Button type="button" variant="danger" disabled={!editId || saving} onClick={deleteLr}>
               Delete LR
             </Button>
           </div>

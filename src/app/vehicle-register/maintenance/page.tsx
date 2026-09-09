@@ -72,7 +72,7 @@ function calcBalance(
 }
 
 export default function MaintenancePage() {
-  const { rows, message, create, update, remove, setMessage } = useCrud<Row>("maintenance");
+  const { rows, message, create, update, remove, setMessage, saving } = useCrud<Row>("maintenance");
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -105,6 +105,7 @@ export default function MaintenancePage() {
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (saving) return;
     const diesel = money(form.diesel);
     const otherExpenses = money(form.otherExpenses);
     const fasTag = money(form.fasTag);
@@ -196,8 +197,8 @@ export default function MaintenancePage() {
               <InputField label="Balance" value={balance} readOnly />
             </div>
           </TwoCol>
-          <Button type="submit" variant="teal">
-            Save Data
+          <Button type="submit" variant="teal" disabled={saving}>
+            {saving ? "Saving…" : "Save Data"}
           </Button>
         </FormCard>
       </AdminForm>

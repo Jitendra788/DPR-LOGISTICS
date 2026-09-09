@@ -81,7 +81,7 @@ type Lhc = {
 };
 
 export default function LorryHireContractPage() {
-  const { rows, message, create, update, remove, setMessage, reload } = useCrud<Lhc>("lhc");
+  const { rows, message, create, update, remove, setMessage, reload, saving } = useCrud<Lhc>("lhc");
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState<Partial<Lhc>>({
     challanDate: new Date().toISOString().slice(0, 10),
@@ -258,6 +258,7 @@ export default function LorryHireContractPage() {
 
   async function saveChallan(e?: FormEvent) {
     e?.preventDefault();
+    if (saving) return;
     const body = {
       ...form,
       totalAdvance,
@@ -416,10 +417,10 @@ export default function LorryHireContractPage() {
       />
 
       <div className="mt-4 flex flex-wrap gap-2">
-        <Button type="button" variant={editId ? "teal" : "primary"} onClick={() => saveChallan()}>
-          {editId ? "Update Challan" : "Save Challan"}
+        <Button type="button" variant={editId ? "teal" : "primary"} disabled={saving} onClick={() => saveChallan()}>
+          {saving ? "Saving…" : editId ? "Update Challan" : "Save Challan"}
         </Button>
-        <Button type="button" variant="danger" disabled={!editId} onClick={deleteChallan}>
+        <Button type="button" variant="danger" disabled={!editId || saving} onClick={deleteChallan}>
           Delete Challan
         </Button>
         <Button type="button" variant="teal" onClick={printChallan}>
