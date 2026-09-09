@@ -195,7 +195,7 @@
 
 .lr-print-title-red {
   font-family: "Times New Roman", Times, Georgia, serif !important;
-  font-size: 19px;
+  font-size: 21px;
   font-weight: 900;
   letter-spacing: 0.2px;
   color: #c00000;
@@ -206,7 +206,7 @@
 
 .lr-print-subtitle-red {
   font-family: "Times New Roman", Times, Georgia, serif !important;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 800;
   color: #c00000;
   margin: 0 0 1px;
@@ -216,7 +216,7 @@
 
 .lr-print-blessings {
   font-family: "Times New Roman", Times, serif !important;
-  font-size: 10.5px !important;
+  font-size: 12.5px !important;
   font-weight: 700 !important;
   margin: 0 0 1px;
   padding-top: 2px;
@@ -227,14 +227,14 @@
 .lr-print-header-mid {
   padding-top: 1px !important;
   padding-bottom: 1px !important;
-  font-size: 10.5px;
+  font-size: 12.5px;
   color: #000000;
   background: #ffffff !important;
 }
 
 .lr-print-header-mid .lr-print-contact {
   font-weight: 700;
-  font-size: 10.5px;
+  font-size: 12.5px;
   line-height: 1.15;
   color: #000000;
 }
