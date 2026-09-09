@@ -477,9 +477,9 @@
     print-color-adjust: exact !important;
   }
 
-  /* Bill table needs width — Landscape */
+  /* Portrait / Landscape — Chrome Layout dropdown controls orientation */
   @page {
-    size: A4 landscape;
+    size: auto;
     margin: 6mm;
   }
 }

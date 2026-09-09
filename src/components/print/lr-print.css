@@ -388,10 +388,10 @@
 }
 
 @media print {
-  /* Match sheet size so 3 copies print back-to-back with no blank gap */
+  /* size: auto → Chrome Layout Portrait / Landscape both work */
   @page {
-    size: 10in 6in;
-    margin: 0.04in;
+    size: auto;
+    margin: 0.15in;
   }
 
   html,
@@ -414,11 +414,11 @@
   .lr-print-copy-page {
     width: 100% !important;
     max-width: none !important;
-    height: 5.92in !important;
-    max-height: 5.92in !important;
+    height: auto !important;
+    max-height: none !important;
     margin: 0 !important;
     padding: 0 !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     page-break-after: always !important;
     break-after: page !important;
     page-break-inside: avoid !important;
@@ -433,11 +433,12 @@
   .lr-print-sheet {
     width: 100% !important;
     max-width: 100% !important;
-    height: 5.92in !important;
-    max-height: 5.92in !important;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
     margin: 0 !important;
     border: 2px solid #000000 !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     page-break-after: auto !important;
     break-after: auto !important;
     page-break-inside: avoid !important;
@@ -446,7 +447,7 @@
 
   .lr-print-table {
     width: 100% !important;
-    height: 100% !important;
+    height: auto !important;
   }
 
   .lr-print-table > tbody > tr > td,
