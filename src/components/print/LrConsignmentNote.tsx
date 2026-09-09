@@ -118,12 +118,6 @@ export function LrConsignmentNote({
     copyLabel.toLowerCase().includes("lorry") || copyLabel.toLowerCase().includes("lory")
       ? "Handling"
       : "Halting";
-  const gstHead =
-    type === "Paid"
-      ? "Freight Paid"
-      : type === "ToPay"
-        ? "Freight To Pay"
-        : "To be bill for GST at";
   const forLabel =
     signFor ||
     (company.name.toUpperCase().includes("ROADWAYS")
@@ -143,20 +137,20 @@ export function LrConsignmentNote({
       <section className="lr-print-sheet">
       <table className="lr-print-table">
         <colgroup>
-          <col style={{ width: "12%" }} />
-          <col style={{ width: "28%" }} />
-          <col style={{ width: "12%" }} />
-          <col style={{ width: "14%" }} />
-          <col style={{ width: "12%" }} />
-          <col style={{ width: "10%" }} />
-          <col style={{ width: "12%" }} />
+          <col style={{ width: "11%" }} />
+          <col style={{ width: "24%" }} />
+          <col style={{ width: "11%" }} />
+          <col style={{ width: "15%" }} />
+          <col style={{ width: "13%" }} />
+          <col style={{ width: "11%" }} />
+          <col style={{ width: "15%" }} />
         </colgroup>
         <tbody>
           {/* Header */}
           <tr className="lr-print-header-row">
             <td className="lr-print-logo-cell">
               {hideLogo ? (
-                <div className="lr-print-title-red" style={{ fontSize: 15 }}>
+                <div className="lr-print-title-red" style={{ fontSize: 14 }}>
                   {company.name}
                 </div>
               ) : (
@@ -253,15 +247,51 @@ export function LrConsignmentNote({
             </td>
           </tr>
 
-          {/* Articles header */}
+          {/* Articles header — intentional line breaks only (no mid-word cut in Portrait) */}
           <tr className="lr-print-bold lr-print-center lr-print-articles-head">
-            <td>No.Of Articales</td>
-            <td>Description Said To Contents</td>
-            <td>Inv.No. &amp; Date</td>
+            <td>
+              No.Of
+              <br />
+              Articales
+            </td>
+            <td>
+              Description Said
+              <br />
+              To Contents
+            </td>
+            <td>
+              Inv.No.
+              <br />
+              &amp; Date
+            </td>
             <td>Weight</td>
-            <td>Rate Per KG</td>
+            <td>
+              Rate
+              <br />
+              Per KG
+            </td>
             <td>Freight</td>
-            <td>{gstHead}</td>
+            <td className="lr-print-gst-head">
+              {type === "Paid" ? (
+                <>
+                  Freight
+                  <br />
+                  Paid
+                </>
+              ) : type === "ToPay" ? (
+                <>
+                  Freight
+                  <br />
+                  To Pay
+                </>
+              ) : (
+                <>
+                  To be bill
+                  <br />
+                  for GST at
+                </>
+              )}
+            </td>
           </tr>
 
           {/* Articles body — 4 columns, same 6-row lines */}

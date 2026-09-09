@@ -1,3 +1,4 @@
+import { type ReactNode } from "react";
 import {
   BRAND_LOGO_HEADER_PRINT,
   BRAND_STAMP_PRINT,
@@ -94,45 +95,50 @@ type Props = {
   docTitle?: string;
 };
 
-/** Column % — room for LR Date / From / To / Freight without overflow */
+/** Column % — charge headers stay readable (no mid-word wrap) */
 const WEIGHT_COLS = [
-  "3%",
-  "5%",
-  "8%",
-  "5%",
+  "2.5%",
+  "4.5%",
+  "7.5%",
+  "4.5%",
   "3.5%",
-  "7.5%",
-  "7.5%",
-  "7%",
-  "4.5%",
-  "5%",
-  "5%",
   "6%",
   "6%",
+  "6%",
+  "5.5%",
+  "5.5%",
+  "5.5%",
+  "5.5%",
+  "5.5%",
+  "5%",
+  "5%",
   "4.5%",
-  "4.5%",
-  "4%",
-  "14%",
+  "17.5%",
 ] as const;
 
 const METER_COLS = [
-  "3%",
-  "5.5%",
-  "8%",
-  "8%",
-  "8%",
+  "2.5%",
   "5%",
-  "4%",
-  "5%",
-  "5%",
-  "5.5%",
-  "6%",
-  "6%",
+  "7.5%",
+  "7%",
+  "7%",
   "4.5%",
+  "3.5%",
+  "5.5%",
+  "5.5%",
+  "5.5%",
+  "5.5%",
+  "5.5%",
   "5%",
-  "4%",
-  "17.5%",
+  "5%",
+  "4.5%",
+  "21%",
 ] as const;
+
+/** Header cell — wraps only where we put <br />, never mid-word */
+function BillTh({ children }: { children: ReactNode }) {
+  return <td className="bill-print-th-cell">{children}</td>;
+}
 
 export function BillTaxInvoice({
   data,
@@ -242,42 +248,98 @@ export function BillTaxInvoice({
 
           {isMeter ? (
             <tr className="bill-print-bold bill-print-center bill-print-th">
-              <td>Sr No</td>
-              <td>LR No</td>
-              <td className="bill-print-lr-date">LR Date</td>
-              <td>From</td>
-              <td>To</td>
-              <td>Mtr Qty</td>
-              <td>Rate</td>
-              <td>Ser Tax</td>
-              <td>Handling</td>
-              <td>Insurance</td>
-              <td>St.Charges</td>
-              <td>Door Colle.</td>
-              <td>Barrier</td>
-              <td>Hamali</td>
-              <td>Other</td>
-              <td>Total Bill</td>
+              <BillTh>Sr No</BillTh>
+              <BillTh>LR No</BillTh>
+              <td className="bill-print-th-cell bill-print-lr-date">LR Date</td>
+              <BillTh>From</BillTh>
+              <BillTh>To</BillTh>
+              <BillTh>
+                Mtr
+                <br />
+                Qty
+              </BillTh>
+              <BillTh>Rate</BillTh>
+              <BillTh>
+                Ser
+                <br />
+                Tax
+              </BillTh>
+              <BillTh>
+                <span className="bill-print-th-one">Handling</span>
+              </BillTh>
+              <BillTh>
+                <span className="bill-print-th-one">Insurance</span>
+              </BillTh>
+              <BillTh>
+                St.
+                <br />
+                Charges
+              </BillTh>
+              <BillTh>
+                Door
+                <br />
+                Colle.
+              </BillTh>
+              <BillTh>
+                <span className="bill-print-th-one">Barrier</span>
+              </BillTh>
+              <BillTh>
+                <span className="bill-print-th-one">Hamali</span>
+              </BillTh>
+              <BillTh>
+                <span className="bill-print-th-one">Other</span>
+              </BillTh>
+              <BillTh>
+                Total
+                <br />
+                Bill
+              </BillTh>
             </tr>
           ) : (
             <tr className="bill-print-bold bill-print-center bill-print-th">
-              <td>Sr No</td>
-              <td>LR No</td>
-              <td className="bill-print-lr-date">LR Date</td>
-              <td>Weight</td>
-              <td>Rate</td>
-              <td>From</td>
-              <td>To</td>
-              <td>Freight</td>
-              <td>Ser Tax</td>
-              <td>Handling</td>
-              <td>Insurance</td>
-              <td>St.Charges</td>
-              <td>Door Colle.</td>
-              <td>Barrier</td>
-              <td>Hamali</td>
-              <td>Other</td>
-              <td>Total Bill</td>
+              <BillTh>Sr No</BillTh>
+              <BillTh>LR No</BillTh>
+              <td className="bill-print-th-cell bill-print-lr-date">LR Date</td>
+              <BillTh>Weight</BillTh>
+              <BillTh>Rate</BillTh>
+              <BillTh>From</BillTh>
+              <BillTh>To</BillTh>
+              <BillTh>Freight</BillTh>
+              <BillTh>
+                Ser
+                <br />
+                Tax
+              </BillTh>
+              <BillTh>
+                <span className="bill-print-th-one">Handling</span>
+              </BillTh>
+              <BillTh>
+                <span className="bill-print-th-one">Insurance</span>
+              </BillTh>
+              <BillTh>
+                St.
+                <br />
+                Charges
+              </BillTh>
+              <BillTh>
+                Door
+                <br />
+                Colle.
+              </BillTh>
+              <BillTh>
+                <span className="bill-print-th-one">Barrier</span>
+              </BillTh>
+              <BillTh>
+                <span className="bill-print-th-one">Hamali</span>
+              </BillTh>
+              <BillTh>
+                <span className="bill-print-th-one">Other</span>
+              </BillTh>
+              <BillTh>
+                Total
+                <br />
+                Bill
+              </BillTh>
             </tr>
           )}
 

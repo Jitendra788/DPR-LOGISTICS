@@ -45,28 +45,41 @@
   background: #ffffff !important;
 }
 
-/* Table headers — wrap inside cell, never clip mid-word across border */
+/* Table headers — never split mid-word (Handli/ng). Wrap only at <br> / spaces */
 .bill-print-th {
   font-weight: 800 !important;
-  font-size: 7pt !important;
+  font-size: 6.5pt !important;
   padding: 2px 0 !important;
   vertical-align: middle !important;
   background: #ffffff !important;
   color: #000000 !important;
 }
 
-.bill-print-th > td {
+.bill-print-th > td,
+.bill-print-th-cell {
   background: #ffffff !important;
   color: #000000 !important;
-  white-space: normal !important;
-  word-break: normal !important;
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+  word-wrap: normal !important;
+  hyphens: none !important;
+  -webkit-hyphens: none !important;
   overflow: hidden !important;
-  overflow-wrap: break-word !important;
-  line-height: 1.1 !important;
-  letter-spacing: -0.15px;
+  line-height: 1.15 !important;
+  letter-spacing: -0.1px;
   padding: 2px 1px !important;
   box-sizing: border-box !important;
   max-width: 0;
+  vertical-align: middle !important;
+  text-align: center !important;
+}
+
+/* Single-word headers (Handling, Insurance…) stay on one line */
+.bill-print-th-one {
+  display: inline-block;
+  white-space: nowrap !important;
+  max-width: 100%;
 }
 
 /* Table data */
@@ -432,12 +445,18 @@
     max-width: 0 !important;
   }
 
-  .bill-print-th > td {
+  .bill-print-th > td,
+  .bill-print-th-cell {
     white-space: normal !important;
-    font-size: 7pt !important;
-    letter-spacing: -0.15px !important;
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+    word-wrap: normal !important;
+    hyphens: none !important;
+    font-size: 6.5pt !important;
+    letter-spacing: -0.1px !important;
     padding: 2px 1px !important;
-    line-height: 1.1 !important;
+    line-height: 1.15 !important;
+    overflow: hidden !important;
   }
 
   .bill-print-data td {

@@ -5,7 +5,7 @@
   margin: 0;
   color: #000000;
   font-family: Arial, Helvetica, sans-serif !important;
-  font-size: 11px;
+  font-size: 10px;
   line-height: 1.15;
   -webkit-font-smoothing: none;
   -webkit-print-color-adjust: exact !important;
@@ -68,7 +68,7 @@
   vertical-align: top;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  font-size: 11px;
+  font-size: 10px;
   color: #000000;
   background: #ffffff;
 }
@@ -99,7 +99,7 @@
   padding: 1px 4px !important;
   vertical-align: middle !important;
   text-align: left !important;
-  font-size: 11.5px !important;
+  font-size: 10.5px !important;
   font-family: Arial, Helvetica, sans-serif !important;
   line-height: 1.15;
   overflow: hidden;
@@ -126,7 +126,7 @@
   text-align: center;
   height: 14px;
   line-height: 1.1;
-  font-size: 11.5px !important;
+  font-size: 10.5px !important;
   font-weight: 800 !important;
   font-family: Arial, Helvetica, sans-serif !important;
   overflow: hidden;
@@ -146,18 +146,32 @@
 .lr-print-articles-head > td {
   background: #ffffff !important;
   font-weight: 800 !important;
-  padding-top: 1px !important;
-  padding-bottom: 1px !important;
-  font-size: 11px !important;
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  font-size: 9px !important;
   font-family: Arial, Helvetica, sans-serif !important;
   color: #000000 !important;
   border: 1.5px solid #000000 !important;
+  white-space: normal !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+  word-wrap: normal !important;
+  hyphens: none !important;
+  -webkit-hyphens: none !important;
+  line-height: 1.15 !important;
+  vertical-align: middle !important;
+  overflow: hidden !important;
+}
+
+.lr-print-gst-head {
+  font-size: 8.5px !important;
+  line-height: 1.15 !important;
 }
 
 .lr-freight-amt {
   text-align: center;
   color: transparent !important;
-  font-size: 12px !important;
+  font-size: 11px !important;
 }
 
 .lr-print-center {
@@ -175,7 +189,7 @@
 
 .lr-print-title-red {
   font-family: "Times New Roman", Times, Georgia, serif !important;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 900;
   letter-spacing: 0.2px;
   color: #c00000;
@@ -186,7 +200,7 @@
 
 .lr-print-subtitle-red {
   font-family: "Times New Roman", Times, Georgia, serif !important;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
   color: #c00000;
   margin: 0 0 1px;
@@ -196,7 +210,7 @@
 
 .lr-print-blessings {
   font-family: "Times New Roman", Times, serif !important;
-  font-size: 10.5px !important;
+  font-size: 9.5px !important;
   font-weight: 700 !important;
   margin: 0 0 1px;
   padding-top: 2px;
@@ -207,20 +221,20 @@
 .lr-print-header-mid {
   padding-top: 1px !important;
   padding-bottom: 1px !important;
-  font-size: 10.5px;
+  font-size: 9.5px;
   color: #000000;
   background: #ffffff !important;
 }
 
 .lr-print-header-mid .lr-print-contact {
   font-weight: 700;
-  font-size: 10.5px;
+  font-size: 9.5px;
   line-height: 1.15;
   color: #000000;
 }
 
 .lr-print-copy {
-  font-size: 10.5px;
+  font-size: 9.5px;
   font-weight: 700;
   text-align: center;
   line-height: 1.15;
@@ -233,7 +247,7 @@
 .lr-print-copy-label {
   text-decoration: underline;
   margin: 1px 0;
-  font-size: 11.5px;
+  font-size: 10.5px;
   font-weight: 800;
   color: #000000;
 }
@@ -265,7 +279,7 @@
   font-weight: 800 !important;
   margin: 0 -4px 2px;
   padding: 1px 4px 2px;
-  font-size: 11.5px !important;
+  font-size: 10.5px !important;
   color: #000000 !important;
   background: #ffffff !important;
   border-bottom: 1.5px solid #000000;
@@ -273,7 +287,7 @@
 
 .lr-print-party-cell {
   min-height: 0;
-  font-size: 11px;
+  font-size: 10px;
   line-height: 1.2;
   padding: 2px 4px !important;
   color: #000000;
@@ -283,7 +297,7 @@
 
 .lr-print-party-line {
   margin: 0 0 2px;
-  font-size: 11px !important;
+  font-size: 10px !important;
   line-height: 1.2;
   font-family: Arial, Helvetica, sans-serif !important;
   color: #000000;
@@ -301,19 +315,19 @@
 .lr-print-label {
   font-weight: 800 !important;
   white-space: nowrap;
-  font-size: 11px !important;
+  font-size: 10px !important;
   color: #000000 !important;
 }
 
 .lr-print-value {
   min-height: 10px;
-  font-size: 11.5px !important;
+  font-size: 10.5px !important;
   font-weight: 800 !important;
   color: #000000 !important;
 }
 
 .lr-print-note {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.2px;
   margin-top: 1px;
@@ -324,7 +338,7 @@
   text-align: left !important;
   vertical-align: middle !important;
   font-weight: 900 !important;
-  font-size: 12.5px !important;
+  font-size: 11.5px !important;
   font-family: Arial, Helvetica, sans-serif !important;
   color: #c00000 !important;
   padding: 2px 6px !important;
@@ -346,7 +360,7 @@
 
 .lr-print-footer-left {
   vertical-align: top !important;
-  font-size: 11px;
+  font-size: 10px;
   line-height: 1.2;
   min-height: 0;
   padding: 2px 4px !important;
@@ -360,7 +374,7 @@
   vertical-align: top !important;
   padding-top: 2px !important;
   padding-bottom: 2px !important;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
   color: #000000;
   background: #ffffff !important;
@@ -380,7 +394,7 @@
   text-align: center;
   vertical-align: middle !important;
   font-weight: 800;
-  font-size: 10.5px;
+  font-size: 9.5px;
   padding: 1px 3px !important;
   color: #000000;
   background: #ffffff !important;
