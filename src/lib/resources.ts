@@ -36,6 +36,7 @@ export function isResource(value: string): value is ResourceKey {
 
 type Delegate = {
   findMany: (args?: object) => Promise<unknown[]>;
+  findFirst: (args?: object) => Promise<unknown>;
   findUnique: (args: object) => Promise<unknown>;
   create: (args: object) => Promise<unknown>;
   update: (args: object) => Promise<unknown>;

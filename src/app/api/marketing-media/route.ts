@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "node:fs/promises";
 import { prisma } from "@/lib/prisma";
+import { apiError } from "@/lib/handle-api-error";
 import { ensureMarketingUploadDir, marketingFilePath, safeFileName } from "@/lib/marketing-media";
 
 const MAX_BYTES = 8 * 1024 * 1024;
@@ -15,8 +16,7 @@ export async function GET(req: NextRequest) {
     });
     return NextResponse.json(rows);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Failed to load photos";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return apiError(err, "Could not load photos");
   }
 }
 
@@ -59,7 +59,6 @@ export async function POST(req: NextRequest) {
     });
     return NextResponse.json(created);
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Upload failed";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return apiError(err, "Upload failed");
   }
 }

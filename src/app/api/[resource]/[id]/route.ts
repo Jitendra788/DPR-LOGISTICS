@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getModel, isResource, sanitize, type ResourceKey } from "@/lib/resources";
 import { resolveBillDeleteId, resolveUpdateId } from "@/lib/resolve-update";
 import { userFacingError } from "@/lib/handle-api-error";
+import { assertUniqueOnUpdate } from "@/lib/api-instructions";
 import { isUnknownPrismaArg, withoutUnknownArgs } from "@/lib/prisma-retry";
 import { prisma } from "@/lib/prisma";
 import { cascadeDeleteBill, syncBillAfterLrRemoved } from "@/lib/cascade-delete";
@@ -73,6 +74,7 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
         delete data.password;
       }
     }
+    await assertUniqueOnUpdate(resource, updateId, data);
     for (let attempt = 0; attempt < 6; attempt++) {
       try {
         const updated = await getModel(resource).update({

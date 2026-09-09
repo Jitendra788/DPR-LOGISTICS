@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { apiError } from "@/lib/handle-api-error";
 import { lrNoEquals, stripLrPrefix } from "@/lib/lr-no";
 
 function resolveBookingIds(lrNos: string[], all: { id: number; lrNo: string }[]) {
@@ -56,8 +57,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true, count: ids.length });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Link failed";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return apiError(err, "Link failed");
   }
 }
 
@@ -75,7 +75,6 @@ export async function DELETE(req: NextRequest) {
     });
     return NextResponse.json({ ok: true, count: result.count });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unlink failed";
-    return NextResponse.json({ error: message }, { status: 400 });
+    return apiError(err, "Unlink failed");
   }
 }

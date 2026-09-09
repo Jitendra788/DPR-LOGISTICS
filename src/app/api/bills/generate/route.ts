@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { calcBillTaxes } from "@/lib/bill-totals";
 import { lrBillableAmount, isMeterBillAs } from "@/lib/lr-totals";
 import { isUniqueViolation, userFacingError } from "@/lib/handle-api-error";
+import { alreadySavedInstruction } from "@/lib/api-instructions";
 import { docSourceWhere, nextUniqueModuleDoc, normalizeDocSource } from "@/lib/module-docs";
 import { isBillableLrType, normalizeLrType } from "@/lib/lr-type";
 
@@ -52,7 +53,11 @@ export async function POST(req: NextRequest) {
       });
       const already = matched.filter((row) => row.billed);
       if (already.length) {
-        return NextResponse.json({ error: "Some selected LRs are already billed" }, { status: 400 });
+        const nos = already.map((r) => r.lrNo).filter(Boolean).join(", ");
+        return NextResponse.json(
+          { error: nos ? `LR ${nos} already billed` : "Some selected LRs are already billed" },
+          { status: 400 },
+        );
       }
       if (matched.length !== body.lrIds.length) {
         return NextResponse.json({ error: "Some selected LRs were not found" }, { status: 400 });
@@ -115,6 +120,16 @@ export async function POST(req: NextRequest) {
     }
 
     const billSource = normalizeDocSource(body.source);
+    const explicitBillNo = String(body.billNo ?? "").trim();
+    if (explicitBillNo) {
+      const existing = await prisma.bill.findFirst({
+        where: { billNo: explicitBillNo },
+        select: { id: true },
+      });
+      if (existing) {
+        return NextResponse.json({ error: alreadySavedInstruction("billNo", explicitBillNo) }, { status: 400 });
+      }
+    }
     const [moduleBills, allBills] = await Promise.all([
       prisma.bill.findMany({
         where: docSourceWhere(billSource),
@@ -174,6 +189,9 @@ export async function POST(req: NextRequest) {
         break;
       } catch (err) {
         if (!isUniqueViolation(err, "billNo")) throw err;
+        if (explicitBillNo) {
+          throw new Error(alreadySavedInstruction("billNo", explicitBillNo));
+        }
         taken.add(billNo);
         const rows = await prisma.bill.findMany({
           where: docSourceWhere(billSource),

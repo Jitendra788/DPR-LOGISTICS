@@ -1,6 +1,7 @@
 import { getModel, type ResourceKey } from "@/lib/resources";
 import { nextPadded } from "@/lib/doc-numbers";
 import { isUniqueViolation } from "@/lib/handle-api-error";
+import { alreadySavedInstruction, assertUniqueOnCreate } from "@/lib/api-instructions";
 import { docSourceWhere, nextUniqueModuleDoc, normalizeDocSource } from "@/lib/module-docs";
 import { isUnknownPrismaArg, withoutUnknownArgs } from "@/lib/prisma-retry";
 
@@ -10,16 +11,6 @@ const DOC_RETRY: Partial<Record<ResourceKey, { field: string; width: number; sou
   lhc: { field: "challanNo", width: 2 },
 };
 
-const ALREADY_SAVED: Record<string, (value: string) => string> = {
-  lrNo: (v) => `LR ${v} already saved`,
-  billNo: (v) => `Bill ${v} already saved`,
-  challanNo: (v) => `Challan ${v} already saved`,
-};
-
-function alreadySavedMessage(field: string, value: string) {
-  return ALREADY_SAVED[field]?.(value) || `${field} ${value} already saved`;
-}
-
 export async function createWithUniqueRetry(resource: ResourceKey, data: Record<string, unknown>) {
   const model = getModel(resource);
   const retry = DOC_RETRY[resource];
@@ -27,16 +18,8 @@ export async function createWithUniqueRetry(resource: ResourceKey, data: Record<
   const taken = new Set<string>();
   const explicitDoc = retry ? String(payload[retry.field] ?? "").trim() : "";
 
-  // Client sent a document number — never silently renumber; reject duplicates.
-  if (retry && explicitDoc) {
-    const existing = await model.findFirst({
-      where: { [retry.field]: explicitDoc },
-      select: { id: true },
-    });
-    if (existing) {
-      throw new Error(alreadySavedMessage(retry.field, explicitDoc));
-    }
-  }
+  // All resources: clear instruction if unique key already saved
+  await assertUniqueOnCreate(resource, payload);
 
   for (let attempt = 0; attempt < 16; attempt++) {
     try {
@@ -51,15 +34,20 @@ export async function createWithUniqueRetry(resource: ResourceKey, data: Record<
         }
       }
 
+      if (isUniqueViolation(err)) {
+        const failedField = retry?.field || "";
+        const failed = failedField ? String(payload[failedField] ?? "").trim() : "";
+        // User-supplied document number / unique key — never silently renumber
+        if (explicitDoc || !retry) {
+          throw new Error(
+            alreadySavedInstruction(failedField || "record", explicitDoc || failed || "value"),
+          );
+        }
+      }
+
       if (!retry || !isUniqueViolation(err, retry.field)) throw err;
 
       const failed = String(payload[retry.field] ?? "").trim();
-
-      // User-supplied number collided (race) — do not auto-create next number.
-      if (explicitDoc) {
-        throw new Error(alreadySavedMessage(retry.field, explicitDoc || failed));
-      }
-
       if (failed) taken.add(failed);
       const source = retry.sourceAware ? normalizeDocSource(String(payload.source ?? "DPR")) : undefined;
       const [moduleRows, allRows] = await Promise.all([

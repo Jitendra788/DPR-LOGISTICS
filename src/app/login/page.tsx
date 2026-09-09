@@ -8,6 +8,13 @@ import { BrandLogo } from "@/components/BrandLogo";
 import { api } from "@/lib/api-client";
 import "./login.css";
 
+function safeNextPath() {
+  if (typeof window === "undefined") return "/dashboard";
+  const raw = new URLSearchParams(window.location.search).get("next");
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//") || raw.startsWith("/login")) return "/dashboard";
+  return raw;
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState("");
@@ -43,7 +50,7 @@ export default function LoginPage() {
         method: "POST",
         body: JSON.stringify({ username, password }),
       });
-      router.push("/dashboard");
+      router.push(safeNextPath());
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");

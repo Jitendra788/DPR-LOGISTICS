@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { alreadySavedInstruction } from "@/lib/api-instructions";
 
 function prismaCode(err: unknown) {
   if (err && typeof err === "object" && "code" in err) return String((err as { code: unknown }).code);
@@ -12,17 +13,6 @@ function prismaTarget(err: unknown) {
   return target ? String(target) : "";
 }
 
-const UNIQUE_LABELS: Record<string, string> = {
-  lrNo: "LR",
-  billNo: "Bill",
-  challanNo: "Challan",
-  username: "Username",
-  vehNo: "Vehicle number",
-  name: "Name",
-  slug: "Slug",
-  referenceId: "Reference",
-};
-
 export function isUniqueViolation(err: unknown, field?: string) {
   if (prismaCode(err) !== "P2002") return false;
   if (!field) return true;
@@ -34,15 +24,11 @@ export function isUniqueViolation(err: unknown, field?: string) {
 export function userFacingError(err: unknown, fallback = "Could not save. Please try again.") {
   if (err instanceof Error) {
     const msg = err.message.trim();
-    if (/already saved/i.test(msg)) return msg;
+    if (/already saved|already exists|already billed/i.test(msg)) return msg;
   }
   if (isUniqueViolation(err)) {
     const key = prismaTarget(err).split(",")[0]?.trim() || "";
-    const label = UNIQUE_LABELS[key] || key || "This value";
-    if (key === "lrNo" || key === "billNo" || key === "challanNo") {
-      return `${label} already saved`;
-    }
-    return `${label} already exists`;
+    return alreadySavedInstruction(key || "record", "");
   }
   if (prismaCode(err) === "P2025") {
     return "Record not found. Refresh the page and try again.";
@@ -59,7 +45,10 @@ export function userFacingError(err: unknown, fallback = "Could not save. Please
   return message;
 }
 
+/** Prefer 400 for client/instruction errors; 500 only for unexpected failures. */
 export function apiError(err: unknown, label = "Request failed") {
   console.error(label, err);
-  return NextResponse.json({ error: userFacingError(err, label) }, { status: 500 });
+  const text = userFacingError(err, label);
+  const clientHint = /already saved|already exists|required|not found|invalid|unauthorized|linked/i.test(text);
+  return NextResponse.json({ error: text }, { status: clientHint ? 400 : 500 });
 }

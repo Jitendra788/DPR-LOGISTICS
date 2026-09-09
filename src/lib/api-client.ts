@@ -36,6 +36,15 @@ export function downloadCsv(filename: string, rows: Record<string, unknown>[]) {
 
 type ApiInit = RequestInit & { timeoutMs?: number };
 
+function redirectToLogin() {
+  if (typeof window === "undefined") return;
+  const path = window.location.pathname;
+  if (path === "/login" || path.startsWith("/login/")) return;
+  const next = `${path}${window.location.search}`;
+  const login = next && next !== "/" ? `/login?next=${encodeURIComponent(next)}` : "/login";
+  window.location.assign(login);
+}
+
 export async function api<T>(url: string, init?: ApiInit): Promise<T> {
   const { timeoutMs, ...rest } = init ?? {};
   const controller = timeoutMs ? new AbortController() : null;
@@ -56,6 +65,10 @@ export async function api<T>(url: string, init?: ApiInit): Promise<T> {
     });
     const data = (await res.json().catch(() => ({}))) as T & { error?: string };
     if (!res.ok) {
+      if (res.status === 401 && !url.includes("/api/auth/login")) {
+        redirectToLogin();
+        throw new Error("Session expired. Please login again.");
+      }
       const raw = String(data.error ?? "").trim();
       if (raw && !/prisma|invocation|unknown argument/i.test(raw) && raw.length <= 220) {
         throw new Error(raw);
