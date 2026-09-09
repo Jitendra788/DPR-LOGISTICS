@@ -59,6 +59,11 @@
 
 .lh-sheet-roadways .lh-letterhead {
   border-bottom-color: #1e40af;
+  grid-template-columns: 140px 1fr;
+}
+
+.lh-sheet-roadways .lh-logo {
+  width: 132px;
 }
 
 .lh-sheet-roadways .lh-tagline {
