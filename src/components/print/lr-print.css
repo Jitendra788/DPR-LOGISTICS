@@ -5,7 +5,7 @@
   margin: 0;
   color: #000000;
   font-family: Arial, Helvetica, sans-serif !important;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.15;
   -webkit-font-smoothing: none;
   -webkit-print-color-adjust: exact !important;
@@ -22,7 +22,7 @@
   display: block;
   width: 10in;
   max-width: 100%;
-  margin: 0 auto 10px;
+  margin: 0 auto 8px;
   page-break-after: always;
   break-after: page;
   page-break-inside: avoid;
@@ -41,8 +41,8 @@
 .lr-print-sheet {
   display: block;
   width: 100%;
-  height: 5.8in;
-  max-height: 5.8in;
+  height: 5.92in;
+  max-height: 5.92in;
   margin: 0;
   background: #ffffff;
   color: #000000;
@@ -68,7 +68,7 @@
   vertical-align: top;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  font-size: 10px;
+  font-size: 11px;
   color: #000000;
   background: #ffffff;
 }
@@ -99,7 +99,7 @@
   padding: 1px 4px !important;
   vertical-align: middle !important;
   text-align: left !important;
-  font-size: 10.5px !important;
+  font-size: 11.5px !important;
   font-family: Arial, Helvetica, sans-serif !important;
   line-height: 1.15;
   overflow: hidden;
@@ -124,9 +124,9 @@
   padding: 0 2px;
   vertical-align: middle;
   text-align: center;
-  height: 13px;
-  line-height: 1.05;
-  font-size: 10.5px !important;
+  height: 14px;
+  line-height: 1.1;
+  font-size: 11.5px !important;
   font-weight: 800 !important;
   font-family: Arial, Helvetica, sans-serif !important;
   overflow: hidden;
@@ -148,7 +148,7 @@
   font-weight: 800 !important;
   padding-top: 1px !important;
   padding-bottom: 1px !important;
-  font-size: 10px !important;
+  font-size: 11px !important;
   font-family: Arial, Helvetica, sans-serif !important;
   color: #000000 !important;
   border: 1.5px solid #000000 !important;
@@ -157,7 +157,7 @@
 .lr-freight-amt {
   text-align: center;
   color: transparent !important;
-  font-size: 11px !important;
+  font-size: 12px !important;
 }
 
 .lr-print-center {
@@ -175,7 +175,7 @@
 
 .lr-print-title-red {
   font-family: "Times New Roman", Times, Georgia, serif !important;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 900;
   letter-spacing: 0.2px;
   color: #c00000;
@@ -186,7 +186,7 @@
 
 .lr-print-subtitle-red {
   font-family: "Times New Roman", Times, Georgia, serif !important;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 800;
   color: #c00000;
   margin: 0 0 1px;
@@ -196,7 +196,7 @@
 
 .lr-print-blessings {
   font-family: "Times New Roman", Times, serif !important;
-  font-size: 9.5px !important;
+  font-size: 10.5px !important;
   font-weight: 700 !important;
   margin: 0 0 1px;
   padding-top: 2px;
@@ -207,20 +207,20 @@
 .lr-print-header-mid {
   padding-top: 1px !important;
   padding-bottom: 1px !important;
-  font-size: 9.5px;
+  font-size: 10.5px;
   color: #000000;
   background: #ffffff !important;
 }
 
 .lr-print-header-mid .lr-print-contact {
   font-weight: 700;
-  font-size: 9.5px;
+  font-size: 10.5px;
   line-height: 1.15;
   color: #000000;
 }
 
 .lr-print-copy {
-  font-size: 9.5px;
+  font-size: 10.5px;
   font-weight: 700;
   text-align: center;
   line-height: 1.15;
@@ -233,7 +233,7 @@
 .lr-print-copy-label {
   text-decoration: underline;
   margin: 1px 0;
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 800;
   color: #000000;
 }
@@ -265,7 +265,7 @@
   font-weight: 800 !important;
   margin: 0 -4px 2px;
   padding: 1px 4px 2px;
-  font-size: 10.5px !important;
+  font-size: 11.5px !important;
   color: #000000 !important;
   background: #ffffff !important;
   border-bottom: 1.5px solid #000000;
@@ -273,7 +273,7 @@
 
 .lr-print-party-cell {
   min-height: 0;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.2;
   padding: 2px 4px !important;
   color: #000000;
@@ -283,7 +283,7 @@
 
 .lr-print-party-line {
   margin: 0 0 2px;
-  font-size: 10px !important;
+  font-size: 11px !important;
   line-height: 1.2;
   font-family: Arial, Helvetica, sans-serif !important;
   color: #000000;
@@ -301,19 +301,19 @@
 .lr-print-label {
   font-weight: 800 !important;
   white-space: nowrap;
-  font-size: 10px !important;
+  font-size: 11px !important;
   color: #000000 !important;
 }
 
 .lr-print-value {
   min-height: 10px;
-  font-size: 10.5px !important;
+  font-size: 11.5px !important;
   font-weight: 800 !important;
   color: #000000 !important;
 }
 
 .lr-print-note {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.2px;
   margin-top: 1px;
@@ -324,7 +324,7 @@
   text-align: left !important;
   vertical-align: middle !important;
   font-weight: 900 !important;
-  font-size: 11.5px !important;
+  font-size: 12.5px !important;
   font-family: Arial, Helvetica, sans-serif !important;
   color: #c00000 !important;
   padding: 2px 6px !important;
@@ -346,7 +346,7 @@
 
 .lr-print-footer-left {
   vertical-align: top !important;
-  font-size: 10px;
+  font-size: 11px;
   line-height: 1.2;
   min-height: 0;
   padding: 2px 4px !important;
@@ -360,7 +360,7 @@
   vertical-align: top !important;
   padding-top: 2px !important;
   padding-bottom: 2px !important;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   color: #000000;
   background: #ffffff !important;
@@ -380,7 +380,7 @@
   text-align: center;
   vertical-align: middle !important;
   font-weight: 800;
-  font-size: 9.5px;
+  font-size: 10.5px;
   padding: 1px 3px !important;
   color: #000000;
   background: #ffffff !important;
@@ -388,10 +388,10 @@
 }
 
 @media print {
-  /* No fixed size — Chrome Layout Portrait / Landscape both work */
+  /* Match sheet size so 3 copies print back-to-back with no blank gap */
   @page {
-    size: auto;
-    margin: 0.12in;
+    size: 10in 6in;
+    margin: 0.04in;
   }
 
   html,
@@ -414,10 +414,11 @@
   .lr-print-copy-page {
     width: 100% !important;
     max-width: none !important;
-    height: auto !important;
-    max-height: none !important;
+    height: 5.92in !important;
+    max-height: 5.92in !important;
     margin: 0 !important;
-    overflow: visible !important;
+    padding: 0 !important;
+    overflow: hidden !important;
     page-break-after: always !important;
     break-after: page !important;
     page-break-inside: avoid !important;
@@ -432,11 +433,11 @@
   .lr-print-sheet {
     width: 100% !important;
     max-width: 100% !important;
-    height: auto !important;
-    max-height: none !important;
-    margin: 0 auto !important;
+    height: 5.92in !important;
+    max-height: 5.92in !important;
+    margin: 0 !important;
     border: 2px solid #000000 !important;
-    overflow: visible !important;
+    overflow: hidden !important;
     page-break-after: auto !important;
     break-after: auto !important;
     page-break-inside: avoid !important;
@@ -445,7 +446,7 @@
 
   .lr-print-table {
     width: 100% !important;
-    height: auto !important;
+    height: 100% !important;
   }
 
   .lr-print-table > tbody > tr > td,

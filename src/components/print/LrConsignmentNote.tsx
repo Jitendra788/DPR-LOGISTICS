@@ -156,7 +156,7 @@ export function LrConsignmentNote({
           <tr className="lr-print-header-row">
             <td className="lr-print-logo-cell">
               {hideLogo ? (
-                <div className="lr-print-title-red" style={{ fontSize: 14 }}>
+                <div className="lr-print-title-red" style={{ fontSize: 15 }}>
                   {company.name}
                 </div>
               ) : (
