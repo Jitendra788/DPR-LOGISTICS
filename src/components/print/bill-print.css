@@ -180,9 +180,9 @@
   print-color-adjust: exact !important;
 }
 
-/* Address ~8–9pt */
+/* Address ~8–9pt + 4px */
 .bill-print-addr {
-  font-size: 8.5pt;
+  font-size: calc(8.5pt + 4px);
   font-weight: 700;
   line-height: 1.28;
   color: #000000 !important;
