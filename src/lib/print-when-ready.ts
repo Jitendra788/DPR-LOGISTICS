@@ -1,10 +1,68 @@
+/** Scale print sheets to page width so Portrait + Landscape both keep headers readable. */
+function resetPrintSheets() {
+  document
+    .querySelectorAll<HTMLElement>(
+      ".bill-print-sheet, .lr-print-sheet, .lhc-memo-sheet, .lm-sheet",
+    )
+    .forEach((el) => {
+      el.style.transform = "";
+      el.style.transformOrigin = "";
+      el.style.width = "";
+      el.style.maxWidth = "";
+      el.style.marginBottom = "";
+    });
+}
+
+function fitPrintSheets() {
+  const sheets = document.querySelectorAll<HTMLElement>(
+    ".bill-print-sheet, .lr-print-sheet, .lhc-memo-sheet, .lm-sheet",
+  );
+  if (!sheets.length) return;
+
+  resetPrintSheets();
+
+  const pageWidth = Math.max(
+    document.documentElement.clientWidth || 0,
+    window.innerWidth || 0,
+    1,
+  );
+
+  sheets.forEach((el) => {
+    const need = Math.max(el.scrollWidth, el.offsetWidth);
+    if (need <= pageWidth + 2) return;
+
+    const scale = Math.min(1, pageWidth / need);
+    if (scale >= 0.995) return;
+
+    el.style.transformOrigin = "top left";
+    el.style.transform = `scale(${scale})`;
+    el.style.width = `${100 / scale}%`;
+    // Collapse unused layout space under the scaled sheet
+    el.style.marginBottom = `${el.offsetHeight * (scale - 1)}px`;
+  });
+}
+
+let printHooksBound = false;
+
+function bindPrintFitHooks() {
+  if (printHooksBound || typeof window === "undefined") return;
+  printHooksBound = true;
+  window.addEventListener("beforeprint", fitPrintSheets);
+  window.addEventListener("afterprint", resetPrintSheets);
+}
+
 /** Wait until print images are decoded, then open the browser print dialog. */
 export function printWhenReady(delayMs = 200) {
   if (typeof window === "undefined") return;
+  bindPrintFitHooks();
 
   const trigger = () => {
+    fitPrintSheets();
     requestAnimationFrame(() => {
-      setTimeout(() => window.print(), delayMs);
+      setTimeout(() => {
+        fitPrintSheets();
+        window.print();
+      }, delayMs);
     });
   };
 
@@ -18,8 +76,7 @@ export function printWhenReady(delayMs = 200) {
     return;
   }
 
-  const ready = (img: HTMLImageElement) =>
-    img.complete && img.naturalWidth > 0;
+  const ready = (img: HTMLImageElement) => img.complete && img.naturalWidth > 0;
 
   Promise.all(
     imgs.map(async (img) => {
@@ -36,7 +93,6 @@ export function printWhenReady(delayMs = 200) {
         const done = () => resolve();
         img.addEventListener("load", done, { once: true });
         img.addEventListener("error", done, { once: true });
-        // Force a re-fetch if the browser left a broken incomplete image
         if (!img.complete && img.src) {
           const src = img.src;
           img.src = "";

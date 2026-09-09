@@ -492,9 +492,9 @@
     print-color-adjust: exact !important;
   }
 
-  /* Bill needs width so header names stay on one line */
+  /* Portrait + Landscape both — browser Layout dropdown; sheet auto-scales to fit */
   @page {
-    size: A4 landscape;
+    size: auto;
     margin: 5mm;
   }
 }

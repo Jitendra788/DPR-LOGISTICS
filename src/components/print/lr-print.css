@@ -408,9 +408,9 @@
 }
 
 @media print {
-  /* Landscape so LR header names fit on one line */
+  /* Portrait + Landscape both — browser Layout dropdown; sheet auto-scales to fit */
   @page {
-    size: A4 landscape;
+    size: auto;
     margin: 0.12in;
   }
 
