@@ -14,12 +14,12 @@ function findParty(parties: Party[], name: string) {
   return parties.find((p) => p.name.trim().toLowerCase() === q);
 }
 
-function findFirstConsignee(parties: Party[], consignee: string) {
-  for (const name of splitPartyNames(consignee)) {
+function findFirstParty(parties: Party[], raw: string) {
+  for (const name of splitPartyNames(raw)) {
     const hit = findParty(parties, name);
     if (hit) return hit;
   }
-  return findParty(parties, consignee);
+  return findParty(parties, raw);
 }
 
 function PrintInner() {
@@ -50,8 +50,8 @@ function PrintInner() {
     printWhenReady(200);
   }, [row]);
 
-  const consignorParty = useMemo(() => (row ? findParty(parties, row.consignor) : undefined), [parties, row]);
-  const consigneeParty = useMemo(() => (row ? findFirstConsignee(parties, row.consignee) : undefined), [parties, row]);
+  const consignorParty = useMemo(() => (row ? findFirstParty(parties, row.consignor) : undefined), [parties, row]);
+  const consigneeParty = useMemo(() => (row ? findFirstParty(parties, row.consignee) : undefined), [parties, row]);
 
   if (error) return <p className="p-8">{error}</p>;
   if (!row) return <p className="p-8">Loading LR...</p>;

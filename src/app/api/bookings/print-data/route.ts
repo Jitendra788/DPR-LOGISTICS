@@ -15,13 +15,13 @@ function matchParty(parties: PartyLite[], name: string) {
   return parties.find((p) => p.name.trim().toLowerCase() === q) ?? null;
 }
 
-function matchFirstConsignee(parties: PartyLite[], consignee: string) {
-  const names = splitPartyNames(consignee);
+function matchFirstParty(parties: PartyLite[], raw: string) {
+  const names = splitPartyNames(raw);
   for (const name of names) {
     const hit = matchParty(parties, name);
     if (hit) return hit;
   }
-  return matchParty(parties, consignee);
+  return matchParty(parties, raw);
 }
 
 export async function GET(req: NextRequest) {
@@ -64,8 +64,8 @@ export async function GET(req: NextRequest) {
     const booking = stripBookingTrackToken({ ...lr } as Record<string, unknown>);
     return NextResponse.json({
       booking,
-      consignorParty: matchParty(parties, lr.consignor),
-      consigneeParty: matchFirstConsignee(parties, lr.consignee),
+      consignorParty: matchFirstParty(parties, lr.consignor),
+      consigneeParty: matchFirstParty(parties, lr.consignee),
     });
   } catch (err) {
     return apiError(err, "Print data failed");
