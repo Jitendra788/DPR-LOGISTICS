@@ -1,0 +1,1 @@
+ALTER TABLE "Maintenance" ADD COLUMN "hamali" REAL NOT NULL DEFAULT 0;

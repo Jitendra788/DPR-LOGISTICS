@@ -22,6 +22,7 @@ type Row = {
   otherExpenses: number;
   fasTag: number;
   freight: number;
+  hamali: number;
   adBlue: number;
   maintenanceCost: number;
   serviceDate: string;
@@ -36,6 +37,7 @@ const emptyForm = {
   otherExpenses: 0,
   fasTag: 0,
   freight: 0,
+  hamali: 0,
   adBlue: 0,
   maintenanceCost: 0,
   serviceDate: todayIso(),
@@ -46,7 +48,7 @@ function money(n: number) {
   return Number(n) || 0;
 }
 
-/** Balance = Freight − Diesel − FasTag − Other Expenses − AdBlue − Maintenance */
+/** Balance = Freight − Diesel − FasTag − Hamali − Other Expenses − AdBlue − Maintenance */
 function calcBalance(
   freight: number,
   diesel: number,
@@ -54,12 +56,14 @@ function calcBalance(
   otherExpenses = 0,
   adBlue = 0,
   maintenanceCost = 0,
+  hamali = 0,
 ) {
   return Number(
     (
       money(freight) -
       money(diesel) -
       money(fasTag) -
+      money(hamali) -
       money(otherExpenses) -
       money(adBlue) -
       money(maintenanceCost)
@@ -82,8 +86,17 @@ export default function MaintenancePage() {
         form.otherExpenses,
         form.adBlue,
         form.maintenanceCost,
+        form.hamali,
       ),
-    [form.freight, form.diesel, form.fasTag, form.otherExpenses, form.adBlue, form.maintenanceCost],
+    [
+      form.freight,
+      form.diesel,
+      form.fasTag,
+      form.otherExpenses,
+      form.adBlue,
+      form.maintenanceCost,
+      form.hamali,
+    ],
   );
 
   useEffect(() => {
@@ -96,9 +109,10 @@ export default function MaintenancePage() {
     const otherExpenses = money(form.otherExpenses);
     const fasTag = money(form.fasTag);
     const freight = money(form.freight);
+    const hamali = money(form.hamali);
     const adBlue = money(form.adBlue);
     const maintenanceCost = money(form.maintenanceCost);
-    const amount = calcBalance(freight, diesel, fasTag, otherExpenses, adBlue, maintenanceCost);
+    const amount = calcBalance(freight, diesel, fasTag, otherExpenses, adBlue, maintenanceCost, hamali);
     const body = {
       ...form,
       amount,
@@ -106,6 +120,7 @@ export default function MaintenancePage() {
       otherExpenses,
       fasTag,
       freight,
+      hamali,
       adBlue,
       maintenanceCost,
       expenseName: form.expenseName || "Maintenance",
@@ -149,6 +164,11 @@ export default function MaintenancePage() {
                 label="FasTag"
                 value={form.fasTag}
                 onChange={(e) => setForm({ ...form, fasTag: Number(e.target.value) || 0 })}
+              />
+              <InputField
+                label="Hamali"
+                value={form.hamali}
+                onChange={(e) => setForm({ ...form, hamali: Number(e.target.value) || 0 })}
               />
             </div>
             <div>
@@ -202,6 +222,7 @@ export default function MaintenancePage() {
                     otherExpenses: money(row.otherExpenses),
                     fasTag: money(row.fasTag),
                     freight: money(row.freight),
+                    hamali: money(row.hamali),
                     adBlue: money(row.adBlue),
                     maintenanceCost: money(row.maintenanceCost),
                     serviceDate: row.serviceDate,
@@ -221,6 +242,7 @@ export default function MaintenancePage() {
           { key: "freight", header: "Freight" },
           { key: "diesel", header: "Diesel" },
           { key: "fasTag", header: "FasTag" },
+          { key: "hamali", header: "Hamali" },
           { key: "otherExpenses", header: "Other Exp" },
           { key: "adBlue", header: "AdBlue" },
           { key: "maintenanceCost", header: "Maintenance" },
@@ -236,6 +258,7 @@ export default function MaintenancePage() {
                 row.otherExpenses,
                 row.adBlue,
                 row.maintenanceCost,
+                row.hamali,
               ),
           },
         ]}

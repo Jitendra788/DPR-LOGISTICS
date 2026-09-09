@@ -310,6 +310,7 @@ model Maintenance {
   otherExpenses   Float  @default(0)
   fasTag          Float  @default(0)
   freight         Float  @default(0)
+  hamali          Float  @default(0)
   adBlue          Float  @default(0)
   maintenanceCost Float  @default(0)
   nextServiceKm   String @default("")
