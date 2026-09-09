@@ -11,6 +11,32 @@
   margin-bottom: 14px;
 }
 
+.lh-brand-switch {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid #d8e2ec;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.lh-brand-btn {
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 12px;
+  cursor: pointer;
+}
+
+.lh-brand-btn.is-active {
+  background: #0f766e;
+  color: #fff;
+}
+
 .lh-sheet {
   width: 210mm;
   max-width: 100%;
@@ -23,6 +49,18 @@
   box-sizing: border-box;
   -webkit-print-color-adjust: exact !important;
   print-color-adjust: exact !important;
+}
+
+.lh-sheet-roadways .lh-brand {
+  font-size: 22px;
+}
+
+.lh-sheet-roadways .lh-letterhead {
+  border-bottom-color: #1e40af;
+}
+
+.lh-sheet-roadways .lh-tagline {
+  color: #1e40af !important;
 }
 
 .lh-letterhead {
