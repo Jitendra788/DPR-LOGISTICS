@@ -12,7 +12,6 @@ export type NavItem = {
 
 export const navItems: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: "gauge" },
-  { label: "Letterhead", href: "/other/letterhead", icon: "file" },
   {
     label: "Master Data",
     icon: "monitor",
