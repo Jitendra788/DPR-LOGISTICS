@@ -62,6 +62,7 @@ export const navItems: NavItem[] = [
       { label: "Vendor Expense Vouher", href: "/other/vendor-voucher" },
       { label: "Vendor Oustanding", href: "/other/vendor-outstanding" },
       { label: "Vendor Ledger", href: "/other/vendor-ledger" },
+      { label: "Company Letterhead", href: "/other/letterhead" },
     ],
   },
   {
