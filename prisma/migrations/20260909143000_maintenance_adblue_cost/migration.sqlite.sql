@@ -1,0 +1,2 @@
+ALTER TABLE "Maintenance" ADD COLUMN "adBlue" REAL NOT NULL DEFAULT 0;
+ALTER TABLE "Maintenance" ADD COLUMN "maintenanceCost" REAL NOT NULL DEFAULT 0;

@@ -30,6 +30,8 @@ type Maint = {
   otherExpenses?: number;
   fasTag?: number;
   freight?: number;
+  adBlue?: number;
+  maintenanceCost?: number;
   serviceDate: string;
 };
 
@@ -96,6 +98,8 @@ export default function MonthwiseReportPage() {
           (Number(m.diesel) || 0) +
           (Number(m.otherExpenses) || 0) +
           (Number(m.fasTag) || 0) +
+          (Number(m.adBlue) || 0) +
+          (Number(m.maintenanceCost) || 0) +
           (Number(m.freight) || 0);
         expenseByVehDate[key] = (expenseByVehDate[key] || 0) + total;
       }

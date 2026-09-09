@@ -22,6 +22,8 @@ type Row = {
   otherExpenses: number;
   fasTag: number;
   freight: number;
+  adBlue: number;
+  maintenanceCost: number;
   serviceDate: string;
   narration: string;
 };
@@ -34,6 +36,8 @@ const emptyForm = {
   otherExpenses: 0,
   fasTag: 0,
   freight: 0,
+  adBlue: 0,
+  maintenanceCost: 0,
   serviceDate: todayIso(),
   narration: "",
 };
@@ -42,9 +46,25 @@ function money(n: number) {
   return Number(n) || 0;
 }
 
-/** Balance = Freight − Diesel − FasTag − Other Expenses */
-function calcBalance(freight: number, diesel: number, fasTag: number, otherExpenses = 0) {
-  return Number((money(freight) - money(diesel) - money(fasTag) - money(otherExpenses)).toFixed(2));
+/** Balance = Freight − Diesel − FasTag − Other Expenses − AdBlue − Maintenance */
+function calcBalance(
+  freight: number,
+  diesel: number,
+  fasTag: number,
+  otherExpenses = 0,
+  adBlue = 0,
+  maintenanceCost = 0,
+) {
+  return Number(
+    (
+      money(freight) -
+      money(diesel) -
+      money(fasTag) -
+      money(otherExpenses) -
+      money(adBlue) -
+      money(maintenanceCost)
+    ).toFixed(2),
+  );
 }
 
 export default function MaintenancePage() {
@@ -54,8 +74,16 @@ export default function MaintenancePage() {
   const [form, setForm] = useState(emptyForm);
 
   const balance = useMemo(
-    () => calcBalance(form.freight, form.diesel, form.fasTag, form.otherExpenses),
-    [form.freight, form.diesel, form.fasTag, form.otherExpenses],
+    () =>
+      calcBalance(
+        form.freight,
+        form.diesel,
+        form.fasTag,
+        form.otherExpenses,
+        form.adBlue,
+        form.maintenanceCost,
+      ),
+    [form.freight, form.diesel, form.fasTag, form.otherExpenses, form.adBlue, form.maintenanceCost],
   );
 
   useEffect(() => {
@@ -68,7 +96,9 @@ export default function MaintenancePage() {
     const otherExpenses = money(form.otherExpenses);
     const fasTag = money(form.fasTag);
     const freight = money(form.freight);
-    const amount = calcBalance(freight, diesel, fasTag, otherExpenses);
+    const adBlue = money(form.adBlue);
+    const maintenanceCost = money(form.maintenanceCost);
+    const amount = calcBalance(freight, diesel, fasTag, otherExpenses, adBlue, maintenanceCost);
     const body = {
       ...form,
       amount,
@@ -76,6 +106,8 @@ export default function MaintenancePage() {
       otherExpenses,
       fasTag,
       freight,
+      adBlue,
+      maintenanceCost,
       expenseName: form.expenseName || "Maintenance",
       workType: form.expenseName || "Maintenance",
       workshopName: form.narration,
@@ -131,6 +163,16 @@ export default function MaintenancePage() {
                 value={form.narration}
                 onChange={(e) => setForm({ ...form, narration: e.target.value })}
               />
+              <InputField
+                label="AdBlue"
+                value={form.adBlue}
+                onChange={(e) => setForm({ ...form, adBlue: Number(e.target.value) || 0 })}
+              />
+              <InputField
+                label="Maintenance"
+                value={form.maintenanceCost}
+                onChange={(e) => setForm({ ...form, maintenanceCost: Number(e.target.value) || 0 })}
+              />
               <InputField label="Balance" value={balance} readOnly />
             </div>
           </TwoCol>
@@ -160,6 +202,8 @@ export default function MaintenancePage() {
                     otherExpenses: money(row.otherExpenses),
                     fasTag: money(row.fasTag),
                     freight: money(row.freight),
+                    adBlue: money(row.adBlue),
+                    maintenanceCost: money(row.maintenanceCost),
                     serviceDate: row.serviceDate,
                     narration: row.narration,
                   });
@@ -178,11 +222,21 @@ export default function MaintenancePage() {
           { key: "diesel", header: "Diesel" },
           { key: "fasTag", header: "FasTag" },
           { key: "otherExpenses", header: "Other Exp" },
+          { key: "adBlue", header: "AdBlue" },
+          { key: "maintenanceCost", header: "Maintenance" },
           { key: "narration", header: "Narration" },
           {
             key: "balance",
             header: "Balance",
-            render: (row) => calcBalance(row.freight, row.diesel, row.fasTag, row.otherExpenses),
+            render: (row) =>
+              calcBalance(
+                row.freight,
+                row.diesel,
+                row.fasTag,
+                row.otherExpenses,
+                row.adBlue,
+                row.maintenanceCost,
+              ),
           },
         ]}
       />

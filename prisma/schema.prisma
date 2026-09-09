@@ -300,19 +300,21 @@ model FleetVehicle {
 }
 
 model Maintenance {
-  id            Int    @id @default(autoincrement())
-  vehNo         String @default("")
-  serviceDate   String @default("")
-  workType      String @default("Service")
-  workshopName  String @default("")
-  amount        Float  @default(0)
-  diesel        Float  @default(0)
-  otherExpenses Float  @default(0)
-  fasTag        Float  @default(0)
-  freight       Float  @default(0)
-  nextServiceKm String @default("")
-  expenseName   String @default("")
-  narration     String @default("")
+  id              Int    @id @default(autoincrement())
+  vehNo           String @default("")
+  serviceDate     String @default("")
+  workType        String @default("Service")
+  workshopName    String @default("")
+  amount          Float  @default(0)
+  diesel          Float  @default(0)
+  otherExpenses   Float  @default(0)
+  fasTag          Float  @default(0)
+  freight         Float  @default(0)
+  adBlue          Float  @default(0)
+  maintenanceCost Float  @default(0)
+  nextServiceKm   String @default("")
+  expenseName     String @default("")
+  narration       String @default("")
 }
 
 model MoneyReceipt {
