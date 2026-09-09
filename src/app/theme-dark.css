@@ -345,6 +345,20 @@
   color: #5eead4;
 }
 
+[data-theme="dark"] .s2-chip {
+  background: #334155;
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .s2-chip-x {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .s2-chip-x:hover {
+  background: #475569;
+  color: #f8fafc;
+}
+
 [data-theme="dark"] .td-stat,
 [data-theme="dark"] .td-panel,
 [data-theme="dark"] .td-form-section,

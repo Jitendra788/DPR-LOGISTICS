@@ -796,6 +796,62 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   font-weight: 600;
 }
 
+.s2-control-multi {
+  height: auto;
+  min-height: 36px;
+  align-items: flex-start;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.s2-chips {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 0;
+  align-items: center;
+}
+
+.s2-chip {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px 2px 8px;
+  border-radius: 6px;
+  background: #e2e8f0;
+  color: #0f172a;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.s2-chip-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.s2-chip-x {
+  flex: 0 0 auto;
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: #475569;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.s2-chip-x:hover {
+  background: #cbd5e1;
+  color: #0f172a;
+}
+
 .s2-empty {
   padding: 14px 12px;
   color: #94a3b8;

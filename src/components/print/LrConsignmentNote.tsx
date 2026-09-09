@@ -82,7 +82,7 @@ type Props = {
 
 function partyLine(party: LrPrintParty | undefined, fallbackName: string) {
   return {
-    name: party?.name || fallbackName,
+    name: fallbackName || party?.name || "",
     address: party?.address || "",
     gst: party?.gst || "",
   };

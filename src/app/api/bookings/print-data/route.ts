@@ -5,6 +5,7 @@ import { apiError } from "@/lib/handle-api-error";
 import { stripBookingTrackToken } from "@/services/trackingService";
 import { verifyLrPrintShareToken } from "@/lib/lr-email";
 import { sessionFromRequest } from "@/lib/api-auth";
+import { splitPartyNames } from "@/lib/multi-party";
 
 type PartyLite = { name: string; address: string; gst: string };
 
@@ -12,6 +13,15 @@ function matchParty(parties: PartyLite[], name: string) {
   const q = name.trim().toLowerCase();
   if (!q) return null;
   return parties.find((p) => p.name.trim().toLowerCase() === q) ?? null;
+}
+
+function matchFirstConsignee(parties: PartyLite[], consignee: string) {
+  const names = splitPartyNames(consignee);
+  for (const name of names) {
+    const hit = matchParty(parties, name);
+    if (hit) return hit;
+  }
+  return matchParty(parties, consignee);
 }
 
 export async function GET(req: NextRequest) {
@@ -55,7 +65,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       booking,
       consignorParty: matchParty(parties, lr.consignor),
-      consigneeParty: matchParty(parties, lr.consignee),
+      consigneeParty: matchFirstConsignee(parties, lr.consignee),
     });
   } catch (err) {
     return apiError(err, "Print data failed");

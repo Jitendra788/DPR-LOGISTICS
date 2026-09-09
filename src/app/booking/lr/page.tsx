@@ -4,7 +4,7 @@ import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { DateField, ComboboxField, DropdownField, FieldWrap, InputField, MoneyField } from "@/components/ui/FormField";
+import { DateField, ComboboxField, DropdownField, FieldWrap, InputField, MoneyField, MultiComboboxField } from "@/components/ui/FormField";
 import { LR_TYPES, normalizeLrType } from "@/lib/lr-type";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
@@ -12,6 +12,7 @@ import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
 import { api, formToObject } from "@/lib/api-client";
 import { lrNoEquals } from "@/lib/lr-no";
+import { joinPartyNames, splitPartyNames } from "@/lib/multi-party";
 
 type Party = { id: number; name: string };
 type Booking = {
@@ -336,7 +337,14 @@ function LrBookingInner() {
               <ComboboxField label="Consignor" name="consignor" value={form.consignor ?? ""} onChange={(consignor) => setForm({ ...form, consignor })} options={partyNames} placeholder="Search or select consignor" />
             </div>
             <div>
-              <ComboboxField label="Consignee" name="consignee" value={form.consignee ?? ""} onChange={(consignee) => setForm({ ...form, consignee })} options={partyNames} placeholder="Search or select consignee" />
+              <MultiComboboxField
+                label="Consignee"
+                name="consignee"
+                values={splitPartyNames(form.consignee ?? "")}
+                onChange={(names) => setForm({ ...form, consignee: joinPartyNames(names) })}
+                options={partyNames}
+                placeholder="Search or select consignee"
+              />
               <InputField label="No. of Articles" name="articles" value={form.articles ?? ""} onChange={(e) => setForm({ ...form, articles: e.target.value })} />
               <InputField label="Particulars" name="particulars" value={form.particulars ?? ""} onChange={(e) => setForm({ ...form, particulars: e.target.value })} />
               <InputField label="Inv.No. & Date" name="invNoDate" value={form.invNoDate ?? ""} onChange={(e) => setForm({ ...form, invNoDate: e.target.value })} />

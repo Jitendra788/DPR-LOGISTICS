@@ -321,6 +321,267 @@ export function ComboboxField({
   );
 }
 
+type MultiComboboxFieldProps = {
+  label: string;
+  options: string[];
+  values: string[];
+  onChange: (values: string[]) => void;
+  placeholder?: string;
+  className?: string;
+  name?: string;
+  required?: boolean;
+  disabled?: boolean;
+};
+
+/** Multi-select search combobox with removable chips (e.g. LR Consignee). */
+export function MultiComboboxField({
+  label,
+  options,
+  values,
+  onChange,
+  placeholder = "Search or select",
+  className = "",
+  name,
+  required,
+  disabled,
+}: MultiComboboxFieldProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const listId = useId().replace(/:/g, "");
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [active, setActive] = useState(0);
+  const [pos, setPos] = useState({
+    top: 0 as number | undefined,
+    bottom: undefined as number | undefined,
+    left: 0,
+    width: 280,
+    maxHeight: 320,
+    place: "bottom" as "bottom" | "top",
+  });
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const selectedSet = useMemo(() => new Set(values.map((v) => v.toLowerCase())), [values]);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const pool = options.filter((option) => !selectedSet.has(option.toLowerCase()));
+    if (!q) return pool;
+    return pool.filter((option) => option.toLowerCase().includes(q));
+  }, [options, query, selectedSet]);
+
+  function placeMenu() {
+    const el = btnRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const gap = 6;
+    const preferred = Math.min(360, Math.max(220, window.innerHeight * 0.45));
+    const spaceBelow = window.innerHeight - rect.bottom - gap - 12;
+    const spaceAbove = rect.top - gap - 12;
+    const place: "bottom" | "top" = spaceBelow < 180 && spaceAbove > spaceBelow ? "top" : "bottom";
+    const maxHeight = Math.max(160, Math.min(preferred, place === "bottom" ? spaceBelow : spaceAbove));
+    const maxW = Math.max(200, window.innerWidth - 24);
+    const width = Math.min(Math.max(rect.width, Math.min(280, maxW)), maxW);
+    let left = rect.left;
+    if (left + width > window.innerWidth - 12) left = Math.max(12, window.innerWidth - width - 12);
+    if (left < 12) left = 12;
+    setPos({
+      top: place === "bottom" ? rect.bottom + gap : undefined,
+      bottom: place === "top" ? window.innerHeight - rect.top + gap : undefined,
+      left,
+      width,
+      maxHeight,
+      place,
+    });
+  }
+
+  useEffect(() => {
+    if (!open) return;
+    placeMenu();
+    setQuery("");
+    setActive(0);
+    const t = window.setTimeout(() => searchRef.current?.focus(), 0);
+    function onDoc(e: MouseEvent) {
+      const target = e.target as Node;
+      if (rootRef.current?.contains(target) || menuRef.current?.contains(target)) return;
+      setOpen(false);
+    }
+    function onReposition() {
+      placeMenu();
+    }
+    document.addEventListener("mousedown", onDoc);
+    window.addEventListener("resize", onReposition);
+    window.addEventListener("scroll", onReposition, true);
+    return () => {
+      window.clearTimeout(t);
+      document.removeEventListener("mousedown", onDoc);
+      window.removeEventListener("resize", onReposition);
+      window.removeEventListener("scroll", onReposition, true);
+    };
+  }, [open]);
+
+  function add(option: string) {
+    if (selectedSet.has(option.toLowerCase())) return;
+    onChange([...values, option]);
+    setQuery("");
+    setActive(0);
+  }
+
+  function remove(option: string) {
+    onChange(values.filter((v) => v.toLowerCase() !== option.toLowerCase()));
+  }
+
+  function onKeyDown(e: KeyboardEvent) {
+    if (!open) {
+      if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        setOpen(true);
+      }
+      return;
+    }
+    if (e.key === "Escape") {
+      e.preventDefault();
+      setOpen(false);
+      return;
+    }
+    if (e.key === "Backspace" && !query && values.length) {
+      e.preventDefault();
+      remove(values[values.length - 1]);
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActive((i) => Math.min(i + 1, Math.max(filtered.length - 1, 0)));
+      return;
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActive((i) => Math.max(i - 1, 0));
+      return;
+    }
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const hit = filtered[active];
+      if (hit) add(hit);
+    }
+  }
+
+  const joined = values.join(", ");
+  const menu =
+    open && mounted
+      ? createPortal(
+          <div
+            ref={menuRef}
+            className={`s2-menu s2-menu-portal${pos.place === "top" ? " is-top" : ""}`}
+            role="presentation"
+            style={{
+              top: pos.top,
+              bottom: pos.bottom,
+              left: pos.left,
+              width: pos.width,
+              maxHeight: pos.maxHeight,
+            }}
+          >
+            <div className="s2-menu-head">
+              <input
+                ref={searchRef}
+                className="s2-search"
+                value={query}
+                placeholder={`Search ${label.toLowerCase()}…`}
+                aria-label={`Search ${label}`}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setActive(0);
+                }}
+                onKeyDown={onKeyDown}
+              />
+              <span className="s2-count">{filtered.length}/{options.length}</span>
+            </div>
+            <div className="s2-list" id={listId} role="listbox" style={{ maxHeight: Math.max(120, pos.maxHeight - 58) }}>
+              {filtered.length ? (
+                filtered.map((option, index) => (
+                  <button
+                    key={option}
+                    type="button"
+                    role="option"
+                    aria-selected={false}
+                    className={`s2-opt${index === active ? " is-active" : ""}`}
+                    onMouseEnter={() => setActive(index)}
+                    onClick={() => add(option)}
+                  >
+                    {option}
+                  </button>
+                ))
+              ) : (
+                <div className="s2-empty">{values.length ? "All matching options selected" : "No match found"}</div>
+              )}
+            </div>
+          </div>,
+          document.body,
+        )
+      : null;
+
+  return (
+    <div className={`form-group block ${className}`.trim()} ref={rootRef}>
+      <span className="form-label">{label}</span>
+      {name ? <input type="hidden" name={name} value={joined} required={required && !values.length} /> : null}
+      <div className={`s2 s2-multi${open ? " is-open" : ""}${disabled ? " is-disabled" : ""}`}>
+        <button
+          ref={btnRef}
+          type="button"
+          className="s2-control s2-control-multi"
+          disabled={disabled}
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          aria-controls={listId}
+          onClick={() => !disabled && setOpen((v) => !v)}
+          onKeyDown={onKeyDown}
+        >
+          <span className="s2-chips">
+            {values.length ? (
+              values.map((option) => (
+                <span key={option} className="s2-chip">
+                  <span className="s2-chip-text">{option}</span>
+                  <span
+                    className="s2-chip-x"
+                    role="button"
+                    tabIndex={-1}
+                    aria-label={`Remove ${option}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (!disabled) remove(option);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (!disabled) remove(option);
+                      }
+                    }}
+                  >
+                    ×
+                  </span>
+                </span>
+              ))
+            ) : (
+              <span className="s2-placeholder">{placeholder}</span>
+            )}
+          </span>
+          <span className="s2-caret" aria-hidden />
+        </button>
+        {menu}
+      </div>
+    </div>
+  );
+}
+
 type SelectFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   label: string;
   options: string[];
