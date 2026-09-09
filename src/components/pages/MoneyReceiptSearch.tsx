@@ -8,7 +8,7 @@ import { DateField, ComboboxField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Flash } from "@/components/ui/Flash";
 import { api } from "@/lib/api-client";
-import { firstOfMonthIso, isoToDisplay, todayIso } from "@/lib/dates";
+import { isoToDisplay, todayIso } from "@/lib/dates";
 
 type Party = { name: string };
 type BillOption = { billNo: string; partyName: string; source?: string };
@@ -167,8 +167,7 @@ export function MoneyReceiptSearch({
     });
     return list.map((b) => b.billNo).filter(Boolean);
   }, [allBills, partyName, source]);
-  const [fromDate, setFromDate] = useState(firstOfMonthIso());
-  const [toDate, setToDate] = useState(todayIso());
+  const [paidDate, setPaidDate] = useState(todayIso());
   const [rows, setRows] = useState<BillRow[]>([]);
   const [drafts, setDrafts] = useState<Record<string, RowDraft>>({});
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
@@ -242,8 +241,6 @@ export function MoneyReceiptSearch({
       const qs = new URLSearchParams({
         ...(party ? { partyName: party } : {}),
         ...(billNo ? { billNo } : {}),
-        ...(fromDate ? { fromDate } : {}),
-        ...(toDate ? { toDate } : {}),
         ...(source ? { source } : {}),
       }).toString();
       const data = await api<BillRow[]>(`/api/reports/money-receipt-outstanding${qs ? `?${qs}` : ""}`);
@@ -287,7 +284,7 @@ export function MoneyReceiptSearch({
           receiptNo: next.value,
           billNo: row.billNo,
           partyName: row.partyName,
-          date: todayIso(),
+          date: paidDate || todayIso(),
           tdsPct: d.tdsPct,
           tdsAmt: d.tdsAmt,
           paidAmt: d.paidAmt,
@@ -310,7 +307,7 @@ export function MoneyReceiptSearch({
     <>
       <PageHeader
         title="Money Reciept"
-        subtitle="Search by party name and date — record payment against pending bills"
+        subtitle="Search by party name — record payment with Paid Date against pending bills"
         crumbs={[{ label: "Home", href: "/dashboard" }, { label: "Money Reciept" }]}
       />
       <Flash message={message} />
@@ -324,7 +321,7 @@ export function MoneyReceiptSearch({
               View Report
             </Button>
           </div>
-          <div className="grid grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-4">
+          <div className="grid grid-cols-1 gap-x-4 gap-y-2 md:grid-cols-3">
             <ComboboxField
               label="Party Name"
               value={partyName}
@@ -342,8 +339,7 @@ export function MoneyReceiptSearch({
               options={billOptions}
               placeholder="Search or select bill"
             />
-            <DateField label="From Date" value={fromDate} onChange={setFromDate} />
-            <DateField label="To Date" value={toDate} onChange={setToDate} />
+            <DateField label="Paid Date" value={paidDate} onChange={setPaidDate} />
           </div>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <Button type="submit" variant="teal" size="sm" disabled={loading}>

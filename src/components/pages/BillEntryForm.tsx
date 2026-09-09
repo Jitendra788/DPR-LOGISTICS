@@ -111,7 +111,6 @@ export function BillEntryForm({
   const searchParams = useSearchParams();
   const { rows, message, update, setMessage, reload } = useCrud<Bill>("bills");
   const [parties, setParties] = useState<Party[]>([]);
-  const partyNames = parties.map((p) => p.name).filter(Boolean);
   const [bookings, setBookings] = useState<LrRow[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [editId, setEditId] = useState<number | null>(null);
@@ -138,6 +137,33 @@ export function BillEntryForm({
   const sgstAmt = useMemo(() => Number(((form.amount * form.sgstPct) / 100).toFixed(2)), [form.amount, form.sgstPct]);
   const igstAmt = useMemo(() => Number(((form.amount * form.igstPct) / 100).toFixed(2)), [form.amount, form.igstPct]);
   const grand = useMemo(() => Number((form.amount + cgstAmt + sgstAmt + igstAmt).toFixed(2)), [form.amount, cgstAmt, sgstAmt, igstAmt]);
+
+  /** Party Name list = only parties with pending (unbilled TBB) LRs for this weight/meter screen */
+  const pendingPartyNames = useMemo(() => {
+    const billAsFilter = form.billAs || (variant === "meter" ? "Mtr" : "");
+    const pendingBillingParties = bookings
+      .filter(
+        (row) =>
+          !row.billed &&
+          isBillableLrType(row.lrType) &&
+          matchesSource(row, source) &&
+          matchesBillAs(row, variant, billAsFilter || undefined) &&
+          String(row.billingParty || "").trim(),
+      )
+      .map((row) => String(row.billingParty).trim());
+
+    const uniquePending = [...new Set(pendingBillingParties)];
+    const masterMatches = parties
+      .map((p) => p.name)
+      .filter((name) => Boolean(name) && uniquePending.some((bp) => matchesParty(bp, name)));
+    const extras = uniquePending.filter((bp) => !masterMatches.some((m) => matchesParty(bp, m)));
+    let list = [...masterMatches, ...extras].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+
+    if (editId && form.partyName.trim() && !list.some((n) => matchesParty(n, form.partyName))) {
+      list = [form.partyName.trim(), ...list];
+    }
+    return list;
+  }, [bookings, parties, variant, source, form.billAs, editId, form.partyName]);
 
   const visibleLrs = useMemo(() => {
     if (!form.partyName) return [];
@@ -399,8 +425,8 @@ export function BillEntryForm({
                   label="Party Name"
                   value={form.partyName}
                   onChange={(partyName) => setForm({ ...form, partyName })}
-                  options={partyNames}
-                  placeholder="Search or select party"
+                  options={pendingPartyNames}
+                  placeholder="Search pending party..."
                 />
               </div>
             </TwoCol>
@@ -423,8 +449,8 @@ export function BillEntryForm({
                   label="Party Name"
                   value={form.partyName}
                   onChange={(partyName) => setForm({ ...form, partyName })}
-                  options={partyNames}
-                  placeholder="Search or select party"
+                  options={pendingPartyNames}
+                  placeholder="Search pending party..."
                 />
                 <InputField label="Remark" value={form.remark} onChange={(e) => setForm({ ...form, remark: e.target.value })} />
                 <ManualNumberField label="Total Amount" value={grand} readOnly />

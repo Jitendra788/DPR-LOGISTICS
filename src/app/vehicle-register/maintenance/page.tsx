@@ -54,14 +54,20 @@ export default function MaintenancePage() {
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    const diesel = money(form.diesel);
+    const otherExpenses = money(form.otherExpenses);
+    const fasTag = money(form.fasTag);
+    const freight = money(form.freight);
+    const amount = diesel + otherExpenses + fasTag + freight;
     const body = {
       ...form,
-      amount: money(form.amount),
-      diesel: money(form.diesel),
-      otherExpenses: money(form.otherExpenses),
-      fasTag: money(form.fasTag),
-      freight: money(form.freight),
-      workType: form.expenseName,
+      amount,
+      diesel,
+      otherExpenses,
+      fasTag,
+      freight,
+      expenseName: form.expenseName || "Maintenance",
+      workType: form.expenseName || "Maintenance",
       workshopName: form.narration,
     };
     const saved = editId ? await update(editId, body) : await create(body);
@@ -80,17 +86,41 @@ export default function MaintenancePage() {
           <TwoCol>
             <div>
               <InputField label="Sr No." value={editId ?? rows.length + 1} readOnly />
-              <ComboboxField label="Enter Vehicle Number" value={form.vehNo} onChange={(vehNo) => setForm({ ...form, vehNo })} options={vehicles.map((v) => v.vehNo)} placeholder="Search or select vehicle" />
-              <InputField label="Expense Name" value={form.expenseName} onChange={(e) => setForm({ ...form, expenseName: e.target.value })} />
-              <InputField label="Diesel" value={form.diesel} onChange={(e) => setForm({ ...form, diesel: Number(e.target.value) || 0 })} />
-              <InputField label="FasTag" value={form.fasTag} onChange={(e) => setForm({ ...form, fasTag: Number(e.target.value) || 0 })} />
+              <ComboboxField
+                label="Enter Vehicle Number"
+                value={form.vehNo}
+                onChange={(vehNo) => setForm({ ...form, vehNo })}
+                options={vehicles.map((v) => v.vehNo)}
+                placeholder="Search or select vehicle"
+              />
+              <InputField
+                label="Freight"
+                value={form.freight}
+                onChange={(e) => setForm({ ...form, freight: Number(e.target.value) || 0 })}
+              />
+              <InputField
+                label="Diesel"
+                value={form.diesel}
+                onChange={(e) => setForm({ ...form, diesel: Number(e.target.value) || 0 })}
+              />
+              <InputField
+                label="FasTag"
+                value={form.fasTag}
+                onChange={(e) => setForm({ ...form, fasTag: Number(e.target.value) || 0 })}
+              />
             </div>
             <div>
-              <InputField label="Expense Rs." value={form.amount} onChange={(e) => setForm({ ...form, amount: Number(e.target.value) || 0 })} />
               <DateField label="Exp Date" value={form.serviceDate} onChange={(serviceDate) => setForm({ ...form, serviceDate })} />
-              <InputField label="Narration" value={form.narration} onChange={(e) => setForm({ ...form, narration: e.target.value })} />
-              <InputField label="Other Expenses" value={form.otherExpenses} onChange={(e) => setForm({ ...form, otherExpenses: Number(e.target.value) || 0 })} />
-              <InputField label="Freight" value={form.freight} onChange={(e) => setForm({ ...form, freight: Number(e.target.value) || 0 })} />
+              <InputField
+                label="Other Expenses"
+                value={form.otherExpenses}
+                onChange={(e) => setForm({ ...form, otherExpenses: Number(e.target.value) || 0 })}
+              />
+              <InputField
+                label="Narration"
+                value={form.narration}
+                onChange={(e) => setForm({ ...form, narration: e.target.value })}
+              />
             </div>
           </TwoCol>
           <Button type="submit" variant="teal">
@@ -132,14 +162,13 @@ export default function MaintenancePage() {
           { key: "delete", header: "Delete", render: (row) => <Button type="button" size="sm" variant="danger" onClick={() => remove(row.id)}>Delete</Button> },
           { key: "id", header: "Sr No" },
           { key: "vehNo", header: "Veh No" },
-          { key: "expenseName", header: "Expense Name" },
-          { key: "serviceDate", header: "Date" },
-          { key: "narration", header: "Narration" },
-          { key: "amount", header: "Amt Rs" },
-          { key: "diesel", header: "Diesel" },
-          { key: "otherExpenses", header: "Other Exp" },
-          { key: "fasTag", header: "FasTag" },
+          { key: "serviceDate", header: "Exp Date" },
           { key: "freight", header: "Freight" },
+          { key: "diesel", header: "Diesel" },
+          { key: "fasTag", header: "FasTag" },
+          { key: "otherExpenses", header: "Other Exp" },
+          { key: "narration", header: "Narration" },
+          { key: "amount", header: "Total" },
         ]}
       />
     </>

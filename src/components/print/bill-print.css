@@ -227,6 +227,13 @@
   background: #ffffff !important;
 }
 
+.bill-print-lr-date {
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+  word-wrap: normal !important;
+}
+
 /* Left totals / words ~11–12pt */
 .bill-print-total-row {
   font-size: 11pt !important;
@@ -413,6 +420,13 @@
     overflow: hidden !important;
   }
 
+  .bill-print-lr-date {
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
+    word-wrap: normal !important;
+  }
+
   .bill-print-data td {
     font-size: 9.5pt !important;
   }
@@ -437,7 +451,8 @@
   }
 
   @page {
-    size: A4 landscape;
+    /* Portrait / Landscape both — browser Layout dropdown controls orientation */
+    size: auto;
     margin: 10mm;
   }
 }

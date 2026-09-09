@@ -98,40 +98,40 @@ type Props = {
 const WEIGHT_COLS = [
   "4%",
   "5.5%",
-  "5.5%",
-  "5.5%",
+  "7.5%", // LR Date — keep DD/MM/YYYY on one line
+  "5%",
   "4%",
-  "6.5%",
-  "6.5%",
-  "5%",
   "6%",
-  "5.5%",
-  "6.5%",
-  "7.5%",
-  "7.5%",
+  "6%",
   "5%",
   "5.5%",
+  "5.5%",
+  "6%",
+  "7%",
+  "7%",
+  "5%",
+  "5%",
   "4.5%",
-  "9.5%",
+  "11.5%",
 ] as const;
 
 const METER_COLS = [
   "4%",
   "6%",
-  "5.5%",
-  "8.5%",
-  "8.5%",
+  "7.5%", // LR Date — keep DD/MM/YYYY on one line
+  "7.5%",
+  "7.5%",
   "5%",
   "4.5%",
   "5.5%",
   "5.5%",
+  "6%",
   "6.5%",
-  "7%",
-  "7%",
+  "6.5%",
   "5%",
   "5.5%",
   "4.5%",
-  "11.5%",
+  "13%",
 ] as const;
 
 export function BillTaxInvoice({
@@ -244,7 +244,7 @@ export function BillTaxInvoice({
             <tr className="bill-print-bold bill-print-center bill-print-th">
               <td>Sr No</td>
               <td>LR No</td>
-              <td>LR Date</td>
+              <td className="bill-print-lr-date">LR Date</td>
               <td>From</td>
               <td>To</td>
               <td>Mtr Qty</td>
@@ -263,7 +263,7 @@ export function BillTaxInvoice({
             <tr className="bill-print-bold bill-print-center bill-print-th">
               <td>Sr No</td>
               <td>LR No</td>
-              <td>LR Date</td>
+              <td className="bill-print-lr-date">LR Date</td>
               <td>Weight</td>
               <td>Rate</td>
               <td>From</td>
@@ -288,7 +288,7 @@ export function BillTaxInvoice({
                 <tr key={`${row.lrNo}-${i}`} className="bill-print-center bill-print-data">
                   <td>{i + 1}</td>
                   <td>{stripLrPrefix(row.lrNo)}</td>
-                  <td>{formatPrintDate(row.lrDate)}</td>
+                  <td className="bill-print-lr-date">{formatPrintDate(row.lrDate)}</td>
                   <td>{row.fromStation}</td>
                   <td>{row.toStation}</td>
                   <td>{row.totalMeter || ""}</td>
@@ -309,7 +309,7 @@ export function BillTaxInvoice({
               <tr key={`${row.lrNo}-${i}`} className="bill-print-center bill-print-data">
                 <td>{i + 1}</td>
                 <td>{stripLrPrefix(row.lrNo)}</td>
-                <td>{formatPrintDate(row.lrDate)}</td>
+                <td className="bill-print-lr-date">{formatPrintDate(row.lrDate)}</td>
                 <td>{lrWeight(row)}</td>
                 <td>{row.rate || ""}</td>
                 <td>{row.fromStation}</td>
