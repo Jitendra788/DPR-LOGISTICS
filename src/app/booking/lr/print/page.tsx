@@ -2,11 +2,9 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { LrConsignmentNote, type LrPrintBooking } from "@/components/print/LrConsignmentNote";
+import { LrConsignmentNote, type LrPrintBooking, type LrPrintParty } from "@/components/print/LrConsignmentNote";
 import { api } from "@/lib/api-client";
 import { printWhenReady } from "@/lib/print-when-ready";
-
-type Party = { name: string; address: string; gst: string };
 
 const copyMap: Record<string, string> = {
   Consignor: "Consignor Copy",
@@ -24,8 +22,8 @@ function PrintInner() {
     .map((c) => c.trim())
     .filter(Boolean);
   const [row, setRow] = useState<LrPrintBooking | null>(null);
-  const [consignorParty, setConsignorParty] = useState<Party | undefined>();
-  const [consigneeParty, setConsigneeParty] = useState<Party | undefined>();
+  const [consignorParties, setConsignorParties] = useState<LrPrintParty[]>([]);
+  const [consigneeParties, setConsigneeParties] = useState<LrPrintParty[]>([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -38,14 +36,16 @@ function PrintInner() {
     if (share) qs.set("share", share);
     api<{
       booking: LrPrintBooking;
-      consignorParty: Party | null;
-      consigneeParty: Party | null;
+      consignorParty: LrPrintParty | null;
+      consigneeParty: LrPrintParty | null;
+      consignorParties?: LrPrintParty[];
+      consigneeParties?: LrPrintParty[];
     }>(`/api/bookings/print-data?${qs.toString()}`)
       .then((res) => {
         if (cancelled) return;
         setRow(res.booking);
-        setConsignorParty(res.consignorParty ?? undefined);
-        setConsigneeParty(res.consigneeParty ?? undefined);
+        setConsignorParties(res.consignorParties?.length ? res.consignorParties : res.consignorParty ? [res.consignorParty] : []);
+        setConsigneeParties(res.consigneeParties?.length ? res.consigneeParties : res.consigneeParty ? [res.consigneeParty] : []);
       })
       .catch((err) => {
         if (!cancelled) setError(err instanceof Error ? err.message : "Unable to load LR");
@@ -70,8 +70,10 @@ function PrintInner() {
           key={copy}
           booking={row}
           copyLabel={copyMap[copy] || `${copy} Copy`}
-          consignorParty={consignorParty}
-          consigneeParty={consigneeParty}
+          consignorParty={consignorParties[0]}
+          consigneeParty={consigneeParties[0]}
+          consignorParties={consignorParties}
+          consigneeParties={consigneeParties}
         />
       ))}
     </div>

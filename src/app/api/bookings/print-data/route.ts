@@ -5,24 +5,7 @@ import { apiError } from "@/lib/handle-api-error";
 import { stripBookingTrackToken } from "@/services/trackingService";
 import { verifyLrPrintShareToken } from "@/lib/lr-email";
 import { sessionFromRequest } from "@/lib/api-auth";
-import { splitPartyNames } from "@/lib/multi-party";
-
-type PartyLite = { name: string; address: string; gst: string };
-
-function matchParty(parties: PartyLite[], name: string) {
-  const q = name.trim().toLowerCase();
-  if (!q) return null;
-  return parties.find((p) => p.name.trim().toLowerCase() === q) ?? null;
-}
-
-function matchFirstParty(parties: PartyLite[], raw: string) {
-  const names = splitPartyNames(raw);
-  for (const name of names) {
-    const hit = matchParty(parties, name);
-    if (hit) return hit;
-  }
-  return matchParty(parties, raw);
-}
+import { resolveParties } from "@/lib/multi-party";
 
 export async function GET(req: NextRequest) {
   try {
@@ -61,11 +44,15 @@ export async function GET(req: NextRequest) {
       select: { name: true, address: true, gst: true },
     });
 
+    const consignorParties = resolveParties(parties, lr.consignor);
+    const consigneeParties = resolveParties(parties, lr.consignee);
     const booking = stripBookingTrackToken({ ...lr } as Record<string, unknown>);
     return NextResponse.json({
       booking,
-      consignorParty: matchFirstParty(parties, lr.consignor),
-      consigneeParty: matchFirstParty(parties, lr.consignee),
+      consignorParty: consignorParties[0] ?? null,
+      consigneeParty: consigneeParties[0] ?? null,
+      consignorParties,
+      consigneeParties,
     });
   } catch (err) {
     return apiError(err, "Print data failed");

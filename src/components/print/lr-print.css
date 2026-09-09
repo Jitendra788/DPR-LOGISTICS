@@ -306,6 +306,14 @@
   border: 1.5px solid #000000 !important;
 }
 
+.lr-print-party-block {
+  margin: 0 0 4px;
+}
+
+.lr-print-party-block:last-of-type {
+  margin-bottom: 2px;
+}
+
 .lr-print-party-line {
   margin: 0 0 2px;
   font-size: 11px !important;

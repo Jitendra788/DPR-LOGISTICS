@@ -2,6 +2,7 @@ import { BRAND_LOGO_HEADER_PRINT, BRAND_STAMP_PRINT } from "@/lib/brand";
 import { formatPrintDate, lrPrintCompany } from "@/lib/lr-print";
 import { stripLrPrefix } from "@/lib/lr-no";
 import { normalizeLrType } from "@/lib/lr-type";
+import { resolveParties, splitPartyNames, type PartyLite } from "@/lib/multi-party";
 import "./lr-print.css";
 
 export type LrPrintCompany = {
@@ -66,6 +67,10 @@ type Props = {
   copyLabel: string;
   consignorParty?: LrPrintParty;
   consigneeParty?: LrPrintParty;
+  /** All selected consignors (multi-select). */
+  consignorParties?: LrPrintParty[];
+  /** All selected consignees (multi-select). */
+  consigneeParties?: LrPrintParty[];
   /** Defaults to DPR Logistics; Roadways passes DELHI PUNJAB ROADWAYS. */
   company?: LrPrintCompany;
   /** Hide company logo (e.g. email / customer share print). */
@@ -88,6 +93,34 @@ function partyLine(party: LrPrintParty | undefined, fallbackName: string) {
   };
 }
 
+function buildPartyBlocks(
+  raw: string,
+  parties: LrPrintParty[] | undefined,
+  fallback: LrPrintParty | undefined,
+): LrPrintParty[] {
+  if (parties?.length) {
+    return parties.map((p) => ({
+      name: p.name || "",
+      address: p.address || "",
+      gst: p.gst || "",
+    }));
+  }
+  const names = splitPartyNames(raw);
+  if (names.length > 1) {
+    return resolveParties((parties as PartyLite[]) || [], raw);
+  }
+  const one = partyLine(fallback, raw);
+  return one.name ? [one] : [];
+}
+
+function consignorNameLabel(index: number) {
+  return index === 0 ? "Party Name :" : `Consignor ${index + 1} Name :`;
+}
+
+function consigneeNameLabel(index: number) {
+  return index === 0 ? "Consignee Name :" : `Consignee ${index + 1} Name :`;
+}
+
 /** Legacy print style: 6TN → 6 TN, 18TN32FEET → 18 TN 32 FEET */
 function formatWeightDisplay(value?: string) {
   const v = String(value ?? "").trim();
@@ -104,6 +137,8 @@ export function LrConsignmentNote({
   copyLabel,
   consignorParty,
   consigneeParty,
+  consignorParties,
+  consigneeParties,
   company = lrPrintCompany,
   hideLogo = false,
   logoSrc = BRAND_LOGO_HEADER_PRINT,
@@ -111,8 +146,8 @@ export function LrConsignmentNote({
   signFor,
   gstPartyLabel = "DPRL",
 }: Props) {
-  const consignor = partyLine(consignorParty, booking.consignor);
-  const consignee = partyLine(consigneeParty, booking.consignee);
+  const consignors = buildPartyBlocks(booking.consignor, consignorParties, consignorParty);
+  const consignees = buildPartyBlocks(booking.consignee, consigneeParties, consigneeParty);
   const type = normalizeLrType(booking.lrType);
   const handlingLabel =
     copyLabel.toLowerCase().includes("lorry") || copyLabel.toLowerCase().includes("lory")
@@ -179,18 +214,22 @@ export function LrConsignmentNote({
           <tr>
             <td colSpan={4} className="lr-print-party-cell">
               <div className="lr-print-section">Consignor Details</div>
-              <div className="lr-print-party-line">
-                <span className="lr-print-label">Party Name :</span>{" "}
-                <span className="lr-print-party-val">{consignor.name}</span>
-              </div>
-              <div className="lr-print-party-line">
-                <span className="lr-print-label">Address :</span>{" "}
-                <span className="lr-print-party-val">{consignor.address}</span>
-              </div>
-              <div className="lr-print-party-line">
-                <span className="lr-print-label">GST No. :</span>{" "}
-                <span className="lr-print-party-val">{consignor.gst}</span>
-              </div>
+              {consignors.map((party, index) => (
+                <div key={`cnr-${index}-${party.name}`} className="lr-print-party-block">
+                  <div className="lr-print-party-line">
+                    <span className="lr-print-label">{consignorNameLabel(index)}</span>{" "}
+                    <span className="lr-print-party-val">{party.name}</span>
+                  </div>
+                  <div className="lr-print-party-line">
+                    <span className="lr-print-label">Address :</span>{" "}
+                    <span className="lr-print-party-val">{party.address}</span>
+                  </div>
+                  <div className="lr-print-party-line">
+                    <span className="lr-print-label">GST No. :</span>{" "}
+                    <span className="lr-print-party-val">{party.gst}</span>
+                  </div>
+                </div>
+              ))}
             </td>
             <td colSpan={3} className="lr-print-no-pad lr-print-meta-cell">
               <table className="lr-nested lr-meta-box">
@@ -228,18 +267,22 @@ export function LrConsignmentNote({
           <tr>
             <td colSpan={7} className="lr-print-party-cell">
               <div className="lr-print-section">Consignee Details</div>
-              <div className="lr-print-party-line">
-                <span className="lr-print-label">Consignee Name :</span>{" "}
-                <span className="lr-print-party-val">{consignee.name}</span>
-              </div>
-              <div className="lr-print-party-line">
-                <span className="lr-print-label">Address :</span>{" "}
-                <span className="lr-print-party-val">{consignee.address}</span>
-              </div>
-              <div className="lr-print-party-line">
-                <span className="lr-print-label">GST No. :</span>{" "}
-                <span className="lr-print-party-val">{consignee.gst}</span>
-              </div>
+              {consignees.map((party, index) => (
+                <div key={`cne-${index}-${party.name}`} className="lr-print-party-block">
+                  <div className="lr-print-party-line">
+                    <span className="lr-print-label">{consigneeNameLabel(index)}</span>{" "}
+                    <span className="lr-print-party-val">{party.name}</span>
+                  </div>
+                  <div className="lr-print-party-line">
+                    <span className="lr-print-label">Address :</span>{" "}
+                    <span className="lr-print-party-val">{party.address}</span>
+                  </div>
+                  <div className="lr-print-party-line">
+                    <span className="lr-print-label">GST No. :</span>{" "}
+                    <span className="lr-print-party-val">{party.gst}</span>
+                  </div>
+                </div>
+              ))}
               <div className="lr-print-party-line">
                 <span className="lr-print-label">Ship To :</span>{" "}
                 <span className="lr-print-party-val">{booking.shipTo || ""}</span>

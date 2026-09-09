@@ -2,25 +2,12 @@
 
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { LrConsignmentNote, type LrPrintBooking } from "@/components/print/LrConsignmentNote";
+import { LrConsignmentNote, type LrPrintBooking, type LrPrintParty } from "@/components/print/LrConsignmentNote";
 import { api } from "@/lib/api-client";
 import { printWhenReady } from "@/lib/print-when-ready";
-import { splitPartyNames } from "@/lib/multi-party";
+import { resolveParties } from "@/lib/multi-party";
 
 type Party = { name: string; address: string; gst: string };
-
-function findParty(parties: Party[], name: string) {
-  const q = name.trim().toLowerCase();
-  return parties.find((p) => p.name.trim().toLowerCase() === q);
-}
-
-function findFirstParty(parties: Party[], raw: string) {
-  for (const name of splitPartyNames(raw)) {
-    const hit = findParty(parties, name);
-    if (hit) return hit;
-  }
-  return findParty(parties, raw);
-}
 
 function PrintInner() {
   const params = useSearchParams();
@@ -50,8 +37,14 @@ function PrintInner() {
     printWhenReady(200);
   }, [row]);
 
-  const consignorParty = useMemo(() => (row ? findFirstParty(parties, row.consignor) : undefined), [parties, row]);
-  const consigneeParty = useMemo(() => (row ? findFirstParty(parties, row.consignee) : undefined), [parties, row]);
+  const consignorParties = useMemo(
+    () => (row ? (resolveParties(parties, row.consignor) as LrPrintParty[]) : []),
+    [parties, row],
+  );
+  const consigneeParties = useMemo(
+    () => (row ? (resolveParties(parties, row.consignee) as LrPrintParty[]) : []),
+    [parties, row],
+  );
 
   if (error) return <p className="p-8">{error}</p>;
   if (!row) return <p className="p-8">Loading LR...</p>;
@@ -63,8 +56,10 @@ function PrintInner() {
           key={copyLabel}
           booking={row}
           copyLabel={copyLabel}
-          consignorParty={consignorParty}
-          consigneeParty={consigneeParty}
+          consignorParty={consignorParties[0]}
+          consigneeParty={consigneeParties[0]}
+          consignorParties={consignorParties}
+          consigneeParties={consigneeParties}
         />
       ))}
     </div>
