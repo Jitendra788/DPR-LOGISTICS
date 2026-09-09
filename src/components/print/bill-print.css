@@ -45,10 +45,10 @@
   background: #ffffff !important;
 }
 
-/* Table headers — never split mid-word (Handli/ng). Wrap only at <br> / spaces */
+/* Table headers — always one full line, never mid-word wrap */
 .bill-print-th {
   font-weight: 800 !important;
-  font-size: 6.5pt !important;
+  font-size: 6pt !important;
   padding: 2px 0 !important;
   vertical-align: middle !important;
   background: #ffffff !important;
@@ -65,21 +65,18 @@
   word-wrap: normal !important;
   hyphens: none !important;
   -webkit-hyphens: none !important;
-  overflow: hidden !important;
-  line-height: 1.15 !important;
-  letter-spacing: -0.1px;
-  padding: 2px 1px !important;
+  overflow: visible !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.15px;
+  padding: 2px 0 !important;
   box-sizing: border-box !important;
-  max-width: 0;
   vertical-align: middle !important;
   text-align: center !important;
 }
 
-/* Single-word headers (Handling, Insurance…) stay on one line */
 .bill-print-th-one {
-  display: inline-block;
+  display: inline;
   white-space: nowrap !important;
-  max-width: 100%;
 }
 
 /* Table data */
@@ -441,26 +438,25 @@
 
   .bill-print-th > td,
   .bill-print-data td {
-    overflow: hidden !important;
-    max-width: 0 !important;
+    max-width: none !important;
   }
 
   .bill-print-th > td,
   .bill-print-th-cell {
-    white-space: normal !important;
+    white-space: nowrap !important;
     word-break: keep-all !important;
     overflow-wrap: normal !important;
-    word-wrap: normal !important;
-    hyphens: none !important;
-    font-size: 6.5pt !important;
-    letter-spacing: -0.1px !important;
-    padding: 2px 1px !important;
-    line-height: 1.15 !important;
-    overflow: hidden !important;
+    overflow: visible !important;
+    font-size: 6pt !important;
+    letter-spacing: -0.15px !important;
+    padding: 2px 0 !important;
+    line-height: 1.1 !important;
   }
 
   .bill-print-data td {
-    font-size: 8pt !important;
+    font-size: 7.5pt !important;
+    overflow: hidden !important;
+    max-width: 0 !important;
   }
 
   .bill-print-lr-date,
@@ -496,9 +492,9 @@
     print-color-adjust: exact !important;
   }
 
-  /* Portrait / Landscape — Chrome Layout dropdown controls orientation */
+  /* Bill needs width so header names stay on one line */
   @page {
-    size: auto;
-    margin: 6mm;
+    size: A4 landscape;
+    margin: 5mm;
   }
 }

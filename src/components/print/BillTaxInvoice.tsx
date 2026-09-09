@@ -253,47 +253,17 @@ export function BillTaxInvoice({
               <td className="bill-print-th-cell bill-print-lr-date">LR Date</td>
               <BillTh>From</BillTh>
               <BillTh>To</BillTh>
-              <BillTh>
-                Mtr
-                <br />
-                Qty
-              </BillTh>
+              <BillTh>Mtr Qty</BillTh>
               <BillTh>Rate</BillTh>
-              <BillTh>
-                Ser
-                <br />
-                Tax
-              </BillTh>
-              <BillTh>
-                <span className="bill-print-th-one">Handling</span>
-              </BillTh>
-              <BillTh>
-                <span className="bill-print-th-one">Insurance</span>
-              </BillTh>
-              <BillTh>
-                St.
-                <br />
-                Charges
-              </BillTh>
-              <BillTh>
-                Door
-                <br />
-                Colle.
-              </BillTh>
-              <BillTh>
-                <span className="bill-print-th-one">Barrier</span>
-              </BillTh>
-              <BillTh>
-                <span className="bill-print-th-one">Hamali</span>
-              </BillTh>
-              <BillTh>
-                <span className="bill-print-th-one">Other</span>
-              </BillTh>
-              <BillTh>
-                Total
-                <br />
-                Bill
-              </BillTh>
+              <BillTh>Ser Tax</BillTh>
+              <BillTh>Handling</BillTh>
+              <BillTh>Insurance</BillTh>
+              <BillTh>St.Chg</BillTh>
+              <BillTh>Door Col.</BillTh>
+              <BillTh>Barrier</BillTh>
+              <BillTh>Hamali</BillTh>
+              <BillTh>Other</BillTh>
+              <BillTh>Total Bill</BillTh>
             </tr>
           ) : (
             <tr className="bill-print-bold bill-print-center bill-print-th">
@@ -305,41 +275,15 @@ export function BillTaxInvoice({
               <BillTh>From</BillTh>
               <BillTh>To</BillTh>
               <BillTh>Freight</BillTh>
-              <BillTh>
-                Ser
-                <br />
-                Tax
-              </BillTh>
-              <BillTh>
-                <span className="bill-print-th-one">Handling</span>
-              </BillTh>
-              <BillTh>
-                <span className="bill-print-th-one">Insurance</span>
-              </BillTh>
-              <BillTh>
-                St.
-                <br />
-                Charges
-              </BillTh>
-              <BillTh>
-                Door
-                <br />
-                Colle.
-              </BillTh>
-              <BillTh>
-                <span className="bill-print-th-one">Barrier</span>
-              </BillTh>
-              <BillTh>
-                <span className="bill-print-th-one">Hamali</span>
-              </BillTh>
-              <BillTh>
-                <span className="bill-print-th-one">Other</span>
-              </BillTh>
-              <BillTh>
-                Total
-                <br />
-                Bill
-              </BillTh>
+              <BillTh>Ser Tax</BillTh>
+              <BillTh>Handling</BillTh>
+              <BillTh>Insurance</BillTh>
+              <BillTh>St.Chg</BillTh>
+              <BillTh>Door Col.</BillTh>
+              <BillTh>Barrier</BillTh>
+              <BillTh>Hamali</BillTh>
+              <BillTh>Other</BillTh>
+              <BillTh>Total Bill</BillTh>
             </tr>
           )}
 

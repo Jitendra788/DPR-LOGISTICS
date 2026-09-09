@@ -148,24 +148,30 @@
   font-weight: 800 !important;
   padding-top: 2px !important;
   padding-bottom: 2px !important;
-  font-size: 9px !important;
+  font-size: 8.5px !important;
   font-family: Arial, Helvetica, sans-serif !important;
   color: #000000 !important;
   border: 1.5px solid #000000 !important;
-  white-space: normal !important;
+  white-space: nowrap !important;
   word-break: keep-all !important;
   overflow-wrap: normal !important;
   word-wrap: normal !important;
   hyphens: none !important;
   -webkit-hyphens: none !important;
-  line-height: 1.15 !important;
+  line-height: 1.1 !important;
   vertical-align: middle !important;
-  overflow: hidden !important;
+  overflow: visible !important;
+}
+
+.lr-print-th-one {
+  display: inline-block;
+  white-space: nowrap !important;
+  max-width: none;
 }
 
 .lr-print-gst-head {
-  font-size: 8.5px !important;
-  line-height: 1.15 !important;
+  font-size: 8px !important;
+  line-height: 1.1 !important;
 }
 
 .lr-freight-amt {
@@ -402,10 +408,10 @@
 }
 
 @media print {
-  /* size: auto → Chrome Layout Portrait / Landscape both work */
+  /* Landscape so LR header names fit on one line */
   @page {
-    size: auto;
-    margin: 0.15in;
+    size: A4 landscape;
+    margin: 0.12in;
   }
 
   html,

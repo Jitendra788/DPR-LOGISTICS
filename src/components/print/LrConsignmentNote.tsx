@@ -137,13 +137,13 @@ export function LrConsignmentNote({
       <section className="lr-print-sheet">
       <table className="lr-print-table">
         <colgroup>
-          <col style={{ width: "11%" }} />
-          <col style={{ width: "24%" }} />
-          <col style={{ width: "11%" }} />
-          <col style={{ width: "15%" }} />
           <col style={{ width: "13%" }} />
-          <col style={{ width: "11%" }} />
-          <col style={{ width: "15%" }} />
+          <col style={{ width: "26%" }} />
+          <col style={{ width: "12%" }} />
+          <col style={{ width: "14%" }} />
+          <col style={{ width: "12%" }} />
+          <col style={{ width: "10%" }} />
+          <col style={{ width: "13%" }} />
         </colgroup>
         <tbody>
           {/* Header */}
@@ -247,50 +247,34 @@ export function LrConsignmentNote({
             </td>
           </tr>
 
-          {/* Articles header — intentional line breaks only (no mid-word cut in Portrait) */}
+          {/* Articles header — one line each (Landscape); no mid-word cut */}
           <tr className="lr-print-bold lr-print-center lr-print-articles-head">
             <td>
-              No.Of
-              <br />
-              Articales
+              <span className="lr-print-th-one">No.Of Articales</span>
             </td>
             <td>
-              Description Said
-              <br />
-              To Contents
+              <span className="lr-print-th-one">Description Said To Contents</span>
             </td>
             <td>
-              Inv.No.
-              <br />
-              &amp; Date
+              <span className="lr-print-th-one">Inv.No. &amp; Date</span>
             </td>
-            <td>Weight</td>
             <td>
-              Rate
-              <br />
-              Per KG
+              <span className="lr-print-th-one">Weight</span>
             </td>
-            <td>Freight</td>
+            <td>
+              <span className="lr-print-th-one">Rate Per KG</span>
+            </td>
+            <td>
+              <span className="lr-print-th-one">Freight</span>
+            </td>
             <td className="lr-print-gst-head">
-              {type === "Paid" ? (
-                <>
-                  Freight
-                  <br />
-                  Paid
-                </>
-              ) : type === "ToPay" ? (
-                <>
-                  Freight
-                  <br />
-                  To Pay
-                </>
-              ) : (
-                <>
-                  To be bill
-                  <br />
-                  for GST at
-                </>
-              )}
+              <span className="lr-print-th-one">
+                {type === "Paid"
+                  ? "Freight Paid"
+                  : type === "ToPay"
+                    ? "Freight To Pay"
+                    : "To be bill for GST at"}
+              </span>
             </td>
           </tr>
 
