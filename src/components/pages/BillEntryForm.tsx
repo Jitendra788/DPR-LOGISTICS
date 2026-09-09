@@ -253,6 +253,36 @@ export function BillEntryForm({
     fillAmount(next, visibleLrs);
   }
 
+  async function removeLinkedLr(row: LrRow) {
+    if (!editId) {
+      toggleLr(row.id, false);
+      return;
+    }
+    if (!form.billNo.trim()) {
+      setMessage({ type: "err", text: "Bill no missing" });
+      return;
+    }
+    if (!window.confirm(`Remove LR ${row.lrNo} from bill ${form.billNo}?`)) return;
+    setSaving(true);
+    try {
+      await api("/api/bills/unlink", {
+        method: "POST",
+        body: JSON.stringify({ billNo: form.billNo.trim(), lrId: row.id }),
+      });
+      const lrs = await api<LrRow[]>("/api/bookings");
+      setBookings(lrs);
+      const remaining = lrs.filter((b) => b.billNo === form.billNo);
+      const ids = remaining.map((b) => b.id);
+      setSelectedIds(ids);
+      fillAmount(ids, remaining);
+      setMessage({ type: "ok", text: `LR ${row.lrNo} removed from bill` });
+    } catch (err) {
+      setMessage({ type: "err", text: err instanceof Error ? err.message : "Remove LR failed" });
+    } finally {
+      setSaving(false);
+    }
+  }
+
   function load(row: Bill) {
     const linked = bookings.filter((b) => b.billNo === row.billNo);
     const lrSum = linked.reduce((s, r) => s + lrBillableAmount(r), 0);
@@ -512,6 +542,21 @@ export function BillEntryForm({
                         disabled={!!editId}
                         onChange={(e) => toggleLr(row.id, e.target.checked)}
                       />
+                    ),
+                  },
+                  {
+                    key: "deleteLr",
+                    header: "Delete",
+                    render: (row) => (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="danger"
+                        disabled={saving || (!editId && !selectedIds.includes(row.id))}
+                        onClick={() => removeLinkedLr(row)}
+                      >
+                        Delete
+                      </Button>
                     ),
                   },
                   { key: "lrNo", header: "LR No" },
