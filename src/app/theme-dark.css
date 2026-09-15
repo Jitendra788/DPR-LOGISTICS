@@ -26,6 +26,11 @@
   color: #5eead4;
 }
 
+[data-theme="dark"] .erp-avatar-brand {
+  background: #0f172a;
+  border-color: #334155;
+}
+
 [data-theme="dark"] .erp-search {
   background: #0f172a;
   border-color: #334155;
