@@ -9,7 +9,7 @@ import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
 import { AdminForm } from "@/components/ui/AdminForm";
 import { useCrud } from "@/hooks/useCrud";
-import { formToObject } from "@/lib/api-client";
+import { api, formToObject } from "@/lib/api-client";
 
 type User = {
   id: number;
@@ -39,6 +39,10 @@ export default function UserCreationPage() {
   const [form, setForm] = useState<Partial<User>>({ role: "Operator", branch: "DPR Logistics", status: "Active" });
   const [online, setOnline] = useState<OnlineUser[]>([]);
   const [onlineCount, setOnlineCount] = useState(0);
+  const [otp, setOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpMobileMasked, setOtpMobileMasked] = useState("******2142");
+  const [sendingOtp, setSendingOtp] = useState(false);
 
   const loadOnline = useCallback(async () => {
     try {
@@ -61,7 +65,54 @@ export default function UserCreationPage() {
   function load(row: User) {
     setEditId(row.id);
     setForm({ ...row, password: "" });
+    setOtp("");
+    setOtpSent(false);
     setMessage({ type: "ok", text: `Editing ${row.username}` });
+  }
+
+  function resetForm(e?: FormEvent<HTMLFormElement>) {
+    setEditId(null);
+    setOtp("");
+    setOtpSent(false);
+    setForm({ role: "Operator", branch: "DPR Logistics", status: "Active" });
+    e?.currentTarget.reset();
+  }
+
+  async function sendPasswordOtp() {
+    if (!editId) {
+      setMessage({ type: "err", text: "Open a user with Update first, then send OTP to change password." });
+      return;
+    }
+    if (!String(form.password ?? "").trim()) {
+      setMessage({ type: "err", text: "Enter new password first, then send OTP." });
+      return;
+    }
+    setSendingOtp(true);
+    try {
+      const res = await api<{
+        ok: boolean;
+        mobileMasked?: string;
+        toMasked?: string;
+        channel?: string;
+        message?: string;
+        devOtp?: string;
+      }>("/api/auth/password-otp", {
+        method: "POST",
+        body: JSON.stringify({ userId: editId }),
+      });
+      setOtpSent(true);
+      setOtpMobileMasked(res.toMasked || res.mobileMasked || "******2142");
+      setMessage({
+        type: "ok",
+        text: res.devOtp
+          ? `${res.message || "OTP sent"} (dev OTP: ${res.devOtp})`
+          : res.message || `OTP sent to ${res.toMasked || res.mobileMasked}`,
+      });
+    } catch (err) {
+      setMessage({ type: "err", text: err instanceof Error ? err.message : "Could not send OTP" });
+    } finally {
+      setSendingOtp(false);
+    }
   }
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -69,9 +120,16 @@ export default function UserCreationPage() {
     const body = { ...form, ...formToObject(e.currentTarget) };
     const passwordEntered = Boolean(String(body.password ?? "").trim());
     if (editId && !body.password) delete body.password;
-    const saved = editId
-      ? await update(editId, body)
-      : await create(body);
+
+    if (editId && passwordEntered) {
+      if (!otpSent || !String(otp).trim()) {
+        setMessage({ type: "err", text: "Send OTP to ******2142 and enter it before changing password." });
+        return;
+      }
+      (body as Record<string, unknown>).otp = String(otp).trim();
+    }
+
+    const saved = editId ? await update(editId, body) : await create(body);
     if (!saved) return;
 
     const result = saved as User & { forceLogout?: boolean; passwordChanged?: boolean };
@@ -82,14 +140,14 @@ export default function UserCreationPage() {
     if (editId && passwordEntered) {
       setMessage({
         type: "ok",
-        text: "Password updated — that user is logged out everywhere. They must login again.",
+        text: "Password updated — user logged out everywhere. They must login again.",
       });
       void loadOnline();
     }
-    setEditId(null);
-    e.currentTarget.reset();
-    setForm({ role: "Operator", branch: "DPR Logistics", status: "Active" });
+    resetForm(e);
   }
+
+  const showOtpStep = Boolean(editId && String(form.password ?? "").trim());
 
   return (
     <>
@@ -128,11 +186,44 @@ export default function UserCreationPage() {
                 label="Password"
                 name="password"
                 value={form.password ?? ""}
-                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                onChange={(e) => {
+                  setForm({ ...form, password: e.target.value });
+                  setOtpSent(false);
+                  setOtp("");
+                }}
                 required={!editId}
                 placeholder={editId ? "Leave blank to keep" : ""}
                 autoComplete="new-password"
               />
+              {showOtpStep ? (
+                <div className="password-otp-box">
+                  <p className="password-otp-hint">
+                    OTP only on phone <strong>9371662142</strong> via Fast2SMS{" "}
+                    Quick SMS (~₹5).
+                    {otpSent ? (
+                      <>
+                        {" "}
+                        Sent → <strong>{otpMobileMasked}</strong>
+                      </>
+                    ) : null}
+                  </p>
+                  <div className="password-otp-row">
+                    <InputField
+                      label="OTP"
+                      name="otp"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 8))}
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      placeholder="6-digit OTP"
+                      required
+                    />
+                    <Button type="button" variant="teal" disabled={sendingOtp} onClick={() => void sendPasswordOtp()}>
+                      {sendingOtp ? "Sending…" : otpSent ? "Resend OTP" : "Send OTP"}
+                    </Button>
+                  </div>
+                </div>
+              ) : null}
               <InputField label="Full Name" name="name" value={form.name ?? ""} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
               <InputField label="Mobile No." name="mobile" value={form.mobile ?? ""} onChange={(e) => setForm({ ...form, mobile: e.target.value })} />
             </div>

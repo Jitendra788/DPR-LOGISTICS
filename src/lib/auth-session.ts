@@ -124,9 +124,13 @@ export function isHashedPassword(stored: string) {
   return stored.startsWith("scrypt$");
 }
 
-export function stripPassword<T extends Record<string, unknown>>(row: T): Omit<T, "password"> {
-  const { password: _p, ...rest } = row;
-  return rest;
+export function stripPassword<T extends Record<string, unknown>>(row: T): Record<string, unknown> {
+  const copy = { ...row } as Record<string, unknown>;
+  delete copy.password;
+  delete copy.passwordOtpHash;
+  delete copy.passwordOtpExpires;
+  delete copy.passwordOtpAttempts;
+  return copy;
 }
 
 export function stripPasswords(rows: Array<Record<string, unknown>>) {

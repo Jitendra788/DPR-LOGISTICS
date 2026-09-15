@@ -8,6 +8,7 @@ import { prisma } from "@/lib/prisma";
 import { cascadeDeleteBill, syncBillAfterLrRemoved } from "@/lib/cascade-delete";
 import { hashPassword, stripPassword } from "@/lib/auth-session";
 import { requireAdmin, requireSession } from "@/lib/api-auth";
+import { OTP_MAX_ATTEMPTS, otpMatches, maskMobile, PASSWORD_OTP_MOBILE } from "@/lib/password-otp";
 
 type Ctx = { params: Promise<{ resource: string; id: string }> };
 
@@ -68,9 +69,9 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
 
     let data = sanitize(body, resource);
     let passwordChanged = false;
+    const otpCode = String(body.otp ?? "").trim();
     if (resource === "users") {
       if (typeof data.password === "string" && data.password) {
-        data.password = hashPassword(String(data.password));
         passwordChanged = true;
       } else {
         delete data.password;
@@ -80,12 +81,52 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
     for (let attempt = 0; attempt < 6; attempt++) {
       try {
         if (resource === "users" && passwordChanged) {
+          if (!/^\d{4,8}$/.test(otpCode)) {
+            return NextResponse.json(
+              {
+                error: `Enter the OTP sent to ${maskMobile(PASSWORD_OTP_MOBILE)} to change password`,
+              },
+              { status: 400 },
+            );
+          }
+          const row = await prisma.user.findUnique({
+            where: { id: updateId },
+            select: {
+              passwordOtpHash: true,
+              passwordOtpExpires: true,
+              passwordOtpAttempts: true,
+            },
+          });
+          if (!row?.passwordOtpHash || !row.passwordOtpExpires || row.passwordOtpExpires.getTime() < Date.now()) {
+            return NextResponse.json(
+              { error: "OTP expired or not sent. Click Send OTP first." },
+              { status: 400 },
+            );
+          }
+          if (Number(row.passwordOtpAttempts) >= OTP_MAX_ATTEMPTS) {
+            return NextResponse.json(
+              { error: "Too many wrong OTP attempts. Send a new OTP." },
+              { status: 400 },
+            );
+          }
+          if (!otpMatches(otpCode, updateId, row.passwordOtpHash)) {
+            await prisma.user.update({
+              where: { id: updateId },
+              data: { passwordOtpAttempts: { increment: 1 } },
+            });
+            return NextResponse.json({ error: "Invalid OTP" }, { status: 400 });
+          }
+
+          data.password = hashPassword(String(data.password));
           const updated = await prisma.user.update({
             where: { id: updateId },
             data: {
               ...data,
               sessionVersion: { increment: 1 },
               lastSeenAt: null,
+              passwordOtpHash: "",
+              passwordOtpExpires: null,
+              passwordOtpAttempts: 0,
             },
           });
           const payload = stripPassword(updated as unknown as Record<string, unknown>);
