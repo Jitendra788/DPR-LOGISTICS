@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { isAdminRole } from "@/lib/auth-session";
 import type { ResourceKey } from "@/lib/resources";
@@ -85,13 +84,46 @@ export async function assignRecordOwner(resource: string, recordId: number, user
     await prisma.$executeRaw`
       INSERT INTO "DataOwner" ("resource", "recordId", "username")
       VALUES (${resource}, ${recordId}, ${username})
-      ON CONFLICT ("resource", "recordId") DO NOTHING
+      ON CONFLICT ("resource", "recordId") DO UPDATE SET "username" = EXCLUDED."username"
     `;
   } else {
-    await prisma.$executeRaw(
-      Prisma.sql`INSERT OR IGNORE INTO "DataOwner" ("resource", "recordId", "username") VALUES (${resource}, ${recordId}, ${username})`,
-    );
+    await prisma.$executeRaw`
+      INSERT INTO "DataOwner" ("resource", "recordId", "username")
+      VALUES (${resource}, ${recordId}, ${username})
+      ON CONFLICT ("resource", "recordId") DO UPDATE SET "username" = excluded."username"
+    `;
   }
+}
+
+/** Resources wiped by clear-transactions — ownership must go with them. */
+export const TRANSACTIONAL_OWNER_RESOURCES = [
+  "bookings",
+  "lhc",
+  "bills",
+  "driver-register",
+  "driver-advance",
+  "trips",
+  "expenses",
+  "fleet",
+  "maintenance",
+  "receipts",
+  "vendor-vouchers",
+  "driver-vouchers",
+  "slips",
+  "tyres",
+  "trip-desk",
+] as const;
+
+export async function clearTransactionalDataOwners() {
+  await ensureDataOwnerTable();
+  for (const resource of TRANSACTIONAL_OWNER_RESOURCES) {
+    await prisma.$executeRaw`DELETE FROM "DataOwner" WHERE "resource" = ${resource}`;
+  }
+}
+
+export async function clearAllDataOwners() {
+  await ensureDataOwnerTable();
+  await prisma.$executeRaw`DELETE FROM "DataOwner"`;
 }
 
 export async function ownedRecordIds(resource: string, username: string): Promise<number[]> {

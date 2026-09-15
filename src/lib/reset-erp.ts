@@ -1,5 +1,6 @@
 import { prisma } from "./prisma";
 import { hashPassword } from "./auth-session";
+import { clearAllDataOwners, clearTransactionalDataOwners } from "./data-scope";
 
 const ERP_SEQUENCE_TABLES = [
   "Party",
@@ -50,17 +51,25 @@ const TRANSACTION_SEQUENCE_TABLES = [
   "TrackingAlert",
 ];
 
-async function resetPostgresSequences(tables: string[]) {
+async function resetPostgresSequences(tables: string[], toMax = false) {
   for (const table of tables) {
     try {
-      await prisma.$executeRawUnsafe(
-        `SELECT setval(pg_get_serial_sequence('"${table}"', 'id'), 1, false)`,
-      );
+      if (toMax) {
+        await prisma.$executeRawUnsafe(
+          `SELECT setval(pg_get_serial_sequence('"${table}"', 'id'), COALESCE((SELECT MAX(id) FROM "${table}"), 1), true)`,
+        );
+      } else {
+        await prisma.$executeRawUnsafe(
+          `SELECT setval(pg_get_serial_sequence('"${table}"', 'id'), 1, false)`,
+        );
+      }
     } catch {
       // SQLite / missing sequence — ignore
     }
   }
 }
+
+export { resetPostgresSequences, ERP_SEQUENCE_TABLES };
 
 /** Wipe ERP data, keep public website tables, recreate admin, restart numbering. */
 export async function resetErpData() {
@@ -87,6 +96,12 @@ export async function resetErpData() {
   await prisma.driver.deleteMany();
   await prisma.party.deleteMany();
   await prisma.user.deleteMany();
+
+  try {
+    await clearAllDataOwners();
+  } catch {
+    /* table may not exist yet */
+  }
 
   await resetPostgresSequences(ERP_SEQUENCE_TABLES);
 
@@ -152,6 +167,12 @@ export async function clearTransactionsKeepMaster() {
   await prisma.bill.deleteMany();
   await prisma.lhcContract.deleteMany();
   await prisma.lrBooking.deleteMany();
+
+  try {
+    await clearTransactionalDataOwners();
+  } catch {
+    /* ignore */
+  }
 
   await resetPostgresSequences(TRANSACTION_SEQUENCE_TABLES);
 

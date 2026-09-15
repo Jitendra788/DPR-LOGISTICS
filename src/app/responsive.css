@@ -186,10 +186,10 @@ body {
   }
 
   .erp-search-drop {
-    position: fixed;
-    top: 56px;
-    left: 8px;
-    right: 8px;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
     max-height: min(70dvh, 420px);
   }
 
@@ -1037,22 +1037,49 @@ iframe {
 /* Header dropdowns: stay inside viewport on phones */
 @media (max-width: 639px) {
   .erp-header .erp-dropdown {
-    position: fixed;
-    top: 64px;
-    right: 8px;
-    left: 8px;
-    width: auto;
-    max-width: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    left: auto;
+    width: min(320px, calc(100vw - 16px));
+    max-width: calc(100vw - 16px);
     margin-top: 0;
     z-index: 90;
   }
 
   .erp-header .erp-dropdown-wide {
+    left: 8px;
+    right: 8px;
+    width: auto;
     max-width: none;
+  }
+
+  .users-table-card > .box {
+    border: 0;
+    box-shadow: none;
+    margin: 0;
+    background: transparent;
+    padding: 0;
+  }
+
+  .box:has(.erp-dt-stack-mobile) {
+    overflow: visible;
   }
 }
 
 /* —— Global ERP mobile polish —— */
+.users-table-card > .box {
+  border: 0;
+  box-shadow: none;
+  margin: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.box:has(.erp-dt-stack-mobile) {
+  overflow: visible;
+}
+
 .erp-main,
 .page-content,
 .erp-form-card,

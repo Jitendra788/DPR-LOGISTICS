@@ -249,14 +249,14 @@ export async function DELETE(req: NextRequest, ctx: Ctx) {
   }
 
   try {
-    if (!(await assertCanAccessRecord(auth, resource, id))) {
-      return NextResponse.json({ error: "Record not found" }, { status: 404 });
-    }
     if (resource === "bills") {
       const billNoParam = req.nextUrl.searchParams.get("billNo") ?? undefined;
       const resolved = await resolveBillDeleteId(id, billNoParam);
       if (!resolved) {
         return NextResponse.json({ error: "Bill not found" }, { status: 404 });
+      }
+      if (!(await assertCanAccessRecord(auth, resource, resolved))) {
+        return NextResponse.json({ error: "Record not found" }, { status: 404 });
       }
       const bill = await prisma.bill.findUnique({ where: { id: resolved } });
       if (!bill) {
@@ -265,6 +265,10 @@ export async function DELETE(req: NextRequest, ctx: Ctx) {
       // Unlink LRs + remove MRs + delete bill (outstanding goes away)
       await cascadeDeleteBill(bill.billNo);
       return NextResponse.json({ ok: true });
+    }
+
+    if (!(await assertCanAccessRecord(auth, resource, id))) {
+      return NextResponse.json({ error: "Record not found" }, { status: 404 });
     }
 
     const existing = await getModel(resource).findUnique({ where: { id } });

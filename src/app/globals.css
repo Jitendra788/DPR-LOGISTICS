@@ -1268,8 +1268,11 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
 }
 
 .login-box {
-  width: 360px;
+  width: min(360px, 100%);
   margin: 7% auto;
+  max-width: 100%;
+  padding: 0 12px;
+  box-sizing: border-box;
 }
 
 .login-box-body {

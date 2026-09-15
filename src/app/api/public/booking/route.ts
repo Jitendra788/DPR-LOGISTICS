@@ -72,7 +72,24 @@ export async function POST(req: NextRequest) {
     };
 
     const created = await createWithUniqueRetry("bookings", data);
-    return NextResponse.json(created);
+    const row = created as {
+      lrNo?: string;
+      lrDate?: string;
+      fromStation?: string;
+      toStation?: string;
+      articles?: string;
+      billed?: boolean;
+      lrType?: string;
+    };
+    return NextResponse.json({
+      lrNo: row.lrNo,
+      lrDate: row.lrDate,
+      fromStation: row.fromStation,
+      toStation: row.toStation,
+      articles: row.articles,
+      status: row.billed ? "Billed" : "Booked",
+      lrType: row.lrType,
+    });
   } catch (err) {
     return NextResponse.json({ error: userFacingError(err, "Could not save booking. Please try again.") }, { status: 400 });
   }

@@ -457,6 +457,16 @@
   }
 }
 
+@media (max-width: 767px) {
+  .dpr-login-main {
+    padding: 20px 16px;
+  }
+
+  .dpr-login-card {
+    padding: 28px 20px 22px;
+  }
+}
+
 @media (max-width: 430px) {
   .dpr-login-main {
     padding: 20px 16px;

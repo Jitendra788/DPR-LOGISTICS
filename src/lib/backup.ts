@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getModel, type ResourceKey } from "@/lib/resources";
-import { ensureDataOwnerTable } from "@/lib/data-scope";
+import { assignRecordOwner, ensureDataOwnerTable } from "@/lib/data-scope";
+import { ERP_SEQUENCE_TABLES, resetPostgresSequences } from "@/lib/reset-erp";
 
 /** Tables included in full admin backup (restore order = create order). */
 export const BACKUP_TABLES: ResourceKey[] = [
@@ -157,21 +158,16 @@ export async function restoreBackup(payload: BackupPayload, opts?: { keepUserIds
     const recordId = map?.get(Number(own.recordId)) ?? Number(own.recordId);
     if (!Number.isFinite(recordId) || !own.username || !own.resource) continue;
     try {
-      await prisma.$executeRaw`
-        INSERT OR IGNORE INTO "DataOwner" ("resource", "recordId", "username")
-        VALUES (${own.resource}, ${recordId}, ${own.username})
-      `;
+      await assignRecordOwner(own.resource, recordId, own.username);
     } catch {
-      try {
-        await prisma.$executeRaw`
-          INSERT INTO "DataOwner" ("resource", "recordId", "username")
-          VALUES (${own.resource}, ${recordId}, ${own.username})
-          ON CONFLICT ("resource", "recordId") DO NOTHING
-        `;
-      } catch {
-        /* skip */
-      }
+      /* skip */
     }
+  }
+
+  try {
+    await resetPostgresSequences(ERP_SEQUENCE_TABLES, true);
+  } catch {
+    /* sqlite */
   }
 
   const restored: Record<string, number> = {};
