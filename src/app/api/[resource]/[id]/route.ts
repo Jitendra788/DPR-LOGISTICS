@@ -6,14 +6,25 @@ import { assertUniqueOnUpdate } from "@/lib/api-instructions";
 import { isUnknownPrismaArg, withoutUnknownArgs } from "@/lib/prisma-retry";
 import { prisma } from "@/lib/prisma";
 import { cascadeDeleteBill, syncBillAfterLrRemoved } from "@/lib/cascade-delete";
-import { hashPassword, stripPassword } from "@/lib/auth-session";
+import { hashPassword, getUserAllowedModules, setUserAllowedModules, setUserPasswordPlain, stripPassword, withUserPasswordPlain } from "@/lib/auth-session";
 import { requireAdmin, requireSession } from "@/lib/api-auth";
 import { OTP_MAX_ATTEMPTS, otpMatches, maskMobile, PASSWORD_OTP_MOBILE } from "@/lib/password-otp";
+import { normalizeModulesInput } from "@/lib/modules";
+import { isOwnerScoped, isRecordOwnedBy, shouldScopeToOwner } from "@/lib/data-scope";
 
 type Ctx = { params: Promise<{ resource: string; id: string }> };
 
 function gate(req: NextRequest, resource: ResourceKey) {
   return resource === "users" ? requireAdmin(req) : requireSession(req);
+}
+
+async function assertCanAccessRecord(
+  auth: { role: string; username: string },
+  resource: ResourceKey,
+  recordId: number,
+) {
+  if (!shouldScopeToOwner(auth.role) || !isOwnerScoped(resource)) return true;
+  return isRecordOwnedBy(resource, recordId, auth.username);
 }
 
 async function resolveId(resource: ResourceKey, id: number, body?: Record<string, unknown>) {
@@ -33,10 +44,18 @@ export async function GET(req: NextRequest, ctx: Ctx) {
   const auth = await gate(req, resource);
   if (auth instanceof NextResponse) return auth;
   try {
-    const row = await getModel(resource).findUnique({ where: { id: Number(id) } });
+    const rowId = Number(id);
+    const row = await getModel(resource).findUnique({ where: { id: rowId } });
     if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    if (!(await assertCanAccessRecord(auth, resource, rowId))) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
     if (resource === "users") {
-      return NextResponse.json(stripPassword(row as Record<string, unknown>));
+      return NextResponse.json(
+        stripPassword(
+          (await withUserPasswordPlain([row as { id: number }]))[0] as Record<string, unknown>,
+        ),
+      );
     }
     return NextResponse.json(row);
   } catch (err) {
@@ -66,15 +85,44 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
         { status: 404 },
       );
     }
+    if (!(await assertCanAccessRecord(auth, resource, updateId))) {
+      return NextResponse.json({ error: "Record not found. Refresh the page and try again." }, { status: 404 });
+    }
 
     let data = sanitize(body, resource);
     let passwordChanged = false;
+    let modulesChanged = false;
+    let nextAllowedModules: string | null = null;
     const otpCode = String(body.otp ?? "").trim();
     if (resource === "users") {
       if (typeof data.password === "string" && data.password) {
         passwordChanged = true;
       } else {
         delete data.password;
+      }
+      if ("allowedModules" in body || "allowedModules" in data) {
+        nextAllowedModules = normalizeModulesInput(body.allowedModules ?? data.allowedModules);
+      }
+      if (
+        String(data.role || body.role || "").toLowerCase() === "admin" &&
+        (nextAllowedModules === "[]" || nextAllowedModules === null)
+      ) {
+        nextAllowedModules = "*";
+      }
+      delete data.allowedModules;
+      delete data.passwordPlain;
+      const existingRole = (
+        await prisma.user.findUnique({
+          where: { id: updateId },
+          select: { role: true },
+        })
+      )?.role;
+      const existingMods = await getUserAllowedModules(updateId);
+      if (existingRole != null) {
+        const nextRole = String(data.role ?? existingRole);
+        const nextMods = nextAllowedModules ?? existingMods;
+        modulesChanged =
+          nextMods !== existingMods || nextRole.toLowerCase() !== String(existingRole).toLowerCase();
       }
     }
     await assertUniqueOnUpdate(resource, updateId, data);
@@ -117,7 +165,9 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
             return NextResponse.json({ error: "Invalid OTP" }, { status: 400 });
           }
 
-          data.password = hashPassword(String(data.password));
+          const plainPassword = String(body.password ?? "");
+          data.password = hashPassword(plainPassword);
+          delete data.passwordPlain;
           const updated = await prisma.user.update({
             where: { id: updateId },
             data: {
@@ -129,7 +179,13 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
               passwordOtpAttempts: 0,
             },
           });
-          const payload = stripPassword(updated as unknown as Record<string, unknown>);
+          await setUserPasswordPlain(updateId, plainPassword);
+          if (nextAllowedModules != null) await setUserAllowedModules(updateId, nextAllowedModules);
+          const withPlain = await withUserPasswordPlain([updated as { id: number }]);
+          const payload = stripPassword({
+            ...(withPlain[0] as Record<string, unknown>),
+            allowedModules: nextAllowedModules ?? (await getUserAllowedModules(updateId)),
+          });
           const res = NextResponse.json({
             ...payload,
             forceLogout: auth.id === updateId,
@@ -142,10 +198,20 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
         }
         const updated = await getModel(resource).update({
           where: { id: updateId },
-          data,
+          data:
+            resource === "users" && modulesChanged
+              ? { ...data, sessionVersion: { increment: 1 }, lastSeenAt: null }
+              : data,
         });
         if (resource === "users") {
-          return NextResponse.json(stripPassword(updated as Record<string, unknown>));
+          if (nextAllowedModules != null) await setUserAllowedModules(updateId, nextAllowedModules);
+          const withPlain = await withUserPasswordPlain([updated as { id: number }]);
+          return NextResponse.json(
+            stripPassword({
+              ...(withPlain[0] as Record<string, unknown>),
+              allowedModules: nextAllowedModules ?? (await getUserAllowedModules(updateId)),
+            }),
+          );
         }
         return NextResponse.json(updated);
       } catch (err) {
@@ -177,6 +243,9 @@ export async function DELETE(req: NextRequest, ctx: Ctx) {
   }
 
   try {
+    if (!(await assertCanAccessRecord(auth, resource, id))) {
+      return NextResponse.json({ error: "Record not found" }, { status: 404 });
+    }
     if (resource === "bills") {
       const billNoParam = req.nextUrl.searchParams.get("billNo") ?? undefined;
       const resolved = await resolveBillDeleteId(id, billNoParam);

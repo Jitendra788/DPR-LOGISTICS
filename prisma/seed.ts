@@ -29,8 +29,8 @@ async function main() {
 
   await prisma.user.createMany({
     data: [
-      { username: "admin", password: hashPassword("admin123"), name: "Admin User", mobile: "9999999999", role: "Admin", branch: "DPR Logistics", status: "Active" },
-      { username: "booking1", password: hashPassword("booking123"), name: "Rajesh Kumar", mobile: "9876543210", role: "Booking", branch: "Surat", email: "rajesh@dpr.com", status: "Active" },
+      { username: "admin", password: hashPassword("admin123"), passwordPlain: "admin123", name: "Admin User", mobile: "9999999999", role: "Admin", branch: "DPR Logistics", status: "Active" },
+      { username: "booking1", password: hashPassword("booking123"), passwordPlain: "booking123", name: "Rajesh Kumar", mobile: "9876543210", role: "Booking", branch: "Surat", email: "rajesh@dpr.com", status: "Active" },
     ],
   });
 

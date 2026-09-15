@@ -91,6 +91,7 @@ export function verifySessionToken(raw?: string | null): SessionUser | null {
       role: String(payload.role || "Operator"),
       branch: String(payload.branch || ""),
       sv: Number(payload.sv ?? 0),
+      mods: String(payload.mods ?? "*"),
       exp: Number(payload.exp),
     };
   } catch {
@@ -126,15 +127,55 @@ export function isHashedPassword(stored: string) {
 
 export function stripPassword<T extends Record<string, unknown>>(row: T): Record<string, unknown> {
   const copy = { ...row } as Record<string, unknown>;
+  const plain = String(copy.passwordPlain ?? "");
   delete copy.password;
+  delete copy.passwordPlain;
   delete copy.passwordOtpHash;
   delete copy.passwordOtpExpires;
   delete copy.passwordOtpAttempts;
+  // Admin UI: show recoverable copy in password field (not the hash)
+  copy.password = plain;
   return copy;
 }
 
 export function stripPasswords(rows: Array<Record<string, unknown>>) {
   return rows.map((row) => stripPassword(row));
+}
+
+/** Persist admin-visible password copy (works even before Prisma client regenerate). */
+export async function setUserPasswordPlain(userId: number, plain: string) {
+  const { prisma } = await import("@/lib/prisma");
+  await prisma.$executeRawUnsafe("UPDATE \"User\" SET \"passwordPlain\" = ? WHERE id = ?", plain, userId);
+}
+
+/** Attach passwordPlain onto user rows for admin UI. */
+export async function withUserPasswordPlain<T extends { id: number }>(rows: T[]): Promise<Array<T & { passwordPlain?: string }>> {
+  if (!rows.length) return rows;
+  const { prisma } = await import("@/lib/prisma");
+  const plains = (await prisma.$queryRawUnsafe(
+    'SELECT id, "passwordPlain" as passwordPlain FROM "User"',
+  )) as Array<{ id: number; passwordPlain: string | null }>;
+  const map = new Map(plains.map((r) => [Number(r.id), String(r.passwordPlain ?? "")]));
+  return rows.map((row) => ({ ...row, passwordPlain: map.get(Number(row.id)) ?? "" }));
+}
+
+/** Read allowedModules without requiring regenerated Prisma client. */
+export async function getUserAllowedModules(userId: number): Promise<string> {
+  const { prisma } = await import("@/lib/prisma");
+  try {
+    const rows = (await prisma.$queryRawUnsafe(
+      'SELECT "allowedModules" as allowedModules FROM "User" WHERE id = ? LIMIT 1',
+      userId,
+    )) as Array<{ allowedModules: string | null }>;
+    return String(rows[0]?.allowedModules ?? "");
+  } catch {
+    return "";
+  }
+}
+
+export async function setUserAllowedModules(userId: number, value: string) {
+  const { prisma } = await import("@/lib/prisma");
+  await prisma.$executeRawUnsafe('UPDATE "User" SET "allowedModules" = ? WHERE id = ?', value, userId);
 }
 
 export function isAdminRole(role?: string | null) {

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   ClipboardList,
@@ -41,8 +42,10 @@ type Finance = {
 };
 
 type DashPayload = {
+  showFinance?: boolean;
+  branchScoped?: boolean;
   stats: Stats;
-  finance?: Finance;
+  finance?: Finance | null;
   billedCount: number;
   unbilledCount: number;
   monthly: { label: string; value: number }[];
@@ -112,6 +115,7 @@ const quickActions = [
 ];
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [data, setData] = useState<DashPayload | null>(null);
   const [error, setError] = useState("");
   const [openList, setOpenList] = useState<ListKey | null>(null);
@@ -125,12 +129,19 @@ export default function DashboardPage() {
         if (live) setData(res);
       })
       .catch((err) => {
-        if (live) setError(err instanceof Error ? err.message : "Unable to load dashboard");
+        const msg = err instanceof Error ? err.message : "Unable to load dashboard";
+        if (live) {
+          if (/not allowed|403|Forbidden/i.test(msg)) {
+            router.replace("/");
+            return;
+          }
+          setError(msg);
+        }
       });
     return () => {
       live = false;
     };
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     if (!openList) return;
@@ -175,7 +186,8 @@ export default function DashboardPage() {
 
   const stats = data?.stats ?? null;
   const finance = data?.finance ?? null;
-  const profit = finance?.profit ?? stats?.profit ?? null;
+  const showFinance = Boolean(data?.showFinance && finance);
+  const profit = showFinance ? (finance?.profit ?? stats?.profit ?? null) : null;
   const listMeta = openList ? summaryCards.find((c) => c.key === openList) : null;
   const profitPositive = (profit ?? 0) >= 0;
 
@@ -188,23 +200,26 @@ export default function DashboardPage() {
           <p className="erp-dash-sub">
             <ClientFormattedDate />
             {stats ? ` · ${stats.totalBookings.toLocaleString("en-IN")} total bookings` : " · Loading…"}
+            {data?.branchScoped ? " · your records only" : ""}
           </p>
         </div>
         <div className="erp-dash-banner-side">
-          <div className={`erp-dash-profit ${profitPositive ? "is-up" : "is-down"}`}>
-            <span className="erp-dash-profit-label">
-              <TrendingUp className="h-3.5 w-3.5" />
-              Net Profit
-            </span>
-            <strong className="erp-dash-profit-val">
-              {profit === null ? <span className="erp-skel erp-skel-light" /> : moneyInr(profit)}
-            </strong>
-            <span className="erp-dash-profit-meta">
-              {finance
-                ? `Margin ${finance.marginPct.toLocaleString("en-IN", { maximumFractionDigits: 1 })}% · LR − LHC − Maint`
-                : "Revenue − hire − maintenance"}
-            </span>
-          </div>
+          {showFinance ? (
+            <div className={`erp-dash-profit ${profitPositive ? "is-up" : "is-down"}`}>
+              <span className="erp-dash-profit-label">
+                <TrendingUp className="h-3.5 w-3.5" />
+                Net Profit
+              </span>
+              <strong className="erp-dash-profit-val">
+                {profit === null ? <span className="erp-skel erp-skel-light" /> : moneyInr(profit)}
+              </strong>
+              <span className="erp-dash-profit-meta">
+                {finance
+                  ? `Margin ${finance.marginPct.toLocaleString("en-IN", { maximumFractionDigits: 1 })}% · LR − LHC − Maint`
+                  : "Revenue − hire − maintenance"}
+              </span>
+            </div>
+          ) : null}
           <div className="erp-dash-banner-actions">
             <Link href="/booking/lr" className="erp-dash-cta">
               New Booking
@@ -226,30 +241,32 @@ export default function DashboardPage() {
         </div>
       ) : null}
 
-      <section className="erp-finance-strip" aria-label="Finance summary">
-        {[
-          { label: "Revenue", value: finance?.revenue, hint: "LR grand total", icon: IndianRupee, tone: "rev" },
-          { label: "LHC Cost", value: finance?.lhcCost, hint: "Lorry freight", icon: Truck, tone: "cost" },
-          { label: "Maint Cost", value: finance?.maintCost, hint: "Service + diesel", icon: Fuel, tone: "cost" },
-          { label: "Profit", value: profit, hint: finance ? `${finance.marginPct}% margin` : "Net", icon: TrendingUp, tone: profitPositive ? "profit" : "loss" },
-        ].map((item) => {
-          const Icon = item.icon;
-          return (
-            <article key={item.label} className={`erp-finance-card tone-${item.tone}`}>
-              <span className="erp-finance-ico" aria-hidden>
-                <Icon className="h-4 w-4" />
-              </span>
-              <div>
-                <p className="erp-finance-label">{item.label}</p>
-                <p className="erp-finance-value">
-                  {item.value == null ? <span className="erp-skel" /> : moneyInr(item.value)}
-                </p>
-                <p className="erp-finance-hint">{item.hint}</p>
-              </div>
-            </article>
-          );
-        })}
-      </section>
+      {showFinance ? (
+        <section className="erp-finance-strip" aria-label="Finance summary">
+          {[
+            { label: "Revenue", value: finance?.revenue, hint: "LR grand total", icon: IndianRupee, tone: "rev" },
+            { label: "LHC Cost", value: finance?.lhcCost, hint: "Lorry freight", icon: Truck, tone: "cost" },
+            { label: "Maint Cost", value: finance?.maintCost, hint: "Service + diesel", icon: Fuel, tone: "cost" },
+            { label: "Profit", value: profit, hint: finance ? `${finance.marginPct}% margin` : "Net", icon: TrendingUp, tone: profitPositive ? "profit" : "loss" },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <article key={item.label} className={`erp-finance-card tone-${item.tone}`}>
+                <span className="erp-finance-ico" aria-hidden>
+                  <Icon className="h-4 w-4" />
+                </span>
+                <div>
+                  <p className="erp-finance-label">{item.label}</p>
+                  <p className="erp-finance-value">
+                    {item.value == null ? <span className="erp-skel" /> : moneyInr(item.value)}
+                  </p>
+                  <p className="erp-finance-hint">{item.hint}</p>
+                </div>
+              </article>
+            );
+          })}
+        </section>
+      ) : null}
 
       <section className="erp-kpi-grid" aria-label="Summary">
         {summaryCards.map((card) => {
@@ -307,13 +324,15 @@ export default function DashboardPage() {
           <BarChart data={data?.monthly ?? []} />
         </section>
 
-        <section className="erp-panel">
-          <header className="erp-panel-h">
-            <h2>Profit — last 6 months</h2>
-            <span className="erp-panel-meta">₹ net</span>
-          </header>
-          <BarChart data={data?.monthlyProfit ?? []} color="#059669" />
-        </section>
+        {showFinance ? (
+          <section className="erp-panel">
+            <header className="erp-panel-h">
+              <h2>Profit — last 6 months</h2>
+              <span className="erp-panel-meta">₹ net</span>
+            </header>
+            <BarChart data={data?.monthlyProfit ?? []} color="#059669" />
+          </section>
+        ) : null}
       </div>
 
       <div className="erp-mid">

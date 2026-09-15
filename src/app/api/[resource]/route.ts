@@ -4,8 +4,24 @@ import { apiError, userFacingError } from "@/lib/handle-api-error";
 import { prisma } from "@/lib/prisma";
 import { attachBookingTrackToken, stripBookingTrackToken } from "@/services/trackingService";
 import { createWithUniqueRetry } from "@/lib/unique-create";
-import { hashPassword, stripPassword, stripPasswords } from "@/lib/auth-session";
+import {
+  hashPassword,
+  getUserAllowedModules,
+  isAdminRole,
+  setUserAllowedModules,
+  setUserPasswordPlain,
+  stripPassword,
+  stripPasswords,
+  withUserPasswordPlain,
+} from "@/lib/auth-session";
 import { requireAdmin, requireSession } from "@/lib/api-auth";
+import { normalizeModulesInput } from "@/lib/modules";
+import {
+  assignRecordOwner,
+  isOwnerScoped,
+  ownedRecordIds,
+  shouldScopeToOwner,
+} from "@/lib/data-scope";
 
 type Ctx = { params: Promise<{ resource: string }> };
 
@@ -18,9 +34,29 @@ export async function GET(req: NextRequest, ctx: Ctx) {
   if (session instanceof NextResponse) return session;
 
   try {
-    const rows = await getModel(resource).findMany({ orderBy: { id: "desc" } });
+    let rows: unknown[];
+
+    if (resource !== "users" && shouldScopeToOwner(session.role) && isOwnerScoped(resource)) {
+      const ids = await ownedRecordIds(resource, session.username);
+      rows = ids.length
+        ? await getModel(resource).findMany({ where: { id: { in: ids } }, orderBy: { id: "desc" } })
+        : [];
+    } else {
+      rows = await getModel(resource).findMany({ orderBy: { id: "desc" } });
+    }
+
     if (resource === "users") {
-      return NextResponse.json(stripPasswords(rows as Array<Record<string, unknown>>));
+      if (!isAdminRole(session.role)) {
+        return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+      }
+      const withPlain = await withUserPasswordPlain(rows as Array<{ id: number }>);
+      const enriched = await Promise.all(
+        (withPlain as Array<Record<string, unknown> & { id: number }>).map(async (row) => ({
+          ...row,
+          allowedModules: await getUserAllowedModules(row.id),
+        })),
+      );
+      return NextResponse.json(stripPasswords(enriched));
     }
     return NextResponse.json(rows);
   } catch (err) {
@@ -34,12 +70,15 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     return NextResponse.json({ error: "Unknown resource" }, { status: 404 });
   }
 
+  let actor: Awaited<ReturnType<typeof requireSession>>;
   if (resource === "users") {
     const admin = await requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
+    actor = admin;
   } else {
     const session = await requireSession(req);
     if (session instanceof NextResponse) return session;
+    actor = session;
   }
 
   const body = (await req.json()) as Record<string, unknown>;
@@ -64,17 +103,48 @@ export async function POST(req: NextRequest, ctx: Ctx) {
 
     let data = sanitize(body, resource);
     if (resource === "bookings") data = stripBookingTrackToken(data);
+    if (resource === "bookings" && !isAdminRole(actor.role) && !String(data.bookingFrom || "").trim()) {
+      data.bookingFrom = actor.branch || "";
+    }
+
+    let plainPassword = "";
+    let allowedModulesValue = "";
     if (resource === "users" && typeof data.password === "string" && data.password) {
-      data.password = hashPassword(String(data.password));
+      plainPassword = String(data.password);
+      data.password = hashPassword(plainPassword);
+      delete data.passwordPlain;
+    }
+    if (resource === "users") {
+      if ("allowedModules" in body || "allowedModules" in data) {
+        allowedModulesValue = normalizeModulesInput(body.allowedModules ?? data.allowedModules);
+      } else if (String(data.role || "").toLowerCase() === "admin") {
+        allowedModulesValue = "*";
+      } else {
+        allowedModulesValue = "[]";
+      }
+      delete data.allowedModules;
     }
 
     const created = await createWithUniqueRetry(resource, data);
+    if (created && typeof created === "object" && "id" in created && isOwnerScoped(resource)) {
+      await assignRecordOwner(resource, Number((created as { id: number }).id), actor.username);
+    }
+
     if (resource === "bookings" && created && typeof created === "object" && "id" in created) {
       const withToken = await attachBookingTrackToken(created as { id: number });
       return NextResponse.json(withToken);
     }
-    if (resource === "users" && created && typeof created === "object") {
-      return NextResponse.json(stripPassword(created as Record<string, unknown>));
+    if (resource === "users" && created && typeof created === "object" && "id" in created) {
+      const id = Number((created as { id: number }).id);
+      if (plainPassword) await setUserPasswordPlain(id, plainPassword);
+      await setUserAllowedModules(id, allowedModulesValue);
+      const withPlain = await withUserPasswordPlain([created as { id: number }]);
+      return NextResponse.json(
+        stripPassword({
+          ...(withPlain[0] as Record<string, unknown>),
+          allowedModules: allowedModulesValue,
+        }),
+      );
     }
     return NextResponse.json(created);
   } catch (err) {

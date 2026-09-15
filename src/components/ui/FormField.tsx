@@ -40,11 +40,15 @@ export function InputField({ label, className = "", ...props }: InputFieldProps)
   );
 }
 
-type PasswordFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type"> & { label: string };
+type PasswordFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type"> & {
+  label: string;
+  /** Start with password visible (default false). */
+  defaultShow?: boolean;
+};
 
 /** Password input with show / hide toggle. */
-export function PasswordField({ label, className = "", ...props }: PasswordFieldProps) {
-  const [show, setShow] = useState(false);
+export function PasswordField({ label, className = "", defaultShow = false, ...props }: PasswordFieldProps) {
+  const [show, setShow] = useState(defaultShow);
   return (
     <FieldWrap label={label} className={`password-field ${className}`.trim()}>
       <div className="password-field-wrap">

@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveLiveSession, onlineSinceDate } from "@/lib/api-auth";
 import { apiError } from "@/lib/handle-api-error";
+import {
+  createSessionToken,
+  getUserAllowedModules,
+  sessionCookieOptions,
+  sessionMaxAge,
+} from "@/lib/auth-session";
+import { modulesToSession, resolveModules } from "@/lib/modules";
 
 /** Keep session alive + refresh lastSeenAt; 401 if password changed / session revoked. */
 export async function POST(req: NextRequest) {
@@ -10,20 +17,51 @@ export async function POST(req: NextRequest) {
     if (!session) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    const row = await prisma.user.findUnique({
+      where: { id: session.id },
+      select: {
+        id: true,
+        username: true,
+        name: true,
+        role: true,
+        branch: true,
+        sessionVersion: true,
+      },
+    });
+    if (!row) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await prisma.user.update({
       where: { id: session.id },
       data: { lastSeenAt: new Date() },
     });
-    return NextResponse.json({
+
+    const allowedModules = await getUserAllowedModules(row.id);
+    const mods = modulesToSession(resolveModules(row.role, allowedModules));
+    const token = createSessionToken({
+      id: row.id,
+      username: row.username,
+      name: row.name,
+      role: row.role,
+      branch: session.branch || row.branch,
+      sv: Number(row.sessionVersion ?? 1),
+      mods,
+    });
+
+    const res = NextResponse.json({
       ok: true,
       user: {
-        id: session.id,
-        username: session.username,
-        name: session.name,
-        role: session.role,
-        branch: session.branch,
+        id: row.id,
+        username: row.username,
+        name: row.name,
+        role: row.role,
+        branch: session.branch || row.branch,
+        modules: mods,
       },
     });
+    res.cookies.set("dpr_session", token, sessionCookieOptions(sessionMaxAge()));
+    return res;
   } catch (err) {
     return apiError(err, "Heartbeat failed");
   }

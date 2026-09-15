@@ -50,7 +50,7 @@ export function getModel(resource: ResourceKey): Delegate {
 /** Only Prisma columns — extra form/UI keys are dropped. */
 const RESOURCE_FIELDS: Record<ResourceKey, ReadonlySet<string>> = {
   parties: new Set(["name", "address", "contact", "gst", "opBalance", "opDate", "partyType", "partyCode", "pan"]),
-  users: new Set(["username", "password", "name", "mobile", "email", "role", "branch", "status"]),
+  users: new Set(["username", "password", "name", "mobile", "email", "role", "branch", "status", "allowedModules"]),
   drivers: new Set([
     "name", "mobile", "licenceNo", "licenceExpiry", "address", "aadhar", "pan", "bankName", "accountNo",
     "ifsc", "alternateNo", "homeContact", "accountHolder", "guarantorName", "guarantorMob", "category",

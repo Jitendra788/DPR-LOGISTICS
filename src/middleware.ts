@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { isMarketingRoute } from "@/lib/marketing-routes";
 import { verifySessionTokenEdge } from "@/lib/auth-session-edge";
+import { ADMIN_HOME } from "@/lib/admin-routes";
+import { canAccessPath, homePathForModules, modulesFromSession } from "@/lib/modules";
 
 export async function middleware(req: NextRequest) {
   const url = req.nextUrl;
@@ -43,6 +45,17 @@ export async function middleware(req: NextRequest) {
     res.cookies.set("dpr_session", "", { path: "/", maxAge: 0 });
     return res;
   }
+
+  // Page access by assigned modules (Admin / "*" = all)
+  if (!pathname.startsWith("/api/")) {
+    const modules = modulesFromSession(session.mods);
+    if (!canAccessPath(pathname, modules, session.role)) {
+      const home = new URL(homePathForModules(modules, session.role) || ADMIN_HOME, url.origin);
+      home.searchParams.set("denied", "1");
+      return NextResponse.redirect(home);
+    }
+  }
+
   return NextResponse.next();
 }
 

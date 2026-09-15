@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isDatabaseConfigured, prisma } from "@/lib/prisma";
 import {
   createSessionToken,
+  getUserAllowedModules,
   hashPassword,
   isHashedPassword,
   sessionCookieOptions,
@@ -9,6 +10,7 @@ import {
   verifyPassword,
 } from "@/lib/auth-session";
 import { rateLimit } from "@/lib/api-auth";
+import { modulesToSession, resolveModules } from "@/lib/modules";
 
 export async function POST(req: NextRequest) {
   try {
@@ -57,6 +59,8 @@ export async function POST(req: NextRequest) {
 
     const selectedBranch = branch || user.branch || "DPR Logistics";
     const sessionVersion = Number((user as { sessionVersion?: number }).sessionVersion ?? 1);
+    const allowedModules = await getUserAllowedModules(user.id);
+    const mods = modulesToSession(resolveModules(user.role, allowedModules));
     await prisma.user.update({
       where: { id: user.id },
       data: { lastSeenAt: new Date() },
@@ -68,8 +72,15 @@ export async function POST(req: NextRequest) {
       role: user.role,
       branch: selectedBranch,
       sv: sessionVersion,
+      mods,
     });
-    const res = NextResponse.json({ ok: true, name: user.name, role: user.role, branch: selectedBranch });
+    const res = NextResponse.json({
+      ok: true,
+      name: user.name,
+      role: user.role,
+      branch: selectedBranch,
+      modules: mods,
+    });
     res.cookies.set("dpr_session", token, sessionCookieOptions(sessionMaxAge()));
     return res;
   } catch (err) {

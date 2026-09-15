@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { ADMIN_HOME } from "@/lib/admin-routes";
 import { BrandLogo } from "@/components/BrandLogo";
 import { usePathname } from "next/navigation";
 import {
@@ -20,8 +19,9 @@ import {
   Warehouse,
   X,
 } from "lucide-react";
-import { useEffect, useState, type ComponentType } from "react";
+import { useEffect, useMemo, useState, type ComponentType } from "react";
 import { navItems, type NavItem } from "@/lib/nav";
+import { filterNavByModules, homePathForModules, modulesFromSession } from "@/lib/modules";
 
 const icons: Record<string, ComponentType<{ className?: string }>> = {
   gauge: LayoutDashboard,
@@ -49,14 +49,48 @@ type Props = {
   onNavigate?: () => void;
 };
 
+type MeUser = {
+  name?: string;
+  role?: string;
+  modules?: string;
+};
+
 export function Sidebar({ open, collapsed, isDesktop, onNavigate }: Props) {
   const pathname = usePathname();
   const [expanded, setExpanded] = useState<string>("");
+  const [me, setMe] = useState<MeUser | null>(null);
 
   useEffect(() => {
-    const match = navItems.find((item) => isActive(pathname, item));
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+        if (!res.ok) return;
+        const data = (await res.json()) as { user?: MeUser | null };
+        if (!cancelled) setMe(data.user ?? null);
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [pathname]);
+
+  const visibleNav = useMemo(() => {
+    const modules = modulesFromSession(me?.modules ?? "*");
+    return filterNavByModules(navItems, modules, me?.role);
+  }, [me?.modules, me?.role]);
+
+  const homeHref = useMemo(
+    () => homePathForModules(modulesFromSession(me?.modules ?? "*"), me?.role),
+    [me?.modules, me?.role],
+  );
+
+  useEffect(() => {
+    const match = visibleNav.find((item) => isActive(pathname, item));
     if (match?.children && !collapsed) setExpanded(match.label);
-  }, [pathname, collapsed]);
+  }, [pathname, collapsed, visibleNav]);
 
   return (
     <aside
@@ -65,7 +99,7 @@ export function Sidebar({ open, collapsed, isDesktop, onNavigate }: Props) {
       aria-label="Main navigation"
     >
       <div className="erp-sidebar-brand">
-        <Link href={ADMIN_HOME} className="erp-brand-link" onClick={onNavigate} title="DPR Logistics">
+        <Link href={homeHref} className="erp-brand-link" onClick={onNavigate} title="DPR Logistics">
           <BrandLogo variant="header" width={collapsed ? 36 : 140} height={collapsed ? 36 : 56} className={`erp-brand-logo ${collapsed ? "erp-brand-logo-collapsed" : ""}`} />
           {!collapsed ? (
             <span className="erp-brand-text">
@@ -87,14 +121,14 @@ export function Sidebar({ open, collapsed, isDesktop, onNavigate }: Props) {
             <CircleUser className="h-5 w-5" />
           </div>
           <div className="min-w-0">
-            <p className="erp-sidebar-user-name">Admin User</p>
-            <p className="erp-sidebar-user-role">Operations</p>
+            <p className="erp-sidebar-user-name">{me?.name || "User"}</p>
+            <p className="erp-sidebar-user-role">{me?.role || "Operations"}</p>
           </div>
         </div>
       ) : null}
 
       <nav className="sidebar-scroll erp-nav">
-        {navItems.map((item) => {
+        {visibleNav.map((item) => {
           const Icon = icons[item.icon] ?? LayoutDashboard;
           const openMenu = !collapsed && expanded === item.label;
           const active = isActive(pathname, item);

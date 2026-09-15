@@ -6,12 +6,13 @@ import { useRouter } from "next/navigation";
 import { ArrowRight, Eye, EyeOff, Lock, ShieldCheck, Truck, UserRound } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { api } from "@/lib/api-client";
+import { homePathForModules, modulesFromSession } from "@/lib/modules";
 import "./login.css";
 
-function safeNextPath() {
-  if (typeof window === "undefined") return "/dashboard";
+function safeNextPath(fallback: string) {
+  if (typeof window === "undefined") return fallback;
   const raw = new URLSearchParams(window.location.search).get("next");
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//") || raw.startsWith("/login")) return "/dashboard";
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//") || raw.startsWith("/login")) return fallback;
   return raw;
 }
 
@@ -46,11 +47,12 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      await api("/api/auth/login", {
+      const res = await api<{ modules?: string }>("/api/auth/login", {
         method: "POST",
         body: JSON.stringify({ username, password }),
       });
-      router.push(safeNextPath());
+      const home = homePathForModules(modulesFromSession(res.modules ?? "*"));
+      router.push(safeNextPath(home));
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");

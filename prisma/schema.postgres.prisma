@@ -37,6 +37,10 @@ model User {
   passwordOtpHash     String    @default("")
   passwordOtpExpires  DateTime?
   passwordOtpAttempts Int       @default(0)
+  /** JSON module keys, "*" = all, "" = legacy full access */
+  allowedModules String @default("")
+  /** Admin-only visible password copy (auth still uses hashed `password`) */
+  passwordPlain  String    @default("")
 }
 
 model Driver {

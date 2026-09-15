@@ -8,6 +8,8 @@ export type SessionUser = {
   branch: string;
   /** Session version — must match User.sessionVersion or cookie is invalid. */
   sv: number;
+  /** "*" = all modules, or comma-separated module keys */
+  mods: string;
   exp: number;
 };
 
@@ -67,6 +69,7 @@ export async function verifySessionTokenEdge(raw?: string | null): Promise<Sessi
       role: String(payload.role || "Operator"),
       branch: String(payload.branch || ""),
       sv: Number(payload.sv ?? 0),
+      mods: String(payload.mods ?? "*"),
       exp: Number(payload.exp),
     };
   } catch {
