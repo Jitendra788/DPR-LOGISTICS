@@ -76,7 +76,13 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
     return NextResponse.json({ error: "Invalid record id" }, { status: 400 });
   }
 
-  const body = (await req.json()) as Record<string, unknown>;
+  let body: Record<string, unknown>;
+  try {
+    body = (await req.json()) as Record<string, unknown>;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
   try {
     const updateId = await resolveId(resource, id, body);
     if (!updateId) {

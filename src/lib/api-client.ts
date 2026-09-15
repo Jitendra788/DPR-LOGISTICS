@@ -53,13 +53,19 @@ export async function api<T>(url: string, init?: ApiInit): Promise<T> {
       ? setTimeout(() => controller.abort(), timeoutMs)
       : null;
 
+  const body = rest.body;
+  const isForm =
+    typeof FormData !== "undefined" && body instanceof FormData
+      ? true
+      : typeof Blob !== "undefined" && body instanceof Blob;
+
   try {
     const res = await fetch(url, {
       ...rest,
       credentials: "include",
       signal: controller?.signal ?? rest.signal,
       headers: {
-        "Content-Type": "application/json",
+        ...(isForm ? {} : { "Content-Type": "application/json" }),
         ...(rest.headers ?? {}),
       },
     });
@@ -84,6 +90,12 @@ export async function api<T>(url: string, init?: ApiInit): Promise<T> {
     }
     if (err instanceof Error && err.name === "AbortError") {
       throw new Error("Request timed out. Check SMTP settings or try again.");
+    }
+    if (err instanceof TypeError && /failed to fetch|networkerror|load failed/i.test(err.message)) {
+      throw new Error("Network error. Check your connection and try again.");
+    }
+    if (err instanceof Error && /failed to fetch/i.test(err.message)) {
+      throw new Error("Network error. Check your connection and try again.");
     }
     throw err;
   } finally {

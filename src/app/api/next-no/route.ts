@@ -2,13 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { nextPadded } from "@/lib/doc-numbers";
 import { docSourceWhere, nextUniqueModuleDoc } from "@/lib/module-docs";
+import { apiError } from "@/lib/handle-api-error";
+import { requireSession } from "@/lib/api-auth";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
+  const session = await requireSession(req);
+  if (session instanceof NextResponse) return session;
+
   const type = req.nextUrl.searchParams.get("type") ?? "lr";
   const source = req.nextUrl.searchParams.get("source");
 
+  try {
   if (type === "lr") {
     const [moduleRows, allRows] = await Promise.all([
       prisma.lrBooking.findMany({
@@ -88,4 +94,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ value: nextPadded(rows.map((r) => r.receiptNo), 2) });
   }
   return NextResponse.json({ error: "Unknown type" }, { status: 400 });
+  } catch (err) {
+    return apiError(err, "Could not generate next number");
+  }
 }

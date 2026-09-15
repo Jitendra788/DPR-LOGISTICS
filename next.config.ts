@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["@prisma/client", "prisma"],
+  images: {
+    qualities: [70, 75, 95],
+  },
   async headers() {
     return [
       {

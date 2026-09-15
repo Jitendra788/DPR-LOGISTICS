@@ -30,6 +30,13 @@ export async function requireSession(req: NextRequest): Promise<SessionUser | Ne
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  // Warm schema patches for owner-scoped APIs (no-op after first call)
+  try {
+    const { ensureDataOwnerTable } = await import("@/lib/data-scope");
+    await ensureDataOwnerTable();
+  } catch {
+    /* ignore */
+  }
   return user;
 }
 

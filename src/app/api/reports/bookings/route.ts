@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { displayToIso } from "@/lib/dates";
-
 import { docSourceWhere } from "@/lib/module-docs";
+import { apiError } from "@/lib/handle-api-error";
+import { requireSession } from "@/lib/api-auth";
 
 function normalizeDate(value: string) {
   const trimmed = value.trim();
@@ -27,6 +28,9 @@ function matchesField(value: string, filter: string) {
 }
 
 export async function GET(req: NextRequest) {
+  const session = await requireSession(req);
+  if (session instanceof NextResponse) return session;
+
   const { searchParams } = req.nextUrl;
   const fromDate = normalizeDate(searchParams.get("fromDate") ?? "");
   const toDate = normalizeDate(searchParams.get("toDate") ?? "");
@@ -37,18 +41,22 @@ export async function GET(req: NextRequest) {
   // Default DPR MIS excludes Roadways (old BookingMIS.aspx)
   const sourceFilter = sourceParam ? docSourceWhere(sourceParam) : docSourceWhere("DPR");
 
-  const rows = await prisma.lrBooking.findMany({
-    where: sourceFilter,
-    orderBy: { id: "desc" },
-  });
+  try {
+    const rows = await prisma.lrBooking.findMany({
+      where: sourceFilter,
+      orderBy: { id: "desc" },
+    });
 
-  const filtered = rows.filter(
-    (row) =>
-      inDateRange(row.lrDate, fromDate, toDate) &&
-      matchesField(row.billingParty, billingParty) &&
-      matchesField(row.fromStation, fromStation) &&
-      matchesField(row.toStation, toStation),
-  );
+    const filtered = rows.filter(
+      (row) =>
+        inDateRange(row.lrDate, fromDate, toDate) &&
+        matchesField(row.billingParty, billingParty) &&
+        matchesField(row.fromStation, fromStation) &&
+        matchesField(row.toStation, toStation),
+    );
 
-  return NextResponse.json(filtered);
+    return NextResponse.json(filtered);
+  } catch (err) {
+    return apiError(err, "Could not load booking report");
+  }
 }

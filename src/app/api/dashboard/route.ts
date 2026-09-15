@@ -5,6 +5,7 @@ import { requireSession } from "@/lib/api-auth";
 import { isAdminRole } from "@/lib/auth-session";
 import { hasModule, modulesFromSession } from "@/lib/modules";
 import { ownedRecordIds } from "@/lib/data-scope";
+import { apiError } from "@/lib/handle-api-error";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Dashboard access not allowed for this user" }, { status: 403 });
   }
 
+  try {
   const showFinance = admin;
   const ownedBookingIds = admin ? null : await ownedRecordIds("bookings", session.username);
   const bookingWhere =
@@ -235,4 +237,7 @@ export async function GET(req: NextRequest) {
       pod: podUpdates,
     },
   });
+  } catch (err) {
+    return apiError(err, "Could not load dashboard");
+  }
 }

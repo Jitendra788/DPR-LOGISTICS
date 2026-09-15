@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { todayIso } from "@/lib/dates";
+import { apiError } from "@/lib/handle-api-error";
+import { requireSession } from "@/lib/api-auth";
+import type { NextRequest } from "next/server";
 
 export type NotificationItem = {
   id: string;
@@ -19,8 +22,12 @@ function daysUntil(iso: string) {
   return Math.round((d.getTime() - now.getTime()) / 86400000);
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const session = await requireSession(req);
+  if (session instanceof NextResponse) return session;
+
   const today = todayIso();
+  try {
   const [pendingBill, pendingLhc, pendingPod, unpaidLhc, vehicles, fleet] = await Promise.all([
     prisma.lrBooking.count({ where: { billed: false } }),
     prisma.lrBooking.count({ where: { lhcNo: "" } }),
@@ -100,4 +107,7 @@ export async function GET() {
 
   const badge = items.reduce((s, i) => s + i.count, 0);
   return NextResponse.json({ badge, asOf: today, items });
+  } catch (err) {
+    return apiError(err, "Could not load notifications");
+  }
 }

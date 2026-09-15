@@ -142,31 +142,39 @@ export function stripPasswords(rows: Array<Record<string, unknown>>) {
   return rows.map((row) => stripPassword(row));
 }
 
-/** Persist admin-visible password copy (works even before Prisma client regenerate). */
+/** Persist admin-visible password copy (works on SQLite + Postgres). */
 export async function setUserPasswordPlain(userId: number, plain: string) {
   const { prisma } = await import("@/lib/prisma");
-  await prisma.$executeRawUnsafe("UPDATE \"User\" SET \"passwordPlain\" = ? WHERE id = ?", plain, userId);
+  await ensureUserExtraColumns();
+  await prisma.$executeRaw`
+    UPDATE "User" SET "passwordPlain" = ${plain} WHERE id = ${userId}
+  `;
 }
 
 /** Attach passwordPlain onto user rows for admin UI. */
 export async function withUserPasswordPlain<T extends { id: number }>(rows: T[]): Promise<Array<T & { passwordPlain?: string }>> {
   if (!rows.length) return rows;
   const { prisma } = await import("@/lib/prisma");
-  const plains = (await prisma.$queryRawUnsafe(
-    'SELECT id, "passwordPlain" as passwordPlain FROM "User"',
-  )) as Array<{ id: number; passwordPlain: string | null }>;
-  const map = new Map(plains.map((r) => [Number(r.id), String(r.passwordPlain ?? "")]));
-  return rows.map((row) => ({ ...row, passwordPlain: map.get(Number(row.id)) ?? "" }));
+  await ensureUserExtraColumns();
+  try {
+    const plains = (await prisma.$queryRaw`
+      SELECT id, "passwordPlain" as "passwordPlain" FROM "User"
+    `) as Array<{ id: number; passwordPlain: string | null }>;
+    const map = new Map(plains.map((r) => [Number(r.id), String(r.passwordPlain ?? "")]));
+    return rows.map((row) => ({ ...row, passwordPlain: map.get(Number(row.id)) ?? "" }));
+  } catch {
+    return rows.map((row) => ({ ...row, passwordPlain: "" }));
+  }
 }
 
 /** Read allowedModules without requiring regenerated Prisma client. */
 export async function getUserAllowedModules(userId: number): Promise<string> {
   const { prisma } = await import("@/lib/prisma");
   try {
-    const rows = (await prisma.$queryRawUnsafe(
-      'SELECT "allowedModules" as allowedModules FROM "User" WHERE id = ? LIMIT 1',
-      userId,
-    )) as Array<{ allowedModules: string | null }>;
+    await ensureUserExtraColumns();
+    const rows = (await prisma.$queryRaw`
+      SELECT "allowedModules" as "allowedModules" FROM "User" WHERE id = ${userId} LIMIT 1
+    `) as Array<{ allowedModules: string | null }>;
     return String(rows[0]?.allowedModules ?? "");
   } catch {
     return "";
@@ -175,7 +183,29 @@ export async function getUserAllowedModules(userId: number): Promise<string> {
 
 export async function setUserAllowedModules(userId: number, value: string) {
   const { prisma } = await import("@/lib/prisma");
-  await prisma.$executeRawUnsafe('UPDATE "User" SET "allowedModules" = ? WHERE id = ?', value, userId);
+  await ensureUserExtraColumns();
+  await prisma.$executeRaw`
+    UPDATE "User" SET "allowedModules" = ${value} WHERE id = ${userId}
+  `;
+}
+
+let userColsEnsured = false;
+
+/** Best-effort schema patch so production APIs don't 500 if a migration was skipped. */
+async function ensureUserExtraColumns() {
+  if (userColsEnsured) return;
+  const { prisma } = await import("@/lib/prisma");
+  try {
+    await prisma.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "passwordPlain" TEXT NOT NULL DEFAULT ''`);
+  } catch {
+    /* column exists or dialect lacks IF NOT EXISTS */
+  }
+  try {
+    await prisma.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "allowedModules" TEXT NOT NULL DEFAULT ''`);
+  } catch {
+    /* ignore */
+  }
+  userColsEnsured = true;
 }
 
 export function isAdminRole(role?: string | null) {

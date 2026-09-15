@@ -1052,3 +1052,121 @@ iframe {
   }
 }
 
+/* —— Global ERP mobile polish —— */
+.erp-main,
+.page-content,
+.erp-form-card,
+.box-body,
+.users-admin,
+.backup-admin {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.erp-main table,
+.erp-dt {
+  max-width: 100%;
+}
+
+.table-scroll,
+.erp-main .overflow-x-auto,
+.erp-main [class*="overflow-x"] {
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 1023px) {
+  .users-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .backup-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .backup-hero-stat {
+    align-items: flex-start !important;
+    width: 100%;
+  }
+
+  .users-module-chips,
+  .users-online-list {
+    gap: 8px;
+  }
+
+  .users-online-chip {
+    min-width: 0;
+    flex: 1 1 100%;
+  }
+
+  .erp-main .grid,
+  .erp-main .erp-form-grid,
+  .box-body .grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr)) !important;
+  }
+
+  .erp-main .flex.gap-2,
+  .erp-main .flex.gap-3,
+  .box-header,
+  .users-form-actions {
+    flex-wrap: wrap;
+  }
+
+  .users-form-actions,
+  .backup-actions {
+    width: 100%;
+  }
+
+  .users-form-actions > *,
+  .backup-dl {
+    width: 100%;
+  }
+
+  .dpr-login {
+    min-height: 100dvh;
+  }
+
+  .dpr-login-main,
+  .dpr-login-card,
+  .dpr-login-stack {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  input,
+  select,
+  textarea,
+  .form-control {
+    max-width: 100%;
+    font-size: 16px; /* prevent iOS zoom */
+  }
+}
+
+@media (max-width: 639px) {
+  .users-stat-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .page-content {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .erp-form-card,
+  .box,
+  .backup-hero {
+    border-radius: 12px;
+  }
+
+  .users-module-chip {
+    flex: 1 1 calc(50% - 8px);
+    justify-content: flex-start;
+  }
+
+  .erp-main .btn-admin,
+  .erp-main button[type="submit"] {
+    min-height: 42px;
+  }
+}
+
+
