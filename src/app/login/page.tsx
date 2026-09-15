@@ -69,13 +69,13 @@ export default function LoginPage() {
             <div className="dpr-login-brand">
               <BrandLogo variant="header" width={200} height={80} priority className="dpr-login-logo" />
               <div>
-                <p>Transport & Logistics Management System</p>
+                <p>DPR Logistics — Transport &amp; Logistics Management System</p>
               </div>
             </div>
 
             <div className="dpr-login-intro">
-              <h2 id="login-heading">Welcome Back</h2>
-              <p>Sign in to access your logistics dashboard</p>
+              <h1 id="login-heading">DPR Login</h1>
+              <p>Sign in to the DPR Logistics admin portal &amp; operations dashboard</p>
             </div>
 
             {error ? (
@@ -183,11 +183,11 @@ export default function LoginPage() {
         <div className="dpr-login-visual-inner">
           <span className="dpr-login-kicker">
             <Truck size={14} />
-            Operations Hub
+            DPR Operations Hub
           </span>
-          <h2>Manage your logistics operations efficiently</h2>
+          <h2>DPR Logistics admin portal</h2>
           <p className="dpr-login-visual-copy">
-            Track bookings, fleet, drivers, billing and POD from one professional workspace.
+            Sign in to manage DPR bookings, fleet, drivers, billing and POD from one workspace.
           </p>
           <div className="dpr-login-pills">
             <span>Bookings</span>

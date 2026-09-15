@@ -41,6 +41,8 @@ type Delegate = {
   create: (args: object) => Promise<unknown>;
   update: (args: object) => Promise<unknown>;
   delete: (args: object) => Promise<unknown>;
+  deleteMany: (args?: object) => Promise<{ count: number }>;
+  count: (args?: object) => Promise<number>;
 };
 
 export function getModel(resource: ResourceKey): Delegate {

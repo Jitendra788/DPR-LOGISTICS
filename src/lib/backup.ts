@@ -52,8 +52,7 @@ function serializeRow(row: Record<string, unknown>): Record<string, unknown> {
 export async function collectBackupCounts(): Promise<Record<string, number>> {
   const counts: Record<string, number> = {};
   for (const key of BACKUP_TABLES) {
-    const model = getModel(key) as unknown as { count: (args?: object) => Promise<number> };
-    counts[key] = await model.count();
+    counts[key] = await getModel(key).count();
   }
   try {
     await ensureDataOwnerTable();

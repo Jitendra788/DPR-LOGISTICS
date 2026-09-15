@@ -82,6 +82,7 @@
   font-size: 14px;
 }
 
+.dpr-login-intro h1,
 .dpr-login-intro h2 {
   margin: 0;
   font-size: 24px;
@@ -466,6 +467,7 @@
     padding: 28px 20px 22px;
   }
 
+  .dpr-login-intro h1,
   .dpr-login-intro h2 {
     font-size: 22px;
   }
