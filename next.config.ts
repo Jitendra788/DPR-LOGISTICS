@@ -5,6 +5,12 @@ const nextConfig: NextConfig = {
   images: {
     qualities: [70, 75, 95],
   },
+  async redirects() {
+    return [
+      // Browsers still probe /favicon.ico first — serve DPR mark
+      { source: "/favicon.ico", destination: "/favicon.png", permanent: false },
+    ];
+  },
   async headers() {
     return [
       {
