@@ -56,12 +56,18 @@ export async function POST(req: NextRequest) {
     }
 
     const selectedBranch = branch || user.branch || "DPR Logistics";
+    const sessionVersion = Number((user as { sessionVersion?: number }).sessionVersion ?? 1);
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastSeenAt: new Date() },
+    });
     const token = createSessionToken({
       id: user.id,
       username: user.username,
       name: user.name,
       role: user.role,
       branch: selectedBranch,
+      sv: sessionVersion,
     });
     const res = NextResponse.json({ ok: true, name: user.name, role: user.role, branch: selectedBranch });
     res.cookies.set("dpr_session", token, sessionCookieOptions(sessionMaxAge()));

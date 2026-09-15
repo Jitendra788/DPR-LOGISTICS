@@ -7,6 +7,7 @@ import { isMarketingRoute } from "@/lib/marketing-routes";
 import { Header } from "./Header";
 import { Sidebar } from "./Sidebar";
 import { ThemeInit } from "./ThemeInit";
+import { SessionHeartbeat } from "./SessionHeartbeat";
 
 const COLLAPSE_KEY = "dpr_sidebar_collapsed";
 
@@ -72,6 +73,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="app-shell min-h-screen bg-content" suppressHydrationWarning>
       <ThemeInit />
+      <SessionHeartbeat />
       {!isDesktop && mobileOpen ? (
         <button
           type="button"

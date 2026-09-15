@@ -9,7 +9,7 @@ import { apiError } from "@/lib/handle-api-error";
  */
 export async function POST(req: NextRequest) {
   try {
-    const auth = requireAdmin(req);
+    const auth = await requireAdmin(req);
     if (auth instanceof NextResponse) return auth;
 
     const body = (await req.json().catch(() => ({}))) as { confirm?: string };

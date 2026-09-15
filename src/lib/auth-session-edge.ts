@@ -6,6 +6,8 @@ export type SessionUser = {
   name: string;
   role: string;
   branch: string;
+  /** Session version — must match User.sessionVersion or cookie is invalid. */
+  sv: number;
   exp: number;
 };
 
@@ -64,6 +66,7 @@ export async function verifySessionTokenEdge(raw?: string | null): Promise<Sessi
       name: String(payload.name || ""),
       role: String(payload.role || "Operator"),
       branch: String(payload.branch || ""),
+      sv: Number(payload.sv ?? 0),
       exp: Number(payload.exp),
     };
   } catch {

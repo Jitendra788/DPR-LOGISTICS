@@ -74,6 +74,73 @@ body {
   box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
 }
 
+.password-field-wrap {
+  position: relative;
+}
+
+.password-field-wrap .form-control {
+  padding-right: 4.25rem;
+}
+
+.password-field-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: #0f766e;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+.password-field-toggle:hover {
+  background: rgba(15, 118, 110, 0.08);
+}
+
+.online-users-card {
+  margin-bottom: 14px;
+}
+
+.online-users-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.online-users-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.online-users-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  flex: 0 0 auto;
+}
+
+.online-users-empty {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
 select.form-control {
   padding-right: 24px;
 }

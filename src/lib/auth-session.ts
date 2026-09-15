@@ -90,6 +90,7 @@ export function verifySessionToken(raw?: string | null): SessionUser | null {
       name: String(payload.name || ""),
       role: String(payload.role || "Operator"),
       branch: String(payload.branch || ""),
+      sv: Number(payload.sv ?? 0),
       exp: Number(payload.exp),
     };
   } catch {

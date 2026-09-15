@@ -40,6 +40,30 @@ export function InputField({ label, className = "", ...props }: InputFieldProps)
   );
 }
 
+type PasswordFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, "type"> & { label: string };
+
+/** Password input with show / hide toggle. */
+export function PasswordField({ label, className = "", ...props }: PasswordFieldProps) {
+  const [show, setShow] = useState(false);
+  return (
+    <FieldWrap label={label} className={`password-field ${className}`.trim()}>
+      <div className="password-field-wrap">
+        <input className="form-control" type={show ? "text" : "password"} {...props} />
+        <button
+          type="button"
+          className="password-field-toggle"
+          onClick={() => setShow((v) => !v)}
+          aria-label={show ? "Hide password" : "Show password"}
+          aria-pressed={show}
+          tabIndex={-1}
+        >
+          {show ? "Hide" : "Show"}
+        </button>
+      </div>
+    </FieldWrap>
+  );
+}
+
 type DatalistFieldProps = InputHTMLAttributes<HTMLInputElement> & {
   label: string;
   options: string[];

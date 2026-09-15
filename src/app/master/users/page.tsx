@@ -1,9 +1,9 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { FormCard, TwoCol } from "@/components/ui/FormCard";
-import { InputField, ComboboxField } from "@/components/ui/FormField";
+import { InputField, ComboboxField, PasswordField } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { DataTable } from "@/components/ui/DataTable";
 import { Flash } from "@/components/ui/Flash";
@@ -23,10 +23,40 @@ type User = {
   status: string;
 };
 
+type OnlineUser = {
+  id: number;
+  username: string;
+  name: string;
+  role: string;
+  branch: string;
+  lastSeenAt: string | null;
+  isYou?: boolean;
+};
+
 export default function UserCreationPage() {
   const { rows, message, create, update, remove, setMessage } = useCrud<User>("users");
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState<Partial<User>>({ role: "Operator", branch: "DPR Logistics", status: "Active" });
+  const [online, setOnline] = useState<OnlineUser[]>([]);
+  const [onlineCount, setOnlineCount] = useState(0);
+
+  const loadOnline = useCallback(async () => {
+    try {
+      const res = await fetch("/api/auth/session", { credentials: "include" });
+      if (!res.ok) return;
+      const data = (await res.json()) as { count?: number; users?: OnlineUser[] };
+      setOnline(Array.isArray(data.users) ? data.users : []);
+      setOnlineCount(Number(data.count) || 0);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadOnline();
+    const id = window.setInterval(() => void loadOnline(), 30_000);
+    return () => window.clearInterval(id);
+  }, [loadOnline]);
 
   function load(row: User) {
     setEditId(row.id);
@@ -37,25 +67,72 @@ export default function UserCreationPage() {
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const body = { ...form, ...formToObject(e.currentTarget) };
+    const passwordEntered = Boolean(String(body.password ?? "").trim());
     if (editId && !body.password) delete body.password;
-    const saved = editId ? await update(editId, body) : await create(body);
-    if (saved) {
-      setEditId(null);
-      e.currentTarget.reset();
-      setForm({ role: "Operator", branch: "DPR Logistics", status: "Active" });
+    const saved = editId
+      ? await update(editId, body)
+      : await create(body);
+    if (!saved) return;
+
+    const result = saved as User & { forceLogout?: boolean; passwordChanged?: boolean };
+    if (result.forceLogout) {
+      window.location.assign("/login");
+      return;
     }
+    if (editId && passwordEntered) {
+      setMessage({
+        type: "ok",
+        text: "Password updated — that user is logged out everywhere. They must login again.",
+      });
+      void loadOnline();
+    }
+    setEditId(null);
+    e.currentTarget.reset();
+    setForm({ role: "Operator", branch: "DPR Logistics", status: "Active" });
   }
 
   return (
     <>
       <PageHeader title="User Creation" subtitle="Create login users and assign roles" crumbs={[{ label: "Home", href: "/dashboard" }, { label: "User Creation" }]} />
       <Flash message={message} />
+
+      <FormCard
+        title={`Logged in users (${onlineCount})`}
+        subtitle="Active in the last 5 minutes"
+        className="online-users-card"
+      >
+        {online.length ? (
+          <ul className="online-users-list">
+            {online.map((user) => (
+              <li key={user.id} className="online-users-chip">
+                <span className="online-users-dot" aria-hidden="true" />
+                <span>
+                  {user.name || user.username}
+                  {user.isYou ? " (you)" : ""}
+                  <span style={{ opacity: 0.75 }}> · {user.role} · {user.branch || "—"}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="online-users-empty">No users online right now.</p>
+        )}
+      </FormCard>
+
       <AdminForm onSubmit={onSubmit}>
         <FormCard title="User Details" subtitle="Create or update login credentials and role access">
           <TwoCol>
             <div>
               <InputField label="Username" name="username" value={form.username ?? ""} onChange={(e) => setForm({ ...form, username: e.target.value })} required />
-              <InputField label="Password" name="password" type="password" value={form.password ?? ""} onChange={(e) => setForm({ ...form, password: e.target.value })} required={!editId} placeholder={editId ? "Leave blank to keep" : ""} />
+              <PasswordField
+                label="Password"
+                name="password"
+                value={form.password ?? ""}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                required={!editId}
+                placeholder={editId ? "Leave blank to keep" : ""}
+                autoComplete="new-password"
+              />
               <InputField label="Full Name" name="name" value={form.name ?? ""} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
               <InputField label="Mobile No." name="mobile" value={form.mobile ?? ""} onChange={(e) => setForm({ ...form, mobile: e.target.value })} />
             </div>

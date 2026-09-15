@@ -14,7 +14,7 @@ export async function GET(req: NextRequest, ctx: Ctx) {
   if (!isResource(resource)) {
     return NextResponse.json({ error: "Unknown resource" }, { status: 404 });
   }
-  const session = requireSession(req);
+  const session = await requireSession(req);
   if (session instanceof NextResponse) return session;
 
   try {
@@ -35,10 +35,10 @@ export async function POST(req: NextRequest, ctx: Ctx) {
   }
 
   if (resource === "users") {
-    const admin = requireAdmin(req);
+    const admin = await requireAdmin(req);
     if (admin instanceof NextResponse) return admin;
   } else {
-    const session = requireSession(req);
+    const session = await requireSession(req);
     if (session instanceof NextResponse) return session;
   }
 

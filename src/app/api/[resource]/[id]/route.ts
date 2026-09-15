@@ -29,7 +29,7 @@ export async function GET(req: NextRequest, ctx: Ctx) {
   if (!isResource(resource)) {
     return NextResponse.json({ error: "Unknown resource" }, { status: 404 });
   }
-  const auth = gate(req, resource);
+  const auth = await gate(req, resource);
   if (auth instanceof NextResponse) return auth;
   try {
     const row = await getModel(resource).findUnique({ where: { id: Number(id) } });
@@ -48,7 +48,7 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
   if (!isResource(resource)) {
     return NextResponse.json({ error: "Unknown resource" }, { status: 404 });
   }
-  const auth = gate(req, resource);
+  const auth = await gate(req, resource);
   if (auth instanceof NextResponse) return auth;
 
   const id = Number(idParam);
@@ -67,9 +67,11 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
     }
 
     let data = sanitize(body, resource);
+    let passwordChanged = false;
     if (resource === "users") {
       if (typeof data.password === "string" && data.password) {
         data.password = hashPassword(String(data.password));
+        passwordChanged = true;
       } else {
         delete data.password;
       }
@@ -77,6 +79,26 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
     await assertUniqueOnUpdate(resource, updateId, data);
     for (let attempt = 0; attempt < 6; attempt++) {
       try {
+        if (resource === "users" && passwordChanged) {
+          const updated = await prisma.user.update({
+            where: { id: updateId },
+            data: {
+              ...data,
+              sessionVersion: { increment: 1 },
+              lastSeenAt: null,
+            },
+          });
+          const payload = stripPassword(updated as unknown as Record<string, unknown>);
+          const res = NextResponse.json({
+            ...payload,
+            forceLogout: auth.id === updateId,
+            passwordChanged: true,
+          });
+          if (auth.id === updateId) {
+            res.cookies.set("dpr_session", "", { httpOnly: true, path: "/", maxAge: 0 });
+          }
+          return res;
+        }
         const updated = await getModel(resource).update({
           where: { id: updateId },
           data,
@@ -105,7 +127,7 @@ export async function DELETE(req: NextRequest, ctx: Ctx) {
   if (!isResource(resource)) {
     return NextResponse.json({ error: "Unknown resource" }, { status: 404 });
   }
-  const auth = gate(req, resource);
+  const auth = await gate(req, resource);
   if (auth instanceof NextResponse) return auth;
 
   const id = Number(idParam);

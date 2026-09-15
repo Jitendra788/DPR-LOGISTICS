@@ -23,15 +23,17 @@ model Party {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  username String @unique
-  password String
-  name     String
-  mobile   String @default("")
-  email    String @default("")
-  role     String @default("Operator")
-  branch   String @default("HO")
-  status   String @default("Active")
+  id             Int       @id @default(autoincrement())
+  username       String    @unique
+  password       String
+  name           String
+  mobile         String    @default("")
+  email          String    @default("")
+  role           String    @default("Operator")
+  branch         String    @default("HO")
+  status         String    @default("Active")
+  sessionVersion Int       @default(1)
+  lastSeenAt     DateTime?
 }
 
 model Driver {
