@@ -22,6 +22,8 @@ export async function middleware(req: NextRequest) {
     (pathname.startsWith("/api/marketing-media/") && req.method === "GET") ||
     pathname.startsWith("/api/tracking/ingest") ||
     pathname.startsWith("/api/auth/login") ||
+    pathname.startsWith("/api/auth/me") ||
+    pathname.startsWith("/api/auth/logout") ||
     pathname.startsWith("/api/bookings/print-data") ||
     pathname.startsWith("/api/bills/print-data") ||
     pathname.startsWith("/booking/lr/print") ||
