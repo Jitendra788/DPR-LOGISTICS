@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { BrandLogo } from "@/components/BrandLogo";
+import { BRAND_FAVICON, BRAND_LOGO_ALT } from "@/lib/brand";
 import { usePathname } from "next/navigation";
 import {
   Car,
   ChevronDown,
-  CircleUser,
   ClipboardList,
   Database,
   FileText,
@@ -117,8 +118,8 @@ export function Sidebar({ open, collapsed, isDesktop, onNavigate }: Props) {
 
       {!collapsed ? (
         <div className="erp-sidebar-user">
-          <div className="erp-avatar" aria-hidden>
-            <CircleUser className="h-5 w-5" />
+          <div className="erp-avatar erp-avatar-brand" aria-hidden>
+            <Image src={BRAND_FAVICON} alt={BRAND_LOGO_ALT} width={32} height={32} className="erp-avatar-logo" />
           </div>
           <div className="min-w-0">
             <p className="erp-sidebar-user-name">{me?.name || "User"}</p>

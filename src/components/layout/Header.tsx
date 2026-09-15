@@ -1,12 +1,14 @@
 "use client";
 
-import { Bell, ChevronDown, LogOut, Menu, Moon, Sun, UserRound } from "lucide-react";
+import { Bell, ChevronDown, LogOut, Menu, Moon, Sun } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api-client";
 import { ADMIN_HOME } from "@/lib/admin-routes";
 import { BrandLogo } from "@/components/BrandLogo";
+import { BRAND_FAVICON, BRAND_LOGO_ALT } from "@/lib/brand";
 import { useTheme } from "@/hooks/useTheme";
 import { GlobalSearch } from "./GlobalSearch";
 
@@ -233,8 +235,8 @@ export function Header({ collapsed, onToggle, isDesktop, mobileOpen }: Props) {
               setNotesOpen(false);
             }}
           >
-            <span className="erp-avatar erp-avatar-sm" aria-hidden>
-              <UserRound className="h-4 w-4" />
+            <span className="erp-avatar erp-avatar-sm erp-avatar-brand" aria-hidden>
+              <Image src={BRAND_FAVICON} alt={BRAND_LOGO_ALT} width={28} height={28} className="erp-avatar-logo" />
             </span>
             <span className="erp-profile-meta">
               <span className="erp-profile-name">{displayName}</span>

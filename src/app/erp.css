@@ -211,6 +211,21 @@
   border-radius: 8px;
 }
 
+.erp-avatar-brand {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  padding: 3px;
+  color: inherit;
+}
+
+.erp-avatar-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
 .erp-dropdown {
   position: absolute;
   top: calc(100% + 8px);
