@@ -39,6 +39,7 @@ type Delegate = {
   findFirst: (args?: object) => Promise<unknown>;
   findUnique: (args: object) => Promise<unknown>;
   create: (args: object) => Promise<unknown>;
+  createMany: (args: object) => Promise<{ count: number }>;
   update: (args: object) => Promise<unknown>;
   delete: (args: object) => Promise<unknown>;
   deleteMany: (args?: object) => Promise<{ count: number }>;

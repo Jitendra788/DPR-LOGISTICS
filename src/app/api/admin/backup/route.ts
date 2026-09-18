@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as { backup?: BackupPayload; confirm?: string };
     if (body.confirm !== "RESTORE") {
       return NextResponse.json(
-        { error: 'Type confirm: "RESTORE" to wipe current data and import backup.' },
+        { error: 'Type confirm: "RESTORE" to merge backup into current data (duplicates skipped).' },
         { status: 400 },
       );
     }
@@ -112,11 +112,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "backup JSON required" }, { status: 400 });
     }
 
-    const restored = await restoreBackup(body.backup);
+    const stats = await restoreBackup(body.backup);
+    const added = Object.values(stats.inserted).reduce((s, n) => s + n, 0);
+    const skipped = Object.values(stats.skipped).reduce((s, n) => s + n, 0);
     return NextResponse.json({
       ok: true,
-      message: "Database restored from backup. Please login again if needed.",
-      restored,
+      message: `Merge restore complete — ${added} new rows added, ${skipped} duplicates skipped. Existing data kept.`,
+      restored: stats.inserted,
+      skipped: stats.skipped,
+      stats,
     });
   } catch (err) {
     console.error("Restore failed", err);

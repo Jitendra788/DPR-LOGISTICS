@@ -36,6 +36,7 @@ export default function DataBackupPage() {
   const [restorePhase, setRestorePhase] = useState<RestorePhase>("idle");
   const [restoreElapsed, setRestoreElapsed] = useState(0);
   const [restoreResult, setRestoreResult] = useState<Counts | null>(null);
+  const [restoreSkipped, setRestoreSkipped] = useState<Counts | null>(null);
   const [confirmText, setConfirmText] = useState("");
   const [fileName, setFileName] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -96,6 +97,7 @@ export default function DataBackupPage() {
     }
     setRestoring(true);
     setRestoreResult(null);
+    setRestoreSkipped(null);
     setMessage({
       type: "ok",
       text: `Import start: ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB) — page band mat karo`,
@@ -129,17 +131,24 @@ export default function DataBackupPage() {
         error?: string;
         message?: string;
         restored?: Counts;
+        skipped?: Counts;
       };
       if (!res.ok) throw new Error(data.error || "Restore failed");
 
       setRestorePhase("done");
       setRestoreResult(data.restored || null);
+      setRestoreSkipped(data.skipped || null);
       const total = data.restored
         ? Object.values(data.restored).reduce((s, n) => s + (Number(n) || 0), 0)
         : 0;
+      const skipTotal = data.skipped
+        ? Object.values(data.skipped).reduce((s, n) => s + (Number(n) || 0), 0)
+        : 0;
       setMessage({
         type: "ok",
-        text: data.message || `Restore complete — ${total.toLocaleString("en-IN")} rows imported`,
+        text:
+          data.message ||
+          `Merge complete — ${total.toLocaleString("en-IN")} added, ${skipTotal.toLocaleString("en-IN")} duplicates skipped`,
         at: Date.now(),
       });
       setConfirmText("");
@@ -238,12 +247,11 @@ export default function DataBackupPage() {
           </div>
         </FormCard>
 
-        <FormCard title="Restore into database" subtitle="Warning: replaces current ERP data">
+        <FormCard title="Restore into database" subtitle="Merge mode — existing data is kept">
           <div className="backup-restore">
             <p className="backup-warn">
-              Restore <strong>deletes current data</strong> and loads the JSON backup. Photo files on disk are not
-              included — only database rows. Badi file (old data) me <strong>2–10 minutes</strong> lag sakte hain —
-              tab tak page band / refresh mat karo.
+              Restore <strong>purana data delete nahi karta</strong> — sirf naye rows add hote hain. Party / Vendor
+              (name), LR / Bill / Challan (number) duplicate skip ho jate hain. Photos disk pe alag rehte hain.
             </p>
             <label className="backup-confirm-label" htmlFor="backup-restore-confirm">
               Step 1 — type <code>RESTORE</code> here
@@ -343,14 +351,21 @@ export default function DataBackupPage() {
                       })}
                     </ol>
                     <p className="backup-progress-note">
-                      Purana data bada ho to ye step 2–10 min tak chal sakta hai. Browser tab band mat karo.
+                      Merge restore chal raha hai — pehla data delete nahi hoga. Tab band mat karo.
                     </p>
                   </>
                 )}
 
                 {restorePhase === "done" && restoreResult && (
                   <div className="backup-progress-result">
-                    <p>Import successful. Neeche updated counts refresh ho gaye.</p>
+                    <p>
+                      Merge successful — pehla data safe hai.
+                      {restoreSkipped
+                        ? ` Duplicates skipped: ${Object.values(restoreSkipped)
+                            .reduce((s, n) => s + (Number(n) || 0), 0)
+                            .toLocaleString("en-IN")}.`
+                        : ""}
+                    </p>
                     <div className="backup-progress-result-grid">
                       {Object.entries(restoreResult)
                         .filter(([, n]) => Number(n) > 0)
@@ -359,7 +374,7 @@ export default function DataBackupPage() {
                         .map(([table, count]) => (
                           <div key={table}>
                             <span>{table}</span>
-                            <strong>{Number(count).toLocaleString("en-IN")}</strong>
+                            <strong>+{Number(count).toLocaleString("en-IN")}</strong>
                           </div>
                         ))}
                     </div>
