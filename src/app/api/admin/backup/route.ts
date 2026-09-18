@@ -6,6 +6,8 @@ import { backupSummaryHtml, collectBackup, collectBackupCounts, restoreBackup, t
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
+/** Large legacy JSON restores can take several minutes */
+export const maxDuration = 300;
 
 function stamp() {
   return new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");

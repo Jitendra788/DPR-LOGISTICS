@@ -7,6 +7,7 @@ import {
   FileJson,
   FileSpreadsheet,
   FileText,
+  Loader2,
   RefreshCw,
   Upload,
 } from "lucide-react";
@@ -17,14 +18,28 @@ import { Flash } from "@/components/ui/Flash";
 
 type Counts = Record<string, number>;
 
+type RestorePhase = "idle" | "reading" | "uploading" | "importing" | "done" | "error";
+
+const PHASE_LABEL: Record<Exclude<RestorePhase, "idle">, string> = {
+  reading: "Step A — JSON file padh rahe hain…",
+  uploading: "Step B — Server ko backup bhej rahe hain…",
+  importing: "Step C — Database me data import ho raha hai…",
+  done: "Import complete",
+  error: "Import fail ho gaya",
+};
+
 export default function DataBackupPage() {
-  const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
+  const [message, setMessage] = useState<{ type: "ok" | "err"; text: string; at?: number } | null>(null);
   const [counts, setCounts] = useState<Counts | null>(null);
   const [loading, setLoading] = useState(false);
   const [restoring, setRestoring] = useState(false);
+  const [restorePhase, setRestorePhase] = useState<RestorePhase>("idle");
+  const [restoreElapsed, setRestoreElapsed] = useState(0);
+  const [restoreResult, setRestoreResult] = useState<Counts | null>(null);
   const [confirmText, setConfirmText] = useState("");
   const [fileName, setFileName] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
 
   const refreshCounts = useCallback(async () => {
     setLoading(true);
@@ -36,9 +51,9 @@ export default function DataBackupPage() {
       }
       const data = (await res.json()) as { counts?: Counts; exportedAt?: string };
       setCounts(data.counts || {});
-      setMessage({ type: "ok", text: `Live snapshot ready · ${data.exportedAt || "now"}` });
+      setMessage({ type: "ok", text: `Live snapshot ready · ${data.exportedAt || "now"}`, at: Date.now() });
     } catch (err) {
-      setMessage({ type: "err", text: err instanceof Error ? err.message : "Preview failed" });
+      setMessage({ type: "err", text: err instanceof Error ? err.message : "Preview failed", at: Date.now() });
     } finally {
       setLoading(false);
     }
@@ -48,6 +63,22 @@ export default function DataBackupPage() {
     void refreshCounts();
   }, [refreshCounts]);
 
+  useEffect(() => {
+    if (!restoring) return;
+    setRestoreElapsed(0);
+    const t0 = Date.now();
+    const id = window.setInterval(() => {
+      setRestoreElapsed(Math.floor((Date.now() - t0) / 1000));
+    }, 250);
+    return () => window.clearInterval(id);
+  }, [restoring]);
+
+  useEffect(() => {
+    if (restoring) {
+      progressRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [restoring, restorePhase]);
+
   function download(format: "json" | "xlsx" | "pdf") {
     window.location.href = `/api/admin/backup?format=${format}`;
   }
@@ -56,28 +87,71 @@ export default function DataBackupPage() {
     if (!file) return;
     setFileName(file.name);
     if (confirmText !== "RESTORE") {
-      setMessage({ type: "err", text: 'Pehle niche box me RESTORE type karo, phir file choose karo.' });
+      setMessage({
+        type: "err",
+        text: "Pehle niche box me RESTORE type karo, phir file choose karo.",
+        at: Date.now(),
+      });
       return;
     }
     setRestoring(true);
-    setMessage(null);
+    setRestoreResult(null);
+    setMessage({
+      type: "ok",
+      text: `Import start: ${file.name} (${(file.size / (1024 * 1024)).toFixed(1)} MB) — page band mat karo`,
+      at: Date.now(),
+    });
     try {
+      setRestorePhase("reading");
       const text = await file.text();
-      const backup = JSON.parse(text) as unknown;
-      const res = await fetch("/api/admin/backup", {
+      let backup: unknown;
+      try {
+        backup = JSON.parse(text);
+      } catch {
+        throw new Error("JSON file invalid hai — sahi backup file choose karo");
+      }
+
+      setRestorePhase("uploading");
+      const fetchPromise = fetch("/api/admin/backup", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ backup, confirm: "RESTORE" }),
       });
-      const data = (await res.json().catch(() => ({}))) as { error?: string; message?: string; restored?: Counts };
+
+      // Upload ke baad zyada time server-side import me jata hai
+      const switchTimer = window.setTimeout(() => setRestorePhase("importing"), 900);
+      const res = await fetchPromise;
+      window.clearTimeout(switchTimer);
+      setRestorePhase("importing");
+
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        message?: string;
+        restored?: Counts;
+      };
       if (!res.ok) throw new Error(data.error || "Restore failed");
-      setMessage({ type: "ok", text: data.message || "Restore complete" });
+
+      setRestorePhase("done");
+      setRestoreResult(data.restored || null);
+      const total = data.restored
+        ? Object.values(data.restored).reduce((s, n) => s + (Number(n) || 0), 0)
+        : 0;
+      setMessage({
+        type: "ok",
+        text: data.message || `Restore complete — ${total.toLocaleString("en-IN")} rows imported`,
+        at: Date.now(),
+      });
       setConfirmText("");
       setFileName("");
       void refreshCounts();
     } catch (err) {
-      setMessage({ type: "err", text: err instanceof Error ? err.message : "Restore failed" });
+      setRestorePhase("error");
+      setMessage({
+        type: "err",
+        text: err instanceof Error ? err.message : "Restore failed",
+        at: Date.now(),
+      });
     } finally {
       setRestoring(false);
     }
@@ -86,6 +160,22 @@ export default function DataBackupPage() {
   const totalRecords = counts
     ? Object.values(counts).reduce((s, n) => s + (Number(n) || 0), 0)
     : 0;
+
+  const phaseSteps: Array<Exclude<RestorePhase, "idle" | "done" | "error">> = [
+    "reading",
+    "uploading",
+    "importing",
+  ];
+  const phaseIndex =
+    restorePhase === "reading"
+      ? 0
+      : restorePhase === "uploading"
+        ? 1
+        : restorePhase === "importing" || restorePhase === "done"
+          ? 2
+          : restorePhase === "error"
+            ? -1
+            : -1;
 
   return (
     <div className="backup-admin">
@@ -111,7 +201,7 @@ export default function DataBackupPage() {
         <div className="backup-hero-stat">
           <span>Total records</span>
           <strong>{loading ? "…" : totalRecords.toLocaleString("en-IN")}</strong>
-          <button type="button" className="backup-refresh" onClick={() => void refreshCounts()} disabled={loading}>
+          <button type="button" className="backup-refresh" onClick={() => void refreshCounts()} disabled={loading || restoring}>
             <RefreshCw className={`h-3.5 w-3.5 ${loading ? "is-spin" : ""}`} />
             Refresh
           </button>
@@ -121,7 +211,7 @@ export default function DataBackupPage() {
       <div className="backup-grid">
         <FormCard title="Download backup" subtitle="Choose format">
           <div className="backup-actions">
-            <button type="button" className="backup-dl tone-json" onClick={() => download("json")}>
+            <button type="button" className="backup-dl tone-json" onClick={() => download("json")} disabled={restoring}>
               <FileJson className="h-5 w-5" />
               <span>
                 <strong>JSON</strong>
@@ -129,7 +219,7 @@ export default function DataBackupPage() {
               </span>
               <Download className="h-4 w-4 backup-dl-ico" />
             </button>
-            <button type="button" className="backup-dl tone-xlsx" onClick={() => download("xlsx")}>
+            <button type="button" className="backup-dl tone-xlsx" onClick={() => download("xlsx")} disabled={restoring}>
               <FileSpreadsheet className="h-5 w-5" />
               <span>
                 <strong>Excel (.xlsx)</strong>
@@ -137,7 +227,7 @@ export default function DataBackupPage() {
               </span>
               <Download className="h-4 w-4 backup-dl-ico" />
             </button>
-            <button type="button" className="backup-dl tone-pdf" onClick={() => download("pdf")}>
+            <button type="button" className="backup-dl tone-pdf" onClick={() => download("pdf")} disabled={restoring}>
               <FileText className="h-5 w-5" />
               <span>
                 <strong>PDF summary</strong>
@@ -152,7 +242,8 @@ export default function DataBackupPage() {
           <div className="backup-restore">
             <p className="backup-warn">
               Restore <strong>deletes current data</strong> and loads the JSON backup. Photo files on disk are not
-              included — only database rows.
+              included — only database rows. Badi file (old data) me <strong>2–10 minutes</strong> lag sakte hain —
+              tab tak page band / refresh mat karo.
             </p>
             <label className="backup-confirm-label" htmlFor="backup-restore-confirm">
               Step 1 — type <code>RESTORE</code> here
@@ -164,6 +255,7 @@ export default function DataBackupPage() {
                 placeholder="Type RESTORE"
                 autoComplete="off"
                 spellCheck={false}
+                disabled={restoring}
               />
             </label>
             <p className={`backup-unlock-hint ${confirmText === "RESTORE" ? "is-ok" : ""}`}>
@@ -173,14 +265,16 @@ export default function DataBackupPage() {
                   ? `Abhi “${confirmText}” dikh raha hai — pura RESTORE likho`
                   : "Pehle upar RESTORE type karo, phir neeche file choose hogi"}
             </p>
-            <div className={`backup-upload ${confirmText === "RESTORE" ? "is-ready" : ""}`}>
-              <Upload className="h-5 w-5" aria-hidden />
+            <div className={`backup-upload ${confirmText === "RESTORE" ? "is-ready" : ""} ${restoring ? "is-busy" : ""}`}>
+              {restoring ? <Loader2 className="h-5 w-5 is-spin" aria-hidden /> : <Upload className="h-5 w-5" aria-hidden />}
               <span>
-                <strong>{restoring ? "Restoring…" : fileName || "Step 2 — Choose JSON backup"}</strong>
+                <strong>{restoring ? "Import chal raha hai…" : fileName || "Step 2 — Choose JSON backup"}</strong>
                 <small>
-                  {confirmText === "RESTORE"
-                    ? "Click here to select .json file"
-                    : "Pehle Step 1 me RESTORE type karo"}
+                  {restoring
+                    ? "Neeche progress dekho — wait karo"
+                    : confirmText === "RESTORE"
+                      ? "Click Browse / yahan se .json file select karo"
+                      : "Pehle Step 1 me RESTORE type karo"}
                 </small>
               </span>
               <input
@@ -203,6 +297,7 @@ export default function DataBackupPage() {
                     setMessage({
                       type: "err",
                       text: "Pehle Confirmation box me RESTORE type karo, phir file choose karo.",
+                      at: Date.now(),
                     });
                     document.getElementById("backup-restore-confirm")?.focus();
                     return;
@@ -210,9 +305,74 @@ export default function DataBackupPage() {
                   fileInputRef.current?.click();
                 }}
               >
-                Browse…
+                {restoring ? "Working…" : "Browse…"}
               </button>
             </div>
+
+            {(restoring || restorePhase === "done" || restorePhase === "error") && (
+              <div
+                ref={progressRef}
+                className={`backup-progress ${restorePhase === "done" ? "is-done" : ""} ${restorePhase === "error" ? "is-err" : ""}`}
+                role="status"
+                aria-live="polite"
+              >
+                <div className="backup-progress-head">
+                  <strong>
+                    {restorePhase !== "idle" ? PHASE_LABEL[restorePhase] : "Import"}
+                  </strong>
+                  <span className="backup-progress-timer">
+                    {restoring ? `${restoreElapsed}s` : restorePhase === "done" ? `Done in ${restoreElapsed}s` : ""}
+                  </span>
+                </div>
+
+                {restoring && (
+                  <>
+                    <div className="backup-progress-bar" aria-hidden>
+                      <div className="backup-progress-bar-indeterminate" />
+                    </div>
+                    <ol className="backup-progress-steps">
+                      {phaseSteps.map((step, i) => {
+                        const state =
+                          phaseIndex > i ? "is-done" : phaseIndex === i ? "is-active" : "";
+                        return (
+                          <li key={step} className={state}>
+                            {state === "is-active" && <Loader2 className="h-3.5 w-3.5 is-spin" aria-hidden />}
+                            {PHASE_LABEL[step].replace(/^Step [A-C] — /, "")}
+                          </li>
+                        );
+                      })}
+                    </ol>
+                    <p className="backup-progress-note">
+                      Purana data bada ho to ye step 2–10 min tak chal sakta hai. Browser tab band mat karo.
+                    </p>
+                  </>
+                )}
+
+                {restorePhase === "done" && restoreResult && (
+                  <div className="backup-progress-result">
+                    <p>Import successful. Neeche updated counts refresh ho gaye.</p>
+                    <div className="backup-progress-result-grid">
+                      {Object.entries(restoreResult)
+                        .filter(([, n]) => Number(n) > 0)
+                        .sort((a, b) => Number(b[1]) - Number(a[1]))
+                        .slice(0, 12)
+                        .map(([table, count]) => (
+                          <div key={table}>
+                            <span>{table}</span>
+                            <strong>{Number(count).toLocaleString("en-IN")}</strong>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+
+                {restorePhase === "error" && (
+                  <p className="backup-progress-note">
+                    Error upar toast me dikha — file dubara try karo ya server log check karo.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         </FormCard>
       </div>
@@ -233,7 +393,7 @@ export default function DataBackupPage() {
           <p className="backup-empty">Loading counts…</p>
         )}
         <div className="backup-foot">
-          <Button type="button" variant="secondary" size="sm" onClick={() => void refreshCounts()} disabled={loading}>
+          <Button type="button" variant="secondary" size="sm" onClick={() => void refreshCounts()} disabled={loading || restoring}>
             Refresh counts
           </Button>
         </div>
