@@ -2029,6 +2029,12 @@ input[type="date"].form-control::-webkit-calendar-picker-indicator {
   color: #475569;
 }
 
+.tds-mode.is-slip {
+  background: #ecfdf5;
+  color: #0f766e;
+  border: 1px solid #a7f3d0;
+}
+
 [data-theme="dark"] .tds-stat {
   background: linear-gradient(165deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.9));
   border-color: #334155;

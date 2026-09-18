@@ -13,7 +13,7 @@ import { displayToIso, firstOfMonthIso, isoToDisplay, todayIso } from "@/lib/dat
 
 type DocSource = "DPR" | "ROADWAYS";
 type ViewMode = "detail" | "party";
-type SortKey = "date" | "party" | "tdsAmt" | "paidAmt";
+type SortKey = "paidDate" | "party" | "tdsAmt" | "paidAmt";
 
 type Party = { name: string };
 
@@ -31,9 +31,24 @@ type Receipt = {
   source?: string;
 };
 
+type Slip = {
+  id: number;
+  slipNo?: string;
+  partyName: string;
+  lorryNo?: string;
+  receiptNo: string;
+  receiptDate: string;
+  paidDate: string;
+  paidAmount: number;
+  tdsPct?: number;
+  tdsAmt?: number;
+  paid?: boolean;
+  remark?: string;
+};
+
 type Row = {
   srNo: number;
-  date: string;
+  paidDate: string;
   partyName: string;
   billNo: string;
   receiptNo: string;
@@ -41,6 +56,7 @@ type Row = {
   tdsPct: number;
   tdsAmt: number;
   mode: string;
+  docType: "MR" | "Slip";
 };
 
 type PartySummary = {
@@ -49,6 +65,15 @@ type PartySummary = {
   paidAmt: number;
   tdsAmt: number;
   avgPct: number;
+};
+
+type FilterOpts = {
+  fromDate: string;
+  toDate: string;
+  partyName: string;
+  billNo: string;
+  receiptNo: string;
+  mode: string;
 };
 
 function normalizeDate(value: string) {
@@ -77,7 +102,87 @@ function showDate(iso: string) {
   return iso;
 }
 
-const MODE_OPTIONS = ["All", "Cash", "Cheque", "NEFT", "RTGS", "UPI", "Bank", "Other"];
+function inPaidRange(paidDate: string, from: string, to: string) {
+  const d = normalizeDate(paidDate);
+  if (!d) return true;
+  if (from && d < from) return false;
+  if (to && d > to) return false;
+  return true;
+}
+
+async function collectTdsRows(source: DocSource, filters: FilterOpts): Promise<Row[]> {
+  const from = normalizeDate(filters.fromDate);
+  const to = normalizeDate(filters.toDate);
+  const party = filters.partyName.trim().toLowerCase();
+  const bill = filters.billNo.trim().toLowerCase();
+  const receipt = filters.receiptNo.trim().toLowerCase();
+  const modeFilter = filters.mode === "All" ? "" : filters.mode.toLowerCase();
+
+  const receipts = await api<Receipt[]>("/api/receipts");
+  const mrRows: Row[] = receipts
+    .filter((r) => matchesSource(r.source, source))
+    .filter((r) => (Number(r.tdsAmt) || 0) > 0)
+    .map((r) => ({
+      srNo: 0,
+      paidDate: r.date || "",
+      partyName: r.partyName || "",
+      billNo: r.billNo || "",
+      receiptNo: r.receiptNo || "",
+      paidAmt: Number(r.paidAmt) || Number(r.amount) || 0,
+      tdsPct: Number(r.tdsPct) || 0,
+      tdsAmt: Number(r.tdsAmt) || 0,
+      mode: r.mode || "MR",
+      docType: "MR" as const,
+    }));
+
+  let slipRows: Row[] = [];
+  if (source === "ROADWAYS") {
+    const slips = await api<Slip[]>("/api/slips");
+    slipRows = slips
+      .filter((s) => (Number(s.tdsAmt) || 0) > 0)
+      .map((s) => ({
+        srNo: 0,
+        paidDate: s.paidDate || s.receiptDate || "",
+        partyName: s.partyName || "",
+        billNo: s.lorryNo || s.slipNo || "",
+        receiptNo: s.receiptNo || "",
+        paidAmt: Number(s.paidAmount) || 0,
+        tdsPct: Number(s.tdsPct) || 0,
+        tdsAmt: Number(s.tdsAmt) || 0,
+        mode: "Booking Slip",
+        docType: "Slip" as const,
+      }));
+  }
+
+  return [...mrRows, ...slipRows]
+    .filter((r) => {
+      if (!party) return true;
+      return r.partyName.trim().toLowerCase() === party;
+    })
+    .filter((r) => {
+      if (!bill) return true;
+      return r.billNo.toLowerCase().includes(bill);
+    })
+    .filter((r) => {
+      if (!receipt) return true;
+      return r.receiptNo.toLowerCase().includes(receipt);
+    })
+    .filter((r) => {
+      if (!modeFilter) return true;
+      return r.mode.toLowerCase().includes(modeFilter) || r.docType.toLowerCase() === modeFilter;
+    })
+    .filter((r) => inPaidRange(r.paidDate, from, to))
+    .sort((a, b) => {
+      const da = normalizeDate(a.paidDate);
+      const db = normalizeDate(b.paidDate);
+      if (da !== db) return da.localeCompare(db);
+      return a.receiptNo.localeCompare(b.receiptNo);
+    })
+    .map((r, i) => ({ ...r, srNo: i + 1 }));
+}
+
+const MODE_OPTIONS_DPR = ["All", "Cash", "Cheque", "NEFT", "RTGS", "UPI", "Bank", "Other"];
+const MODE_OPTIONS_RW = ["All", "Booking Slip", "Cash", "Cheque", "NEFT", "RTGS", "UPI", "Bank", "Other"];
 
 export function TdsLedgerReport({
   source = "DPR",
@@ -99,12 +204,14 @@ export function TdsLedgerReport({
   const [mode, setMode] = useState("All");
   const [quickSearch, setQuickSearch] = useState("");
   const [view, setView] = useState<ViewMode>("detail");
-  const [sortKey, setSortKey] = useState<SortKey>("date");
+  const [sortKey, setSortKey] = useState<SortKey>("paidDate");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [rows, setRows] = useState<Row[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [message, setMessage] = useState<{ type: "ok" | "err"; text: string } | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const modeOptions = source === "ROADWAYS" ? MODE_OPTIONS_RW : MODE_OPTIONS_DPR;
 
   useEffect(() => {
     api<Party[]>("/api/parties").then(setParties).catch(() => setParties([]));
@@ -115,32 +222,15 @@ export function TdsLedgerReport({
     (async () => {
       setLoading(true);
       try {
-        const list = await api<Receipt[]>("/api/receipts");
+        const filtered = await collectTdsRows(source, {
+          fromDate: firstOfMonthIso(),
+          toDate: todayIso(),
+          partyName: "",
+          billNo: "",
+          receiptNo: "",
+          mode: "All",
+        });
         if (cancelled) return;
-        const from = normalizeDate(firstOfMonthIso());
-        const to = normalizeDate(todayIso());
-        const filtered = list
-          .filter((r) => matchesSource(r.source, source))
-          .filter((r) => (Number(r.tdsAmt) || 0) > 0)
-          .filter((r) => {
-            const d = normalizeDate(r.date);
-            if (!d) return true;
-            if (from && d < from) return false;
-            if (to && d > to) return false;
-            return true;
-          })
-          .sort((a, b) => normalizeDate(a.date).localeCompare(normalizeDate(b.date)))
-          .map((r, i) => ({
-            srNo: i + 1,
-            date: r.date,
-            partyName: r.partyName || "",
-            billNo: r.billNo || "",
-            receiptNo: r.receiptNo || "",
-            paidAmt: Number(r.paidAmt) || Number(r.amount) || 0,
-            tdsPct: Number(r.tdsPct) || 0,
-            tdsAmt: Number(r.tdsAmt) || 0,
-            mode: r.mode || "",
-          }));
         setRows(filtered);
         setLoaded(true);
       } catch {
@@ -166,13 +256,15 @@ export function TdsLedgerReport({
           r.partyName.toLowerCase().includes(q) ||
           r.billNo.toLowerCase().includes(q) ||
           r.receiptNo.toLowerCase().includes(q) ||
-          r.mode.toLowerCase().includes(q),
+          r.mode.toLowerCase().includes(q) ||
+          r.docType.toLowerCase().includes(q) ||
+          showDate(r.paidDate).includes(q),
       );
     }
     const dir = sortDir === "asc" ? 1 : -1;
     return [...list].sort((a, b) => {
-      if (sortKey === "date") {
-        return dir * normalizeDate(a.date).localeCompare(normalizeDate(b.date));
+      if (sortKey === "paidDate") {
+        return dir * normalizeDate(a.paidDate).localeCompare(normalizeDate(b.paidDate));
       }
       if (sortKey === "party") return dir * a.partyName.localeCompare(b.partyName);
       if (sortKey === "paidAmt") return dir * (a.paidAmt - b.paidAmt);
@@ -203,64 +295,21 @@ export function TdsLedgerReport({
   const totalTds = useMemo(() => filteredRows.reduce((s, r) => s + (r.tdsAmt || 0), 0), [filteredRows]);
   const totalPaid = useMemo(() => filteredRows.reduce((s, r) => s + (r.paidAmt || 0), 0), [filteredRows]);
   const partyCount = useMemo(() => new Set(filteredRows.map((r) => r.partyName)).size, [filteredRows]);
+  const slipCount = useMemo(() => filteredRows.filter((r) => r.docType === "Slip").length, [filteredRows]);
   const avgPct = totalPaid > 0 ? Number(((totalTds / totalPaid) * 100).toFixed(2)) : 0;
 
   async function load(e?: FormEvent) {
     e?.preventDefault();
     setLoading(true);
     try {
-      const list = await api<Receipt[]>("/api/receipts");
-      const from = normalizeDate(fromDate);
-      const to = normalizeDate(toDate);
-      const party = partyName.trim().toLowerCase();
-      const bill = billNo.trim().toLowerCase();
-      const receipt = receiptNo.trim().toLowerCase();
-      const modeFilter = mode === "All" ? "" : mode.toLowerCase();
-
-      const filtered = list
-        .filter((r) => matchesSource(r.source, source))
-        .filter((r) => (Number(r.tdsAmt) || 0) > 0)
-        .filter((r) => {
-          if (!party) return true;
-          return (r.partyName || "").trim().toLowerCase() === party;
-        })
-        .filter((r) => {
-          if (!bill) return true;
-          return (r.billNo || "").toLowerCase().includes(bill);
-        })
-        .filter((r) => {
-          if (!receipt) return true;
-          return (r.receiptNo || "").toLowerCase().includes(receipt);
-        })
-        .filter((r) => {
-          if (!modeFilter) return true;
-          return (r.mode || "").toLowerCase().includes(modeFilter);
-        })
-        .filter((r) => {
-          const d = normalizeDate(r.date);
-          if (!d) return true;
-          if (from && d < from) return false;
-          if (to && d > to) return false;
-          return true;
-        })
-        .sort((a, b) => {
-          const da = normalizeDate(a.date);
-          const db = normalizeDate(b.date);
-          if (da !== db) return da.localeCompare(db);
-          return String(a.receiptNo).localeCompare(String(b.receiptNo));
-        })
-        .map((r, i) => ({
-          srNo: i + 1,
-          date: r.date,
-          partyName: r.partyName || "",
-          billNo: r.billNo || "",
-          receiptNo: r.receiptNo || "",
-          paidAmt: Number(r.paidAmt) || Number(r.amount) || 0,
-          tdsPct: Number(r.tdsPct) || 0,
-          tdsAmt: Number(r.tdsAmt) || 0,
-          mode: r.mode || "",
-        }));
-
+      const filtered = await collectTdsRows(source, {
+        fromDate,
+        toDate,
+        partyName,
+        billNo,
+        receiptNo,
+        mode,
+      });
       setRows(filtered);
       setLoaded(true);
       setMessage({
@@ -301,9 +350,10 @@ export function TdsLedgerReport({
       exportName,
       filteredRows.map((r, i) => ({
         Sr: i + 1,
-        Date: showDate(r.date),
+        "Paid Date": showDate(r.paidDate),
+        Type: r.docType === "Slip" ? "Booking Slip" : "Money Receipt",
         Party: r.partyName,
-        "Bill No": r.billNo,
+        "Bill / Lorry": r.billNo,
         "Receipt No": r.receiptNo,
         "Paid Amt": r.paidAmt,
         "TDS %": r.tdsPct,
@@ -380,17 +430,28 @@ export function TdsLedgerReport({
             <p className="tds-stat-label">Parties / Entries</p>
             <p className="tds-stat-value">
               {partyCount}
-              <small> / {filteredRows.length}</small>
+              <small>
+                {" "}
+                / {filteredRows.length}
+                {source === "ROADWAYS" && slipCount ? ` · ${slipCount} slip` : ""}
+              </small>
             </p>
           </div>
         </div>
       </section>
 
       <AdminForm onSubmit={load}>
-        <FormCard title="Filters" subtitle="Blank party = all parties · bill / receipt / mode optional">
+        <FormCard
+          title="Filters"
+          subtitle={
+            source === "ROADWAYS"
+              ? "Includes money receipts + booking-slip TDS · date filter uses Paid Date"
+              : "Blank party = all parties · date filter uses Paid Date"
+          }
+        >
           <div className="tds-filter-grid">
-            <DateField label="From Date" value={fromDate} onChange={setFromDate} />
-            <DateField label="To Date" value={toDate} onChange={setToDate} />
+            <DateField label="From Paid Date" value={fromDate} onChange={setFromDate} />
+            <DateField label="To Paid Date" value={toDate} onChange={setToDate} />
             <div className="tds-party-wrap">
               <ComboboxField
                 label="Party Name"
@@ -405,9 +466,9 @@ export function TdsLedgerReport({
                 </button>
               ) : null}
             </div>
-            <DropdownField label="Payment Mode" value={mode} onChange={(e) => setMode(e.target.value)} options={MODE_OPTIONS} />
+            <DropdownField label="Payment Mode" value={mode} onChange={(e) => setMode(e.target.value)} options={modeOptions} />
             <InputField
-              label="Bill No"
+              label={source === "ROADWAYS" ? "Bill / Lorry No" : "Bill No"}
               value={billNo}
               onChange={(e) => setBillNo(e.target.value)}
               placeholder="Optional"
@@ -438,7 +499,7 @@ export function TdsLedgerReport({
 
       <FormCard
         title={partyName.trim() ? `TDS Ledger — ${partyName.trim()}` : "TDS Ledger — All Parties"}
-        subtitle={`${fromDate || "…"} → ${toDate || "…"}`}
+        subtitle={`Paid ${fromDate || "…"} → ${toDate || "…"}`}
         className="mt-3 tds-result-card"
       >
         <div className="tds-toolbar">
@@ -466,28 +527,29 @@ export function TdsLedgerReport({
             className="form-control tds-search"
             value={quickSearch}
             onChange={(e) => setQuickSearch(e.target.value)}
-            placeholder="Search party / bill / MR / mode…"
+            placeholder="Search party / bill / MR / paid date…"
             aria-label="Search TDS rows"
           />
         </div>
 
         <div className="table-scroll overflow-x-auto">
           {view === "detail" ? (
-            <table className="erp-dt w-full min-w-[780px]">
+            <table className="erp-dt w-full min-w-[860px]">
               <thead>
                 <tr>
                   <th>Sr</th>
                   <th>
-                    <button type="button" className="tds-sort" onClick={() => toggleSort("date")}>
-                      Date{sortMark("date")}
+                    <button type="button" className="tds-sort" onClick={() => toggleSort("paidDate")}>
+                      Paid Date{sortMark("paidDate")}
                     </button>
                   </th>
+                  <th>Type</th>
                   <th>
                     <button type="button" className="tds-sort" onClick={() => toggleSort("party")}>
                       Party{sortMark("party")}
                     </button>
                   </th>
-                  <th>Bill No</th>
+                  <th>{source === "ROADWAYS" ? "Bill / Lorry" : "Bill No"}</th>
                   <th>Receipt No</th>
                   <th className="text-right">
                     <button type="button" className="tds-sort" onClick={() => toggleSort("paidAmt")}>
@@ -506,9 +568,14 @@ export function TdsLedgerReport({
               <tbody>
                 {filteredRows.length ? (
                   filteredRows.map((r, i) => (
-                    <tr key={`${r.receiptNo}-${r.billNo}-${r.srNo}`}>
+                    <tr key={`${r.docType}-${r.receiptNo}-${r.billNo}-${r.srNo}`}>
                       <td>{i + 1}</td>
-                      <td>{showDate(r.date)}</td>
+                      <td>{showDate(r.paidDate)}</td>
+                      <td>
+                        <span className={`tds-mode ${r.docType === "Slip" ? "is-slip" : ""}`}>
+                          {r.docType === "Slip" ? "Booking Slip" : "MR"}
+                        </span>
+                      </td>
                       <td>
                         <button type="button" className="tds-party-link" onClick={() => setPartyName(r.partyName)}>
                           {r.partyName}
@@ -526,7 +593,7 @@ export function TdsLedgerReport({
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={9} className="py-6 text-center text-slate-500">
+                    <td colSpan={10} className="py-6 text-center text-slate-500">
                       {loading
                         ? "Loading…"
                         : loaded
@@ -539,7 +606,7 @@ export function TdsLedgerReport({
               {filteredRows.length ? (
                 <tfoot>
                   <tr>
-                    <td colSpan={5} className="font-semibold">
+                    <td colSpan={6} className="font-semibold">
                       Total ({filteredRows.length})
                     </td>
                     <td className="text-right font-semibold">{money(totalPaid)}</td>
