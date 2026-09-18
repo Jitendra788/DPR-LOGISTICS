@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   DatabaseBackup,
   Download,
@@ -24,6 +24,7 @@ export default function DataBackupPage() {
   const [restoring, setRestoring] = useState(false);
   const [confirmText, setConfirmText] = useState("");
   const [fileName, setFileName] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const refreshCounts = useCallback(async () => {
     setLoading(true);
@@ -151,31 +152,67 @@ export default function DataBackupPage() {
           <div className="backup-restore">
             <p className="backup-warn">
               Restore <strong>deletes current data</strong> and loads the JSON backup. Photo files on disk are not
-              included — only database rows. Type <code>RESTORE</code> to enable upload.
+              included — only database rows.
             </p>
-            <label className="backup-confirm-label">
-              Confirmation
+            <label className="backup-confirm-label" htmlFor="backup-restore-confirm">
+              Step 1 — type <code>RESTORE</code> here
               <input
+                id="backup-restore-confirm"
                 className="form-control"
                 value={confirmText}
-                onChange={(e) => setConfirmText(e.target.value.trim().toUpperCase())}
+                onChange={(e) => setConfirmText(e.target.value.replace(/\s+/g, "").toUpperCase())}
                 placeholder="Type RESTORE"
                 autoComplete="off"
+                spellCheck={false}
               />
             </label>
-            <label className={`backup-upload ${confirmText === "RESTORE" ? "is-ready" : ""}`}>
-              <Upload className="h-5 w-5" />
+            <p className={`backup-unlock-hint ${confirmText === "RESTORE" ? "is-ok" : ""}`}>
+              {confirmText === "RESTORE"
+                ? "Unlocked — ab Step 2 pe JSON file choose karo"
+                : confirmText
+                  ? `Abhi “${confirmText}” dikh raha hai — pura RESTORE likho`
+                  : "Pehle upar RESTORE type karo, phir neeche file choose hogi"}
+            </p>
+            <div className={`backup-upload ${confirmText === "RESTORE" ? "is-ready" : ""}`}>
+              <Upload className="h-5 w-5" aria-hidden />
               <span>
-                <strong>{restoring ? "Restoring…" : fileName || "Choose JSON backup"}</strong>
-                <small>{confirmText === "RESTORE" ? "Click to select .json file" : "Unlock with RESTORE first"}</small>
+                <strong>{restoring ? "Restoring…" : fileName || "Step 2 — Choose JSON backup"}</strong>
+                <small>
+                  {confirmText === "RESTORE"
+                    ? "Click here to select .json file"
+                    : "Pehle Step 1 me RESTORE type karo"}
+                </small>
               </span>
               <input
+                ref={fileInputRef}
                 type="file"
                 accept="application/json,.json"
-                disabled={confirmText !== "RESTORE" || restoring}
-                onChange={(e) => void onRestoreFile(e.target.files?.[0] || null)}
+                disabled={restoring}
+                onChange={(e) => {
+                  const file = e.target.files?.[0] || null;
+                  e.target.value = "";
+                  void onRestoreFile(file);
+                }}
               />
-            </label>
+              <button
+                type="button"
+                className="backup-upload-btn"
+                disabled={restoring}
+                onClick={() => {
+                  if (confirmText !== "RESTORE") {
+                    setMessage({
+                      type: "err",
+                      text: "Pehle Confirmation box me RESTORE type karo, phir file choose karo.",
+                    });
+                    document.getElementById("backup-restore-confirm")?.focus();
+                    return;
+                  }
+                  fileInputRef.current?.click();
+                }}
+              >
+                Browse…
+              </button>
+            </div>
           </div>
         </FormCard>
       </div>
