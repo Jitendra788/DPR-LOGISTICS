@@ -174,11 +174,14 @@ export function MoneyReceiptSearch({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    Promise.all([api<Party[]>("/api/parties"), api<BillOption[]>("/api/bills")]).then(([p, bills]) => {
+    Promise.all([
+      api<Party[]>("/api/parties"),
+      api<BillOption[]>(`/api/bills?source=${encodeURIComponent(source)}`),
+    ]).then(([p, bills]) => {
       setParties(p);
       setAllBills(bills);
     });
-  }, []);
+  }, [source]);
 
   useEffect(() => {
     const qParty = searchParams.get("partyName") ?? "";
@@ -221,8 +224,9 @@ export function MoneyReceiptSearch({
       const next = { ...cur, ...patch };
       if ("tdsPct" in patch || "paidAmt" in patch || "otherDed" in patch) {
         if (next.tdsPct > 0) {
-          // TDS on outstanding (what user sees), not before-tax freight
-          next.tdsAmt = Number(((row.outstanding * next.tdsPct) / 100).toFixed(2));
+          // TDS on Before Tax (freight), not GST-inclusive outstanding
+          const base = Number(row.beforeTax) || 0;
+          next.tdsAmt = Number(((base * next.tdsPct) / 100).toFixed(2));
         } else if ("tdsPct" in patch) {
           next.tdsAmt = 0;
         }

@@ -8,6 +8,7 @@ import { todayIso } from "@/lib/dates";
 import { SearchSelect } from "@/components/ui/SearchSelect";
 import { company } from "@/data/marketing/company";
 import { LR_TYPES, normalizeLrType } from "@/lib/lr-type";
+import { autoLrFreight } from "@/lib/lr-totals";
 import "./public.css";
 
 type FormState = {
@@ -125,7 +126,19 @@ export default function CustomerBookingPage() {
   const grandTotal = total + form.gst;
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
-    setForm((f) => ({ ...f, [key]: value }));
+    setForm((f) => {
+      const next = { ...f, [key]: value };
+      if (key === "rate" || key === "totalMeter" || key === "chargedWeight" || key === "billAs") {
+        const auto = autoLrFreight({
+          billAs: next.billAs,
+          rate: next.rate,
+          totalMeter: next.totalMeter,
+          chargedWeight: next.chargedWeight,
+        });
+        if (auto != null) next.freight = auto;
+      }
+      return next;
+    });
   }
 
   async function onSubmit(e: FormEvent) {

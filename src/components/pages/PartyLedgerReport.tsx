@@ -118,7 +118,10 @@ export function PartyLedgerReport({
       throw new Error("Select a party name");
     }
 
-    const [bills, receipts] = await Promise.all([api<Bill[]>("/api/bills"), api<Receipt[]>("/api/receipts")]);
+    const [bills, receipts] = await Promise.all([
+      api<Bill[]>(`/api/bills?source=${encodeURIComponent(source)}`),
+      api<Receipt[]>(`/api/receipts?source=${encodeURIComponent(source)}`),
+    ]);
     const party = parties.find((p) => matchesParty(p.name, partyName));
     const rows: LedgerLine[] = [];
 

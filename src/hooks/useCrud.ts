@@ -31,22 +31,24 @@ function docGuardKey(resource: string, body: unknown) {
   return value ? `${resource}:${field}:${value}` : "";
 }
 
-export function useCrud<T extends { id: number }>(resource: string) {
+export function useCrud<T extends { id: number }>(resource: string, opts?: { query?: string }) {
   const [rows, setRows] = useState<T[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessageState] = useState<FlashState>(null);
   const busyRef = useRef(false);
+  const query = opts?.query || "";
 
   const setMessage = useCallback((msg: { type: "ok" | "err"; text: string } | null) => {
     setMessageState(msg ? { ...msg, at: Date.now() } : null);
   }, []);
 
   const reload = useCallback(async () => {
-    const data = await api<T[]>(`/api/${resource}`);
+    const qs = query ? `?${query}` : "";
+    const data = await api<T[]>(`/api/${resource}${qs}`);
     setRows(Array.isArray(data) ? data : []);
     setLoading(false);
-  }, [resource]);
+  }, [resource, query]);
 
   useEffect(() => {
     reload().catch((err: Error) => {

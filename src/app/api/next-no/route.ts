@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { nextPadded } from "@/lib/doc-numbers";
-import { docSourceWhere, nextUniqueModuleDoc } from "@/lib/module-docs";
+import { DOC_SEQUENCE_FLOOR, nextPadded } from "@/lib/doc-numbers";
+import { billSequenceFloor, docSourceWhere, nextUniqueModuleDoc } from "@/lib/module-docs";
 import { apiError } from "@/lib/handle-api-error";
 import { requireSession } from "@/lib/api-auth";
 
@@ -34,7 +34,9 @@ export async function GET(req: NextRequest) {
   }
   if (type === "lhc") {
     const rows = await prisma.lhcContract.findMany({ select: { challanNo: true } });
-    return NextResponse.json({ value: nextPadded(rows.map((r) => r.challanNo), 2) });
+    return NextResponse.json({
+      value: nextPadded(rows.map((r) => r.challanNo), 2, DOC_SEQUENCE_FLOOR.lhc),
+    });
   }
   if (type === "party") {
     const rows = await prisma.party.findMany({ select: { id: true, partyCode: true } });
@@ -70,6 +72,8 @@ export async function GET(req: NextRequest) {
         allRows.map((r) => r.billNo),
         2,
         source,
+        undefined,
+        billSequenceFloor(source),
       ),
     });
   }

@@ -40,11 +40,14 @@ export function SearchBillForUpdate({
   }, [bills, source]);
 
   useEffect(() => {
-    Promise.all([api<Bill[]>("/api/bills"), api<Lr[]>("/api/bookings")]).then(([allBills, allLrs]) => {
+    Promise.all([
+      api<Bill[]>(`/api/bills?source=${encodeURIComponent(source)}`),
+      api<Lr[]>(`/api/bookings?source=${encodeURIComponent(source)}`),
+    ]).then(([allBills, allLrs]) => {
       setBills(allBills);
       setBookings(allLrs);
     });
-  }, []);
+  }, [source]);
 
   async function search(e: FormEvent) {
     e.preventDefault();
@@ -53,7 +56,7 @@ export function SearchBillForUpdate({
       return;
     }
 
-    const all = bills.length ? bills : await api<Bill[]>("/api/bills");
+    const all = bills.length ? bills : await api<Bill[]>(`/api/bills?source=${encodeURIComponent(source)}`);
     const found = all.find((b) => {
       if (b.billNo.toLowerCase() !== billNo.trim().toLowerCase()) return false;
       if (source === "ROADWAYS") return (b.source || "DPR") === "ROADWAYS";
@@ -65,7 +68,7 @@ export function SearchBillForUpdate({
       return;
     }
 
-    const linkedAs = (bookings.length ? bookings : await api<Lr[]>("/api/bookings"))
+    const linkedAs = (bookings.length ? bookings : await api<Lr[]>(`/api/bookings?source=${encodeURIComponent(source)}`))
       .filter((lr) => (lr.billNo || "").toLowerCase() === found.billNo.toLowerCase())
       .map((lr) => lr.billAs);
     const meter = isMeterBill(found, linkedAs);

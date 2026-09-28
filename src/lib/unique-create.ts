@@ -1,14 +1,21 @@
 import { getModel, type ResourceKey } from "@/lib/resources";
-import { nextPadded } from "@/lib/doc-numbers";
+import { DOC_SEQUENCE_FLOOR, nextPadded } from "@/lib/doc-numbers";
 import { isUniqueViolation } from "@/lib/handle-api-error";
 import { alreadySavedInstruction, assertUniqueOnCreate } from "@/lib/api-instructions";
-import { docSourceWhere, nextUniqueModuleDoc, normalizeDocSource } from "@/lib/module-docs";
+import {
+  billSequenceFloor,
+  docSourceWhere,
+  nextUniqueModuleDoc,
+  normalizeDocSource,
+} from "@/lib/module-docs";
 import { isUnknownPrismaArg, withoutUnknownArgs } from "@/lib/prisma-retry";
 
-const DOC_RETRY: Partial<Record<ResourceKey, { field: string; width: number; sourceAware?: boolean }>> = {
+const DOC_RETRY: Partial<
+  Record<ResourceKey, { field: string; width: number; sourceAware?: boolean; minNext?: number }>
+> = {
   bookings: { field: "lrNo", width: 3, sourceAware: true },
   bills: { field: "billNo", width: 2, sourceAware: true },
-  lhc: { field: "challanNo", width: 2 },
+  lhc: { field: "challanNo", width: 2, minNext: DOC_SEQUENCE_FLOOR.lhc },
 };
 
 export async function createWithUniqueRetry(resource: ResourceKey, data: Record<string, unknown>) {
@@ -64,11 +71,15 @@ export async function createWithUniqueRetry(resource: ResourceKey, data: Record<
         if (v) taken.add(v);
       }
       const moduleValues = moduleRows.map((row) => row[retry.field] as string | number | null | undefined);
+      const minNext =
+        retry.field === "billNo"
+          ? billSequenceFloor(source)
+          : (retry.minNext ?? 1);
       payload = {
         ...payload,
         [retry.field]: retry.sourceAware
-          ? nextUniqueModuleDoc(moduleValues, [...taken], retry.width, source)
-          : nextPadded([...moduleValues, ...taken], retry.width),
+          ? nextUniqueModuleDoc(moduleValues, [...taken], retry.width, source, undefined, minNext)
+          : nextPadded([...moduleValues, ...taken], retry.width, minNext),
       };
     }
   }

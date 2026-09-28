@@ -118,7 +118,7 @@ async function collectTdsRows(source: DocSource, filters: FilterOpts): Promise<R
   const receipt = filters.receiptNo.trim().toLowerCase();
   const modeFilter = filters.mode === "All" ? "" : filters.mode.toLowerCase();
 
-  const receipts = await api<Receipt[]>("/api/receipts");
+  const receipts = await api<Receipt[]>(`/api/receipts?source=${encodeURIComponent(source)}`);
   const mrRows: Row[] = receipts
     .filter((r) => matchesSource(r.source, source))
     .filter((r) => (Number(r.tdsAmt) || 0) > 0)

@@ -13,6 +13,7 @@ import { api, formToObject } from "@/lib/api-client";
 import { todayIso } from "@/lib/dates";
 import { lrNoEquals } from "@/lib/lr-no";
 import { joinPartyNames, splitPartyNames } from "@/lib/multi-party";
+import { autoLrFreight } from "@/lib/lr-totals";
 type Party = { name: string };
 type Booking = {
   id: number;
@@ -115,7 +116,9 @@ function blankForm(lrNo = "") {
 }
 
 export default function RoadwaysLrPage() {
-  const { rows, message, create, update, remove, setMessage, reload, saving } = useCrud<Booking>("bookings");
+  const { rows, message, create, update, remove, setMessage, reload, saving } = useCrud<Booking>("bookings", {
+    query: "source=ROADWAYS",
+  });
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState(blankForm());
   const [parties, setParties] = useState<Party[]>([]);
@@ -135,6 +138,15 @@ export default function RoadwaysLrPage() {
       const next = { ...prev, ...patch };
       if ("cgstAmt" in patch || "sgstAmt" in patch || "igstAmt" in patch) {
         next.gst = Number(((Number(next.cgstAmt) || 0) + (Number(next.sgstAmt) || 0) + (Number(next.igstAmt) || 0)).toFixed(2));
+      }
+      if ("rate" in patch || "totalMeter" in patch || "chargedWeight" in patch || "billAs" in patch) {
+        const auto = autoLrFreight({
+          billAs: next.billAs,
+          rate: next.rate,
+          totalMeter: next.totalMeter,
+          chargedWeight: next.chargedWeight,
+        });
+        if (auto != null) next.freight = auto;
       }
       return next;
     });

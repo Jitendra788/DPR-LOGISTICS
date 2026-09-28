@@ -22,6 +22,7 @@ import {
   ownedRecordIds,
   shouldScopeToOwner,
 } from "@/lib/data-scope";
+import { docSourceWhere } from "@/lib/module-docs";
 
 type Ctx = { params: Promise<{ resource: string }> };
 
@@ -35,14 +36,25 @@ export async function GET(req: NextRequest, ctx: Ctx) {
 
   try {
     let rows: unknown[];
+    const sourceParam = req.nextUrl.searchParams.get("source");
+    const sourceWhere =
+      sourceParam && (resource === "bookings" || resource === "bills" || resource === "receipts")
+        ? docSourceWhere(sourceParam)
+        : undefined;
 
     if (resource !== "users" && shouldScopeToOwner(session.role) && isOwnerScoped(resource)) {
       const ids = await ownedRecordIds(resource, session.username);
       rows = ids.length
-        ? await getModel(resource).findMany({ where: { id: { in: ids } }, orderBy: { id: "desc" } })
+        ? await getModel(resource).findMany({
+            where: { id: { in: ids }, ...(sourceWhere || {}) },
+            orderBy: { id: "desc" },
+          })
         : [];
     } else {
-      rows = await getModel(resource).findMany({ orderBy: { id: "desc" } });
+      rows = await getModel(resource).findMany({
+        where: sourceWhere || undefined,
+        orderBy: { id: "desc" },
+      });
     }
 
     if (resource === "users") {

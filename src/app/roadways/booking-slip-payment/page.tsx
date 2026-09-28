@@ -207,7 +207,7 @@ export default function BookingSlipPaymentPage() {
     return Number(Math.max(0, outstanding - draft.paidAmt - draft.otherDed - draft.tdsAmt).toFixed(2));
   }
 
-  function updateDraft(id: number, patch: Partial<RowDraft>, outstanding: number, _freight?: number) {
+  function updateDraft(id: number, patch: Partial<RowDraft>, outstanding: number, freight?: number) {
     setDrafts((prev) => {
       const cur = prev[id] ?? {
         tdsPct: 0,
@@ -220,7 +220,9 @@ export default function BookingSlipPaymentPage() {
       const next = { ...cur, ...patch };
       if ("tdsPct" in patch || "paidAmt" in patch || "otherDed" in patch) {
         if (next.tdsPct > 0) {
-          next.tdsAmt = Number(((outstanding * next.tdsPct) / 100).toFixed(2));
+          // TDS on freight (before tax), not outstanding
+          const base = Number(freight) || 0;
+          next.tdsAmt = Number(((base * next.tdsPct) / 100).toFixed(2));
         } else if ("tdsPct" in patch) {
           next.tdsAmt = 0;
         }

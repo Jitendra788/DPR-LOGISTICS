@@ -41,6 +41,7 @@ type Booking = {
   particulars: string;
   chargedWeight: string;
   lhcNo: string;
+  source?: string;
 };
 type Lhc = {
   id: number;
@@ -102,13 +103,14 @@ export default function LorryHireContractPage() {
       api<Vendor[]>("/api/vendors"),
       api<Party[]>("/api/parties"),
       api<Vehicle[]>("/api/vehicles"),
-      api<Booking[]>("/api/bookings"),
+      api<Booking[]>("/api/bookings?source=DPR"),
       api<{ value: string }>("/api/next-no?type=lhc"),
     ]).then(([v, p, veh, b, next]) => {
       setVendors(v);
       setParties(p);
       setVehicles(veh);
-      setBookings(b);
+      // DPR LHC: only logistics LRs (exclude Roadways + Customer)
+      setBookings(b.filter((row) => (row.source || "DPR").toUpperCase() === "DPR"));
       setForm((f) => ({ ...f, challanNo: f.challanNo || next.value }));
     });
   }, []);
@@ -130,7 +132,9 @@ export default function LorryHireContractPage() {
   }, [brokerParties, brokerVendors]);
   const fuelVendors = vendors.filter((v) => v.type === "Fuel" || v.type === "Other").map((v) => v.name);
   const pendingLrs = bookings.filter(
-    (b) => !b.lhcNo || (editId && selectedLrs.some((lr) => lrNoEquals(lr, b.lrNo))),
+    (b) =>
+      (b.source || "DPR").toUpperCase() === "DPR" &&
+      (!b.lhcNo || (editId && selectedLrs.some((lr) => lrNoEquals(lr, b.lrNo)))),
   );
 
   function panFromGst(gst?: string) {
@@ -293,7 +297,11 @@ export default function LorryHireContractPage() {
       dieselLtr: 0,
       fuel: 0,
     });
-    setBookings(await api<Booking[]>("/api/bookings"));
+    setBookings(
+      (await api<Booking[]>("/api/bookings?source=DPR")).filter(
+        (row) => (row.source || "DPR").toUpperCase() === "DPR",
+      ),
+    );
     await reload();
   }
 
@@ -306,7 +314,11 @@ export default function LorryHireContractPage() {
       body: JSON.stringify({ lhcNo: form.challanNo }),
     });
     setEditId(null);
-    setBookings(await api<Booking[]>("/api/bookings"));
+    setBookings(
+      (await api<Booking[]>("/api/bookings?source=DPR")).filter(
+        (row) => (row.source || "DPR").toUpperCase() === "DPR",
+      ),
+    );
   }
 
   function printChallan() {

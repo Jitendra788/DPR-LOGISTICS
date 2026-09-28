@@ -44,7 +44,7 @@ export function MoneyReceiptEdit({
 
   async function showData(e?: FormEvent) {
     e?.preventDefault();
-    const all = await api<Receipt[]>("/api/receipts");
+    const all = await api<Receipt[]>(`/api/receipts?source=${encodeURIComponent(source)}`);
     const filtered = all.filter((r) => {
       if ((r.source || "DPR") !== source) return false;
       const d = (r.date || "").slice(0, 10);

@@ -46,7 +46,7 @@ export async function GET(req: NextRequest, ctx: Ctx) {
   try {
     const rowId = Number(id);
     const row = await getModel(resource).findUnique({ where: { id: rowId } });
-    if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!row) return NextResponse.json({ error: "Not found" }, { status: 404 });
     if (!(await assertCanAccessRecord(auth, resource, rowId))) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest, ctx: Ctx) {
         ),
       );
     }
-    return NextResponse.json(row);
+  return NextResponse.json(row);
   } catch (err) {
     return NextResponse.json({ error: userFacingError(err, "Could not load record") }, { status: 400 });
   }
@@ -202,7 +202,7 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
           }
           return res;
         }
-        const updated = await getModel(resource).update({
+    const updated = await getModel(resource).update({
           where: { id: updateId },
           data:
             resource === "users" && modulesChanged
@@ -219,7 +219,7 @@ export async function PUT(req: NextRequest, ctx: Ctx) {
             }),
           );
         }
-        return NextResponse.json(updated);
+    return NextResponse.json(updated);
       } catch (err) {
         if (!isUnknownPrismaArg(err)) throw err;
         const { data: cleaned, dropped } = withoutUnknownArgs(data, err);

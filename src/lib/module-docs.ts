@@ -1,4 +1,4 @@
-import { nextPadded, padDoc, parseDocNumber } from "@/lib/doc-numbers";
+import { nextPadded, padDoc, parseDocNumber, DOC_SEQUENCE_FLOOR } from "@/lib/doc-numbers";
 
 /** Document module / branch discriminator on LrBooking & Bill. */
 export type DocSource = "DPR" | "ROADWAYS" | "CUSTOMER";
@@ -20,25 +20,24 @@ export function docSourceWhere(source?: string | null) {
   return { source: { not: "ROADWAYS" } };
 }
 
-/** Format a numeric sequence for a module (Roadways → RW-01). */
-export function formatModuleDoc(n: number, width: number, source?: string | null) {
-  const padded = padDoc(n, width);
-  if (normalizeDocSource(source) === "ROADWAYS") {
-    return `${ROADWAYS_DOC_PREFIX}${padded}`;
-  }
-  return padded;
+/**
+ * Format a numeric sequence for a module.
+ * Legacy Roadways bills/LRs are plain numbers (227, 214201055) — no RW- prefix.
+ */
+export function formatModuleDoc(n: number, width: number, _source?: string | null) {
+  return padDoc(n, width);
 }
 
 /**
  * Next LR/Bill number for a module.
- * Roadways uses RW-001… so it never collides with DPR/CUSTOMER sequences.
  */
 export function nextModuleDoc(
   values: Array<string | number | null | undefined>,
   width: number,
   source?: string | null,
+  minNext = 1,
 ) {
-  return formatModuleDoc(parseDocNumber(nextPadded(values, width)), width, source);
+  return formatModuleDoc(parseDocNumber(nextPadded(values, width, minNext)), width, source);
 }
 
 /**
@@ -52,6 +51,7 @@ export function nextUniqueModuleDoc(
   width: number,
   source?: string | null,
   preferred?: string | null,
+  minNext = 1,
 ) {
   const taken = new Set(
     takenValues.map((v) => String(v ?? "").trim()).filter(Boolean),
@@ -61,10 +61,11 @@ export function nextUniqueModuleDoc(
     return preferredTrim;
   }
 
-  let num = parseDocNumber(nextPadded(moduleValues, width));
+  let num = parseDocNumber(nextPadded(moduleValues, width, minNext));
   if (preferredTrim) {
     num = Math.max(num, parseDocNumber(preferredTrim) + 1);
   }
+  num = Math.max(num, minNext);
 
   for (let i = 0; i < 10000; i++) {
     const candidate = formatModuleDoc(num, width, source);
@@ -74,3 +75,9 @@ export function nextUniqueModuleDoc(
 
   throw new Error("Could not assign a unique document number");
 }
+
+export function billSequenceFloor(source?: string | null) {
+  return normalizeDocSource(source) === "ROADWAYS" ? DOC_SEQUENCE_FLOOR.billRoadways : 1;
+}
+
+export { DOC_SEQUENCE_FLOOR };

@@ -109,7 +109,9 @@ export function BillEntryForm({
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { rows, message, update, setMessage, reload } = useCrud<Bill>("bills");
+  const { rows, message, update, setMessage, reload } = useCrud<Bill>("bills", {
+    query: `source=${encodeURIComponent(source)}`,
+  });
   const [parties, setParties] = useState<Party[]>([]);
   const [bookings, setBookings] = useState<LrRow[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -207,7 +209,7 @@ export function BillEntryForm({
     Promise.all([
       api<Party[]>("/api/parties"),
       api<{ value: string }>(`/api/next-no?type=bill&source=${encodeURIComponent(source)}`),
-      api<LrRow[]>("/api/bookings"),
+      api<LrRow[]>(`/api/bookings?source=${encodeURIComponent(source)}`),
     ]).then(([p, next, lrs]) => {
       setParties(p);
       setBookings(lrs);
@@ -269,7 +271,7 @@ export function BillEntryForm({
         method: "POST",
         body: JSON.stringify({ billNo: form.billNo.trim(), lrId: row.id }),
       });
-      const lrs = await api<LrRow[]>("/api/bookings");
+      const lrs = await api<LrRow[]>(`/api/bookings?source=${encodeURIComponent(source)}`);
       setBookings(lrs);
       const remaining = lrs.filter((b) => b.billNo === form.billNo);
       const ids = remaining.map((b) => b.id);
@@ -407,7 +409,7 @@ export function BillEntryForm({
     setSelectedIds([]);
     const [next, lrs] = await Promise.all([
       api<{ value: string }>(`/api/next-no?type=bill&source=${encodeURIComponent(source)}`),
-      api<LrRow[]>("/api/bookings"),
+      api<LrRow[]>(`/api/bookings?source=${encodeURIComponent(source)}`),
     ]);
     setBookings(lrs);
     setForm({

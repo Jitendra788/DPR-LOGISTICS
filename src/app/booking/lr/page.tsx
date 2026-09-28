@@ -13,6 +13,7 @@ import { useCrud } from "@/hooks/useCrud";
 import { api, formToObject } from "@/lib/api-client";
 import { lrNoEquals } from "@/lib/lr-no";
 import { joinPartyNames, splitPartyNames } from "@/lib/multi-party";
+import { autoLrFreight } from "@/lib/lr-totals";
 
 type Party = { id: number; name: string };
 type Booking = {
@@ -120,7 +121,9 @@ function blankLrForm(lrNo = ""): Partial<Booking> {
 
 function LrBookingInner() {
   const searchParams = useSearchParams();
-  const { rows, message, create, update, remove, setMessage, reload, saving } = useCrud<Booking>("bookings");
+  const { rows, message, create, update, remove, setMessage, reload, saving } = useCrud<Booking>("bookings", {
+    query: "source=DPR",
+  });
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState<Partial<Booking>>(blankLrForm());
   const [parties, setParties] = useState<Party[]>([]);
@@ -143,6 +146,15 @@ function LrBookingInner() {
       const igst = Number(next.igstAmt) || 0;
       if ("cgstAmt" in patch || "sgstAmt" in patch || "igstAmt" in patch) {
         next.gst = Number((cgst + sgst + igst).toFixed(2));
+      }
+      if ("rate" in patch || "totalMeter" in patch || "chargedWeight" in patch || "billAs" in patch) {
+        const auto = autoLrFreight({
+          billAs: next.billAs,
+          rate: next.rate,
+          totalMeter: next.totalMeter,
+          chargedWeight: next.chargedWeight,
+        });
+        if (auto != null) next.freight = auto;
       }
       return next;
     });

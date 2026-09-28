@@ -42,17 +42,20 @@ export function BillGenerateForm({
   });
 
   async function loadBills() {
-    setBills(await api<Bill[]>("/api/bills"));
+    setBills(await api<Bill[]>(`/api/bills?source=${encodeURIComponent(source)}`));
   }
 
   useEffect(() => {
-    Promise.all([api<Party[]>("/api/parties"), api<Bill[]>("/api/bills")]).then(
+    Promise.all([
+      api<Party[]>("/api/parties"),
+      api<Bill[]>(`/api/bills?source=${encodeURIComponent(source)}`),
+    ]).then(
       ([p, b]) => {
         setParties(p);
         setBills(b);
       },
     );
-  }, []);
+  }, [source]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
