@@ -41,21 +41,23 @@ export function BillGenerateForm({
     toStation: "",
   });
 
+  const billsUrl = `/api/bills?source=${encodeURIComponent(source ?? "DPR")}`;
+
   async function loadBills() {
-    setBills(await api<Bill[]>(`/api/bills?source=${encodeURIComponent(source)}`));
+    setBills(await api<Bill[]>(billsUrl));
   }
 
   useEffect(() => {
     Promise.all([
       api<Party[]>("/api/parties"),
-      api<Bill[]>(`/api/bills?source=${encodeURIComponent(source)}`),
+      api<Bill[]>(billsUrl),
     ]).then(
       ([p, b]) => {
         setParties(p);
         setBills(b);
       },
     );
-  }, [source]);
+  }, [billsUrl]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
